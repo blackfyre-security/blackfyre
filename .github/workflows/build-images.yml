@@ -1,0 +1,88 @@
+name: Build & Push Images
+
+on:
+  workflow_dispatch:
+    inputs:
+      env:
+        description: "Build images targeting which env (sets NEXT_PUBLIC_API_URL)"
+        type: choice
+        options: [staging, prod]
+        required: true
+  push:
+    branches: [main]
+    paths:
+      - "platform/packages/**"
+      # SECURITY FIX (BLACKFYRE audit 2026-06-05): pipeline drift — the path filter pointed at
+      # "platform/Dockerfile.*", which does not exist (Dockerfiles live at
+      # platform/packages/<service>/Dockerfile). A no-op path filter means Dockerfile changes never
+      # retrigger an image rebuild, so prod could silently run a stale image. Point it at the real
+      # Dockerfile locations (also covered by platform/packages/** above; kept explicit for clarity).
+      - "platform/packages/*/Dockerfile"
+      - ".github/workflows/build-images.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build-push:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [api, admin, portal]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS creds
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:            ap-south-1
+
+      - name: Login to ECR
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Compute build args
+        id: args
+        # SECURITY FIX (BLACKFYRE audit 2026-06-05): defense-in-depth against Actions script
+        # injection — pass workflow expressions through env vars and reference "$VAR" in the shell
+        # rather than inlining ${{ ... }}. inputs.env is a constrained choice and github.sha is a
+        # trusted commit SHA, but routing them via env keeps this file consistent with the no-inline
+        # rule so a future free-form input can't silently become an injection sink. Outputs are
+        # written with the constrained $TARGET_ENV value, never raw expansion.
+        env:
+          TARGET_ENV: ${{ inputs.env || 'staging' }}
+          COMMIT_SHA: ${{ github.sha }}
+        run: |
+          if [ "$TARGET_ENV" = "prod" ]; then
+            echo "api_url=https://api.blackfyre.tech"   >> "$GITHUB_OUTPUT"
+          else
+            echo "api_url=https://api-staging.blackfyre.tech" >> "$GITHUB_OUTPUT"
+          fi
+          echo "tag=${COMMIT_SHA}" >> "$GITHUB_OUTPUT"
+
+      - name: Build & push ${{ matrix.service }}
+        # SECURITY FIX (BLACKFYRE audit 2026-06-05): broken Dockerfile path / pipeline drift — the
+        # job referenced "-f Dockerfile.${{ matrix.service }}" at the platform/ root, but no such
+        # files exist; the real Dockerfiles are at platform/packages/<service>/Dockerfile and (per
+        # their "COPY package*.json ./" + npm workspace steps) require the build context to be the
+        # platform/ workspace root. As written the build would fail outright (a silently broken
+        # release pipeline an operator might "fix" under pressure with an untrusted path). We point
+        # -f at the correct per-service Dockerfile while keeping context "." == platform/.
+        # The service name is matrix-constrained (api|admin|portal), so it is not attacker-controlled.
+        env:
+          REGISTRY: ${{ steps.ecr.outputs.registry }}
+          IMAGE_TAG: ${{ steps.args.outputs.tag }}
+          API_URL: ${{ steps.args.outputs.api_url }}
+          SERVICE: ${{ matrix.service }}
+        working-directory: platform
+        run: |
+          docker build \
+            -f "packages/${SERVICE}/Dockerfile" \
+            -t "$REGISTRY/blackfyre/${SERVICE}:${IMAGE_TAG}" \
+            -t "$REGISTRY/blackfyre/${SERVICE}:latest" \
+            --build-arg "NEXT_PUBLIC_API_URL=${API_URL}" \
+            .
+          docker push "$REGISTRY/blackfyre/${SERVICE}:${IMAGE_TAG}"
+          docker push "$REGISTRY/blackfyre/${SERVICE}:latest"

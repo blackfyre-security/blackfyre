@@ -1,0 +1,483 @@
+{
+  "tenant": {
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "name": "Acme Bank"
+  },
+  "subscription": {
+    "id": "sub-acmebank-prod-001",
+    "name": "acme-bank-production",
+    "displayName": "Acme Bank Production"
+  },
+  "resourceGroups": [
+    { "name": "rg-core-infra", "location": "eastus" },
+    { "name": "rg-data", "location": "eastus2" },
+    { "name": "rg-security", "location": "eastus" },
+    { "name": "rg-devops", "location": "westus2" }
+  ],
+  "storageAccounts": [
+    {
+      "name": "acmedata01",
+      "id": "/subscriptions/sub-acmebank-prod-001/resourceGroups/rg-data/providers/Microsoft.Storage/storageAccounts/acmedata01",
+      "location": "eastus2",
+      "resourceGroup": "rg-data",
+      "enableHttpsTrafficOnly": false,
+      "allowBlobPublicAccess": true,
+      "encryptionKeySource": "Microsoft.Storage",
+      "blobSoftDeleteEnabled": false,
+      "minimumTlsVersion": "TLS1_0",
+      "sensitiveData": true
+    },
+    {
+      "name": "acmedata02",
+      "id": "/subscriptions/sub-acmebank-prod-001/resourceGroups/rg-data/providers/Microsoft.Storage/storageAccounts/acmedata02",
+      "location": "eastus2",
+      "resourceGroup": "rg-data",
+      "enableHttpsTrafficOnly": true,
+      "allowBlobPublicAccess": false,
+      "encryptionKeySource": "Microsoft.Keyvault",
+      "blobSoftDeleteEnabled": true,
+      "minimumTlsVersion": "TLS1_2",
+      "sensitiveData": true
+    },
+    {
+      "name": "acmearchive01",
+      "id": "/subscriptions/sub-acmebank-prod-001/resourceGroups/rg-data/providers/Microsoft.Storage/storageAccounts/acmearchive01",
+      "location": "eastus",
+      "resourceGroup": "rg-data",
+      "enableHttpsTrafficOnly": true,
+      "allowBlobPublicAccess": false,
+      "encryptionKeySource": "Microsoft.Storage",
+      "blobSoftDeleteEnabled": true,
+      "minimumTlsVersion": "TLS1_1",
+      "sensitiveData": true
+    },
+    {
+      "name": "acmelogs01",
+      "id": "/subscriptions/sub-acmebank-prod-001/resourceGroups/rg-core-infra/providers/Microsoft.Storage/storageAccounts/acmelogs01",
+      "location": "eastus",
+      "resourceGroup": "rg-core-infra",
+      "enableHttpsTrafficOnly": true,
+      "allowBlobPublicAccess": false,
+      "encryptionKeySource": "Microsoft.Keyvault",
+      "blobSoftDeleteEnabled": true,
+      "minimumTlsVersion": "TLS1_2",
+      "sensitiveData": false
+    },
+    {
+      "name": "acmebkup01",
+      "id": "/subscriptions/sub-acmebank-prod-001/resourceGroups/rg-devops/providers/Microsoft.Storage/storageAccounts/acmebkup01",
+      "location": "westus2",
+      "resourceGroup": "rg-devops",
+      "enableHttpsTrafficOnly": true,
+      "allowBlobPublicAccess": false,
+      "encryptionKeySource": "Microsoft.Keyvault",
+      "blobSoftDeleteEnabled": true,
+      "minimumTlsVersion": "TLS1_2",
+      "sensitiveData": false
+    },
+    {
+      "name": "acmestatic01",
+      "id": "/subscriptions/sub-acmebank-prod-001/resourceGroups/rg-core-infra/providers/Microsoft.Storage/storageAccounts/acmestatic01",
+      "location": "eastus",
+      "resourceGroup": "rg-core-infra",
+      "enableHttpsTrafficOnly": true,
+      "allowBlobPublicAccess": false,
+      "encryptionKeySource": "Microsoft.Storage",
+      "blobSoftDeleteEnabled": true,
+      "minimumTlsVersion": "TLS1_2",
+      "sensitiveData": false
+    },
+    {
+      "name": "acmeml01",
+      "id": "/subscriptions/sub-acmebank-prod-001/resourceGroups/rg-data/providers/Microsoft.Storage/storageAccounts/acmeml01",
+      "location": "eastus2",
+      "resourceGroup": "rg-data",
+      "enableHttpsTrafficOnly": true,
+      "allowBlobPublicAccess": false,
+      "encryptionKeySource": "Microsoft.Storage",
+      "blobSoftDeleteEnabled": true,
+      "minimumTlsVersion": "TLS1_2",
+      "sensitiveData": true
+    },
+    {
+      "name": "acmediag01",
+      "id": "/subscriptions/sub-acmebank-prod-001/resourceGroups/rg-security/providers/Microsoft.Storage/storageAccounts/acmediag01",
+      "location": "eastus",
+      "resourceGroup": "rg-security",
+      "enableHttpsTrafficOnly": true,
+      "allowBlobPublicAccess": false,
+      "encryptionKeySource": "Microsoft.Keyvault",
+      "blobSoftDeleteEnabled": true,
+      "minimumTlsVersion": "TLS1_2",
+      "sensitiveData": false
+    }
+  ],
+  "keyVaults": [
+    {
+      "name": "kv-prod",
+      "id": "/subscriptions/sub-acmebank-prod-001/resourceGroups/rg-security/providers/Microsoft.KeyVault/vaults/kv-prod",
+      "location": "eastus",
+      "resourceGroup": "rg-security",
+      "enableSoftDelete": false,
+      "enablePurgeProtection": false,
+      "enableRbacAuthorization": false
+    },
+    {
+      "name": "kv-secrets",
+      "id": "/subscriptions/sub-acmebank-prod-001/resourceGroups/rg-core-infra/providers/Microsoft.KeyVault/vaults/kv-secrets",
+      "location": "eastus",
+      "resourceGroup": "rg-core-infra",
+      "enableSoftDelete": true,
+      "enablePurgeProtection": true,
+      "enableRbacAuthorization": true
+    },
+    {
+      "name": "kv-devops",
+      "id": "/subscriptions/sub-acmebank-prod-001/resourceGroups/rg-devops/providers/Microsoft.KeyVault/vaults/kv-devops",
+      "location": "westus2",
+      "resourceGroup": "rg-devops",
+      "enableSoftDelete": true,
+      "enablePurgeProtection": true,
+      "enableRbacAuthorization": true
+    },
+    {
+      "name": "kv-data",
+      "id": "/subscriptions/sub-acmebank-prod-001/resourceGroups/rg-data/providers/Microsoft.KeyVault/vaults/kv-data",
+      "location": "eastus2",
+      "resourceGroup": "rg-data",
+      "enableSoftDelete": true,
+      "enablePurgeProtection": true,
+      "enableRbacAuthorization": true
+    },
+    {
+      "name": "kv-backup",
+      "id": "/subscriptions/sub-acmebank-prod-001/resourceGroups/rg-devops/providers/Microsoft.KeyVault/vaults/kv-backup",
+      "location": "westus2",
+      "resourceGroup": "rg-devops",
+      "enableSoftDelete": true,
+      "enablePurgeProtection": true,
+      "enableRbacAuthorization": true
+    }
+  ],
+  "sqlDatabases": [
+    {
+      "name": "acme-prod",
+      "id": "/subscriptions/sub-acmebank-prod-001/resourceGroups/rg-data/providers/Microsoft.Sql/servers/sql-acme-prod/databases/acme-prod",
+      "serverName": "sql-acme-prod",
+      "resourceGroup": "rg-data",
+      "location": "eastus2",
+      "tdeEnabled": false,
+      "auditingEnabled": false,
+      "threatDetectionEnabled": false,
+      "publicNetworkAccess": "Enabled"
+    },
+    {
+      "name": "acme-reporting",
+      "id": "/subscriptions/sub-acmebank-prod-001/resourceGroups/rg-data/providers/Microsoft.Sql/servers/sql-acme-prod/databases/acme-reporting",
+      "serverName": "sql-acme-prod",
+      "resourceGroup": "rg-data",
+      "location": "eastus2",
+      "tdeEnabled": true,
+      "auditingEnabled": true,
+      "threatDetectionEnabled": false,
+      "publicNetworkAccess": "Enabled"
+    },
+    {
+      "name": "acme-archive",
+      "id": "/subscriptions/sub-acmebank-prod-001/resourceGroups/rg-data/providers/Microsoft.Sql/servers/sql-acme-archive/databases/acme-archive",
+      "serverName": "sql-acme-archive",
+      "resourceGroup": "rg-data",
+      "location": "eastus2",
+      "tdeEnabled": true,
+      "auditingEnabled": true,
+      "threatDetectionEnabled": true,
+      "publicNetworkAccess": "Disabled"
+    },
+    {
+      "name": "acme-dev",
+      "id": "/subscriptions/sub-acmebank-prod-001/resourceGroups/rg-devops/providers/Microsoft.Sql/servers/sql-acme-dev/databases/acme-dev",
+      "serverName": "sql-acme-dev",
+      "resourceGroup": "rg-devops",
+      "location": "westus2",
+      "tdeEnabled": true,
+      "auditingEnabled": false,
+      "threatDetectionEnabled": false,
+      "publicNetworkAccess": "Enabled"
+    },
+    {
+      "name": "acme-staging",
+      "id": "/subscriptions/sub-acmebank-prod-001/resourceGroups/rg-devops/providers/Microsoft.Sql/servers/sql-acme-dev/databases/acme-staging",
+      "serverName": "sql-acme-dev",
+      "resourceGroup": "rg-devops",
+      "location": "westus2",
+      "tdeEnabled": true,
+      "auditingEnabled": true,
+      "threatDetectionEnabled": true,
+      "publicNetworkAccess": "Disabled"
+    },
+    {
+      "name": "acme-analytics",
+      "id": "/subscriptions/sub-acmebank-prod-001/resourceGroups/rg-data/providers/Microsoft.Sql/servers/sql-acme-analytics/databases/acme-analytics",
+      "serverName": "sql-acme-analytics",
+      "resourceGroup": "rg-data",
+      "location": "eastus2",
+      "tdeEnabled": false,
+      "auditingEnabled": true,
+      "threatDetectionEnabled": true,
+      "publicNetworkAccess": "Enabled"
+    }
+  ],
+  "aksClusters": [
+    {
+      "name": "aks-prod",
+      "id": "/subscriptions/sub-acmebank-prod-001/resourceGroups/rg-core-infra/providers/Microsoft.ContainerService/managedClusters/aks-prod",
+      "location": "eastus",
+      "resourceGroup": "rg-core-infra",
+      "rbacEnabled": false,
+      "networkPolicyEnabled": false,
+      "privateCluster": false,
+      "aadIntegrationEnabled": false
+    },
+    {
+      "name": "aks-dev",
+      "id": "/subscriptions/sub-acmebank-prod-001/resourceGroups/rg-devops/providers/Microsoft.ContainerService/managedClusters/aks-dev",
+      "location": "westus2",
+      "resourceGroup": "rg-devops",
+      "rbacEnabled": true,
+      "networkPolicyEnabled": false,
+      "privateCluster": true,
+      "aadIntegrationEnabled": true
+    },
+    {
+      "name": "aks-ml",
+      "id": "/subscriptions/sub-acmebank-prod-001/resourceGroups/rg-data/providers/Microsoft.ContainerService/managedClusters/aks-ml",
+      "location": "eastus2",
+      "resourceGroup": "rg-data",
+      "rbacEnabled": true,
+      "networkPolicyEnabled": true,
+      "privateCluster": true,
+      "aadIntegrationEnabled": true
+    }
+  ],
+  "virtualMachines": [
+    {
+      "name": "vm-jumpbox-01",
+      "id": "/subscriptions/sub-acmebank-prod-001/resourceGroups/rg-core-infra/providers/Microsoft.Compute/virtualMachines/vm-jumpbox-01",
+      "location": "eastus",
+      "resourceGroup": "rg-core-infra",
+      "diskEncryptionEnabled": false,
+      "managedIdentityEnabled": false
+    },
+    {
+      "name": "vm-app-01",
+      "id": "/subscriptions/sub-acmebank-prod-001/resourceGroups/rg-core-infra/providers/Microsoft.Compute/virtualMachines/vm-app-01",
+      "location": "eastus",
+      "resourceGroup": "rg-core-infra",
+      "diskEncryptionEnabled": false,
+      "managedIdentityEnabled": true
+    },
+    {
+      "name": "vm-bastion-01",
+      "id": "/subscriptions/sub-acmebank-prod-001/resourceGroups/rg-security/providers/Microsoft.Compute/virtualMachines/vm-bastion-01",
+      "location": "eastus",
+      "resourceGroup": "rg-security",
+      "diskEncryptionEnabled": true,
+      "managedIdentityEnabled": true
+    },
+    {
+      "name": "vm-build-01",
+      "id": "/subscriptions/sub-acmebank-prod-001/resourceGroups/rg-devops/providers/Microsoft.Compute/virtualMachines/vm-build-01",
+      "location": "westus2",
+      "resourceGroup": "rg-devops",
+      "diskEncryptionEnabled": false,
+      "managedIdentityEnabled": true
+    }
+  ],
+  "rbacAssignments": [
+    {
+      "principalId": "user-alice-001",
+      "principalName": "alice@acmebank.com",
+      "principalType": "User",
+      "roleName": "Owner",
+      "roleDefinitionId": "8e3af657-a8ff-443c-a75c-2fe8c4bcb635",
+      "scope": "/subscriptions/sub-acmebank-prod-001"
+    },
+    {
+      "principalId": "user-bob-002",
+      "principalName": "bob@acmebank.com",
+      "principalType": "User",
+      "roleName": "Owner",
+      "roleDefinitionId": "8e3af657-a8ff-443c-a75c-2fe8c4bcb635",
+      "scope": "/subscriptions/sub-acmebank-prod-001"
+    },
+    {
+      "principalId": "user-carol-003",
+      "principalName": "carol@acmebank.com",
+      "principalType": "User",
+      "roleName": "Owner",
+      "roleDefinitionId": "8e3af657-a8ff-443c-a75c-2fe8c4bcb635",
+      "scope": "/subscriptions/sub-acmebank-prod-001"
+    },
+    {
+      "principalId": "user-david-004",
+      "principalName": "david@acmebank.com",
+      "principalType": "User",
+      "roleName": "Owner",
+      "roleDefinitionId": "8e3af657-a8ff-443c-a75c-2fe8c4bcb635",
+      "scope": "/subscriptions/sub-acmebank-prod-001"
+    },
+    {
+      "principalId": "sp-devops-pipeline-005",
+      "principalName": "sp-devops-pipeline",
+      "principalType": "ServicePrincipal",
+      "roleName": "Contributor",
+      "roleDefinitionId": "b24988ac-6180-42a0-ab88-20f7382dd24c",
+      "scope": "/subscriptions/sub-acmebank-prod-001"
+    },
+    {
+      "principalId": "user-frank-006",
+      "principalName": "frank@acmebank.com",
+      "principalType": "User",
+      "roleName": "Contributor",
+      "roleDefinitionId": "b24988ac-6180-42a0-ab88-20f7382dd24c",
+      "scope": "/subscriptions/sub-acmebank-prod-001"
+    },
+    {
+      "principalId": "guest-vendor-007",
+      "principalName": "vendor@external.com",
+      "principalType": "Guest",
+      "roleName": "Contributor",
+      "roleDefinitionId": "b24988ac-6180-42a0-ab88-20f7382dd24c",
+      "scope": "/subscriptions/sub-acmebank-prod-001/resourceGroups/rg-devops"
+    },
+    {
+      "principalId": "guest-audit-008",
+      "principalName": "auditor@thirdparty.com",
+      "principalType": "Guest",
+      "roleName": "Reader",
+      "roleDefinitionId": "acdd72a7-3385-48ef-bd42-f606fba81ae7",
+      "scope": "/subscriptions/sub-acmebank-prod-001"
+    },
+    {
+      "principalId": "user-grace-009",
+      "principalName": "grace@acmebank.com",
+      "principalType": "User",
+      "roleName": "Reader",
+      "roleDefinitionId": "acdd72a7-3385-48ef-bd42-f606fba81ae7",
+      "scope": "/subscriptions/sub-acmebank-prod-001"
+    },
+    {
+      "principalId": "sp-monitor-010",
+      "principalName": "sp-monitoring",
+      "principalType": "ServicePrincipal",
+      "roleName": "Reader",
+      "roleDefinitionId": "acdd72a7-3385-48ef-bd42-f606fba81ae7",
+      "scope": "/subscriptions/sub-acmebank-prod-001"
+    },
+    {
+      "principalId": "user-henry-011",
+      "principalName": "henry@acmebank.com",
+      "principalType": "User",
+      "roleName": "Owner",
+      "roleDefinitionId": "8e3af657-a8ff-443c-a75c-2fe8c4bcb635",
+      "scope": "/subscriptions/sub-acmebank-prod-001"
+    },
+    {
+      "principalId": "sp-custom-wildcard-012",
+      "principalName": "sp-legacy-automation",
+      "principalType": "ServicePrincipal",
+      "roleName": "CustomRole-LegacyAdmin",
+      "roleDefinitionId": "custom-legacy-admin-role",
+      "scope": "/subscriptions/sub-acmebank-prod-001",
+      "isCustomWildcard": true
+    }
+  ],
+  "networkSecurityGroups": [
+    {
+      "name": "nsg-bastion",
+      "id": "/subscriptions/sub-acmebank-prod-001/resourceGroups/rg-security/providers/Microsoft.Network/networkSecurityGroups/nsg-bastion",
+      "location": "eastus",
+      "resourceGroup": "rg-security",
+      "rules": [
+        {
+          "name": "Allow-SSH-Inbound",
+          "priority": 100,
+          "direction": "Inbound",
+          "access": "Allow",
+          "protocol": "TCP",
+          "sourceAddressPrefix": "0.0.0.0/0",
+          "destinationPortRange": "22"
+        }
+      ],
+      "hasFlowLogs": false
+    },
+    {
+      "name": "nsg-app-tier",
+      "id": "/subscriptions/sub-acmebank-prod-001/resourceGroups/rg-core-infra/providers/Microsoft.Network/networkSecurityGroups/nsg-app-tier",
+      "location": "eastus",
+      "resourceGroup": "rg-core-infra",
+      "rules": [
+        {
+          "name": "Allow-RDP-Inbound",
+          "priority": 200,
+          "direction": "Inbound",
+          "access": "Allow",
+          "protocol": "TCP",
+          "sourceAddressPrefix": "Internet",
+          "destinationPortRange": "3389"
+        },
+        {
+          "name": "Allow-HTTPS-Inbound",
+          "priority": 300,
+          "direction": "Inbound",
+          "access": "Allow",
+          "protocol": "TCP",
+          "sourceAddressPrefix": "Internet",
+          "destinationPortRange": "443"
+        }
+      ],
+      "hasFlowLogs": false
+    },
+    {
+      "name": "nsg-data-tier",
+      "id": "/subscriptions/sub-acmebank-prod-001/resourceGroups/rg-data/providers/Microsoft.Network/networkSecurityGroups/nsg-data-tier",
+      "location": "eastus2",
+      "resourceGroup": "rg-data",
+      "rules": [],
+      "hasFlowLogs": false
+    },
+    {
+      "name": "nsg-devops",
+      "id": "/subscriptions/sub-acmebank-prod-001/resourceGroups/rg-devops/providers/Microsoft.Network/networkSecurityGroups/nsg-devops",
+      "location": "westus2",
+      "resourceGroup": "rg-devops",
+      "rules": [
+        {
+          "name": "Allow-SSH-Inbound",
+          "priority": 100,
+          "direction": "Inbound",
+          "access": "Allow",
+          "protocol": "TCP",
+          "sourceAddressPrefix": "Internet",
+          "destinationPortRange": "22"
+        }
+      ],
+      "hasFlowLogs": true
+    }
+  ],
+  "classicAdmins": [
+    { "emailAddress": "sysadmin@acmebank.com", "role": "ServiceAdministrator" }
+  ],
+  "diagnosticSettings": {
+    "activityLogExported": false,
+    "logAnalyticsWorkspaceConnected": false,
+    "keyVaultDiagnosticsEnabled": false
+  },
+  "defenderPlans": {
+    "servers": "Free",
+    "sqlServers": "Free",
+    "appService": "Off",
+    "storage": "Off",
+    "containers": "Off"
+  }
+}

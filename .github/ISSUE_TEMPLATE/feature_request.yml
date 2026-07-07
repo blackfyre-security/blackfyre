@@ -1,0 +1,33 @@
+name: Feature request
+description: Suggest a new capability or improvement
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem this solves
+      placeholder: "What's the user/customer pain or business need?"
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      placeholder: "Rough sketch. Implementation details optional."
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - "nice-to-have"
+        - "next-quarter"
+        - "blocking-a-customer"
+        - "blocking-our-pitch"
+    validations:
+      required: true

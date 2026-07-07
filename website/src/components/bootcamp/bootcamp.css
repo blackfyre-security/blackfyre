@@ -1,0 +1,225 @@
+/* ════════════════════════════════════════════════════════════════════════
+   AI PRODUCT BUILDER BOOTCAMP — scoped design system
+   Self-contained premium dark theme (Apple × Stripe × Linear). Everything is
+   namespaced under .bp-scope so it never touches the site's Halo tokens or
+   the light/dark theme toggle. Tokens + glass + aurora + motion helpers.
+   ════════════════════════════════════════════════════════════════════════ */
+
+.bp-scope {
+  /* Canvas */
+  --bp-bg: #07080b;
+  --bp-bg-2: #0a0c11;
+  --bp-bg-3: #0e1118;
+
+  /* Type */
+  --bp-fg: #f4f5f7;
+  --bp-fg-muted: #9aa1ad;
+  --bp-fg-dim: #858d9c;
+
+  /* Lines + glass */
+  --bp-border: rgba(255, 255, 255, 0.09);
+  --bp-border-strong: rgba(255, 255, 255, 0.16);
+  --bp-glass: rgba(20, 23, 32, 0.55);
+  --bp-glass-2: rgba(28, 32, 44, 0.7);
+
+  /* Signature accent system — iris → violet → cyan, warm ember for energy */
+  --bp-iris: #7c6cff;
+  --bp-violet: #a855f7;
+  --bp-cyan: #22d3ee;
+  --bp-ember: #ff8a3d;
+  --bp-pink: #ff4d8d;
+  --bp-grad: linear-gradient(120deg, #7c6cff 0%, #a855f7 45%, #22d3ee 100%);
+  --bp-grad-ember: linear-gradient(120deg, #ff8a3d 0%, #ff4d8d 100%);
+  --bp-glow: rgba(124, 108, 255, 0.35);
+
+  position: relative;
+  isolation: isolate;
+  background: var(--bp-bg);
+  color: var(--bp-fg);
+  color-scheme: dark;
+  font-feature-settings: "ss01", "cv01", "cv11";
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* ── Color helpers ─────────────────────────────────────────────── */
+.bp-fg        { color: var(--bp-fg); }
+.bp-muted     { color: var(--bp-fg-muted); }
+.bp-dim       { color: var(--bp-fg-dim); }
+.bp-iris      { color: var(--bp-iris); }
+.bp-ember     { color: var(--bp-ember); }
+
+/* Gradient clip text */
+.bp-grad-text {
+  background: var(--bp-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+.bp-grad-text-ember {
+  background: var(--bp-grad-ember);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ── Glassmorphism ─────────────────────────────────────────────── */
+.bp-glass {
+  background: var(--bp-glass);
+  border: 1px solid var(--bp-border);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  backdrop-filter: blur(16px) saturate(150%);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.06),
+    0 24px 60px -28px rgba(0, 0, 0, 0.7);
+}
+.bp-glass-strong {
+  background: var(--bp-glass-2);
+  border: 1px solid var(--bp-border-strong);
+  -webkit-backdrop-filter: blur(22px) saturate(160%);
+  backdrop-filter: blur(22px) saturate(160%);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.08),
+    0 40px 90px -32px rgba(0, 0, 0, 0.8);
+}
+.bp-hairline { border: 1px solid var(--bp-border); }
+
+/* Gradient hairline frame (premium edge light) */
+.bp-edge {
+  position: relative;
+}
+.bp-edge::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(140deg, rgba(124,108,255,0.5), rgba(34,211,238,0.18) 40%, transparent 70%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* CTA glow */
+.bp-cta-glow {
+  box-shadow: 0 10px 40px -8px var(--bp-glow), inset 0 1px 0 0 rgba(255,255,255,0.25);
+}
+
+/* ── Backdrops ─────────────────────────────────────────────────── */
+.bp-aurora {
+  position: absolute;
+  inset: -20% -10% auto -10%;
+  height: 90%;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(60px);
+  opacity: 0.55;
+  background:
+    radial-gradient(38% 50% at 20% 18%, rgba(124,108,255,0.55), transparent 70%),
+    radial-gradient(34% 46% at 82% 24%, rgba(34,211,238,0.38), transparent 72%),
+    radial-gradient(40% 50% at 60% 80%, rgba(168,85,247,0.30), transparent 75%);
+  background-size: 200% 200%;
+  animation: bpAurora 22s ease-in-out infinite;
+}
+.bp-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    linear-gradient(var(--bp-border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--bp-border) 1px, transparent 1px);
+  background-size: 56px 56px;
+  -webkit-mask-image: radial-gradient(ellipse 75% 60% at 50% 30%, #000 25%, transparent 72%);
+  mask-image: radial-gradient(ellipse 75% 60% at 50% 30%, #000 25%, transparent 72%);
+  opacity: 0.5;
+}
+.bp-noise::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 220px 220px;
+}
+
+/* Soft orb used inside cards/hero visual */
+.bp-orb {
+  border-radius: 9999px;
+  filter: blur(28px);
+  background: var(--bp-grad);
+  opacity: 0.7;
+  animation: bpFloat 9s ease-in-out infinite;
+}
+
+/* ── Keyframes ─────────────────────────────────────────────────── */
+@keyframes bpAurora {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+@keyframes bpFloat {
+  0%, 100% { transform: translateY(0) translateX(0); }
+  50%      { transform: translateY(-16px) translateX(8px); }
+}
+@keyframes bpFloatSlow {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(12px); }
+}
+@keyframes bpShimmer {
+  to { background-position: 200% center; }
+}
+@keyframes bpMarquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+@keyframes bpPulseRing {
+  0%   { transform: scale(0.7); opacity: 0.6; }
+  100% { transform: scale(2.1); opacity: 0; }
+}
+@keyframes bpSpin {
+  to { transform: rotate(360deg); }
+}
+
+.bp-float      { animation: bpFloat 9s ease-in-out infinite; }
+.bp-float-slow { animation: bpFloatSlow 11s ease-in-out infinite; }
+.bp-spin-slow  { animation: bpSpin 32s linear infinite; transform-origin: center; }
+.bp-pulse-ring { animation: bpPulseRing 3s ease-out infinite; transform-origin: center; }
+
+/* Shimmering gradient border line (dividers, progress) */
+.bp-shimmer {
+  background: linear-gradient(90deg, transparent, var(--bp-iris), var(--bp-cyan), transparent);
+  background-size: 200% auto;
+  animation: bpShimmer 4s linear infinite;
+}
+
+/* Marquee track (duplicate children inside) */
+.bp-marquee {
+  display: flex;
+  width: max-content;
+  animation: bpMarquee 28s linear infinite;
+}
+.bp-marquee-wrap:hover .bp-marquee { animation-play-state: paused; }
+
+/* ── A11y / focus ──────────────────────────────────────────────── */
+.bp-scope :focus-visible {
+  outline: 2px solid var(--bp-iris);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* Respect reduced motion globally inside the scope */
+@media (prefers-reduced-motion: reduce) {
+  .bp-scope *,
+  .bp-scope *::before,
+  .bp-scope *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

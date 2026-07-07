@@ -1,0 +1,5 @@
+checkov==3.2.0
+semgrep==1.90.0
+bandit==1.7.10
+boto3==1.35.0
+awslambdaric==2.2.1

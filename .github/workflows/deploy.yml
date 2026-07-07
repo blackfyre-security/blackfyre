@@ -1,0 +1,392 @@
+# Manual-only in the community repo: deploys require maintainer-configured secrets.
+name: Deploy
+
+# Manual deploys only:
+#   workflow_dispatch with stage=demo|staging|prod → --stage <stage>
+#     demo:            just demo Lambda + portal-demo CF Pages
+#     staging/prod:    RDS + Lambdas + scanners + CF Pages (portal[-staging], admin[-staging][, website on prod])
+#
+# Required GitHub secrets (set at repo level on your fork/org's blackfyre repo,
+# e.g. <org>/blackfyre):
+#   AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY   — IAM user with deploy permissions (or migrate to OIDC)
+#   CLOUDFLARE_API_TOKEN                       — Pages:Edit + Zone:DNS:Edit for blackfyre.tech
+#   CLOUDFLARE_ACCOUNT_ID                      — from your Cloudflare dashboard (right sidebar)
+#   SST: DB_MASTER_PASSWORD, JWT_SECRET, ENCRYPTION_MASTER_KEY,
+#        ANTHROPIC_API_KEY, SMTP_PASS, WEBHOOK_SIGNING_SECRET,
+#        GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET,
+#        RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET, RAZORPAY_WEBHOOK_SECRET
+# Required GitHub variable (repo or environment level):
+#   CLOUDFLARE_ZONE_ID                         — zone id for blackfyre.tech (prod-only custom domain)
+
+on:
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: "Stage to deploy (demo|staging|prod)"
+        required: true
+        type: choice
+        options: [demo, staging, prod]
+
+concurrency:
+  # workflow_run events don't expose github.ref_name in the same way as push;
+  # fall back to the upstream workflow's head_branch.
+  group: deploy-${{ github.workflow }}-${{ github.event.inputs.stage || github.event.workflow_run.head_branch || github.ref_name }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  resolve-stage:
+    runs-on: ubuntu-latest
+    # Only run when the upstream CI workflow succeeded (or when a human
+    # manually dispatched). Skipping the whole pipeline if CI failed.
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    outputs:
+      stage: ${{ steps.s.outputs.stage }}
+      ref: ${{ steps.s.outputs.ref }}
+      is_demo: ${{ steps.s.outputs.is_demo }}
+      is_prod: ${{ steps.s.outputs.is_prod }}
+      is_staging: ${{ steps.s.outputs.is_staging }}
+    steps:
+      - id: s
+        run: |
+          # workflow_dispatch: human picks stage + uses the current default
+          # branch.
+          # workflow_run: stage derived from the branch CI ran on
+          # (workflow_run.head_branch); ref to check out = that branch's SHA
+          # (workflow_run.head_sha) so the deploy uses the exact commit CI
+          # validated, not whatever's at HEAD now.
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            STAGE="${{ github.event.inputs.stage }}"
+            REF="${{ github.ref }}"
+          else
+            BRANCH="${{ github.event.workflow_run.head_branch }}"
+            REF="${{ github.event.workflow_run.head_sha }}"
+            case "$BRANCH" in
+              main) STAGE="prod" ;;
+              staging) STAGE="staging" ;;
+              *) echo "unexpected branch: $BRANCH" >&2; exit 1 ;;
+            esac
+          fi
+          echo "stage=$STAGE" >> "$GITHUB_OUTPUT"
+          echo "ref=$REF" >> "$GITHUB_OUTPUT"
+          [ "$STAGE" = "demo" ]    && echo "is_demo=true"    >> "$GITHUB_OUTPUT" || echo "is_demo=false"    >> "$GITHUB_OUTPUT"
+          [ "$STAGE" = "prod" ]    && echo "is_prod=true"    >> "$GITHUB_OUTPUT" || echo "is_prod=false"    >> "$GITHUB_OUTPUT"
+          [ "$STAGE" = "staging" ] && echo "is_staging=true" >> "$GITHUB_OUTPUT" || echo "is_staging=false" >> "$GITHUB_OUTPUT"
+          echo "Resolved stage=$STAGE ref=$REF"
+
+  # ── AWS via SST: API + SSE + workers + scanners + RDS + SQS + S3 ──
+  deploy-sst:
+    needs: resolve-stage
+    runs-on: ubuntu-latest
+    # Bound the infra step. A fresh RDS create (~10m) + ACM cert DNS validation
+    # can legitimately take ~30m; beyond that the deploy is wedged, not slow.
+    # Without this, a hung `sst deploy` (the failure mode seen 2026-06-09) drags
+    # toward the 6h default before anyone notices. Fail fast and visibly instead.
+    timeout-minutes: 40
+    environment: ${{ needs.resolve-stage.outputs.stage }}
+    env:
+      STAGE: ${{ needs.resolve-stage.outputs.stage }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: ap-south-1
+      # Cloudflare creds for the api custom domain (sst.cloudflare.dns() creates
+      # the CNAME + ACM validation records on the blackfyre.tech zone).
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      # cloudflare provider v6 resolves the account from CLOUDFLARE_DEFAULT_ACCOUNT_ID
+      # (the scoped token can't self-determine it).
+      CLOUDFLARE_DEFAULT_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      # Zone id for the prod-only api custom domain (platform/infra/api.ts). The
+      # token lacks Zone:Read, so SST's automatic zone lookup fails without this.
+      CLOUDFLARE_ZONE_ID: ${{ vars.CLOUDFLARE_ZONE_ID }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # Check out the exact SHA CI validated. For workflow_dispatch,
+          # falls back to the dispatched ref. Prevents the
+          # "merge → CI green → another merge → deploy gets new code" race.
+          ref: ${{ needs.resolve-stage.outputs.ref }}
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: platform/package-lock.json
+      - run: npm ci --no-audit --no-fund
+        working-directory: platform
+      - name: Build @blackfyre/shared
+        run: npm run build --workspace=packages/shared
+        working-directory: platform
+      - name: Unlock SST (clear stale locks)
+        run: npx sst unlock --stage "$STAGE" || true
+        working-directory: platform
+      - name: Set SST secrets (staging + prod only — demo has none)
+        if: needs.resolve-stage.outputs.is_demo == 'false'
+        # SST rejects empty secret values. Each set is gated on the GH
+        # Actions secret being non-empty so optional secrets (Anthropic /
+        # SMTP / OAuth / Razorpay) can be added later without breaking the
+        # pipeline. Existing SST values are kept untouched for secrets that
+        # aren't provided here.
+        env:
+          DB_MASTER_PASSWORD: ${{ secrets.DB_MASTER_PASSWORD }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          ENCRYPTION_MASTER_KEY: ${{ secrets.ENCRYPTION_MASTER_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          WEBHOOK_SIGNING_SECRET: ${{ secrets.WEBHOOK_SIGNING_SECRET }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          RAZORPAY_KEY_ID: ${{ secrets.RAZORPAY_KEY_ID }}
+          RAZORPAY_KEY_SECRET: ${{ secrets.RAZORPAY_KEY_SECRET }}
+          RAZORPAY_WEBHOOK_SECRET: ${{ secrets.RAZORPAY_WEBHOOK_SECRET }}
+        run: |
+          set_if_present() {
+            local sst_name="$1"; local value="$2"
+            if [ -n "$value" ]; then
+              npx sst secret set "$sst_name" "$value" --stage "$STAGE"
+            else
+              echo "Skipping $sst_name — GH secret empty/unset; keeping current SST value."
+            fi
+          }
+          set_if_present DbMasterPassword       "$DB_MASTER_PASSWORD"
+          set_if_present JwtSecret              "$JWT_SECRET"
+          set_if_present EncryptionMasterKey    "$ENCRYPTION_MASTER_KEY"
+          set_if_present AnthropicApiKey        "$ANTHROPIC_API_KEY"
+          set_if_present SmtpPass               "$SMTP_PASS"
+          set_if_present WebhookSigningSecret   "$WEBHOOK_SIGNING_SECRET"
+          set_if_present GoogleClientId         "$GOOGLE_CLIENT_ID"
+          set_if_present GoogleClientSecret     "$GOOGLE_CLIENT_SECRET"
+          set_if_present RazorpayKeyId          "$RAZORPAY_KEY_ID"
+          set_if_present RazorpayKeySecret      "$RAZORPAY_KEY_SECRET"
+          set_if_present RazorpayWebhookSecret  "$RAZORPAY_WEBHOOK_SECRET"
+        working-directory: platform
+      - name: Reconcile SST state (clear drift left by interrupted deploys)
+        # An interrupted `sst deploy` — a killed CI run, or a closed local deploy
+        # terminal — leaves resources mid-operation in Pulumi state. The next
+        # deploy then stalls reconciling them. A refresh syncs state with the
+        # real AWS resources first, so deploy starts from truth.
+        #
+        # The existing "Unlock SST" step above clears a stale *lock*; it does NOT
+        # clear stale *operations* — that gap is what this step closes.
+        #
+        # LIMITATION (read before trusting this): refresh reconciles drift and
+        # pending UPDATE/DELETE ops, but Pulumi *pending CREATE* ops still need
+        # an INTERACTIVE `pulumi refresh` and cannot be cleared headlessly. If a
+        # deploy was interrupted mid-create (the staging stack currently has two
+        # such ops: BlackfyreDb + IacScannerImage), follow the manual runbook.
+        run: npx sst refresh --stage "$STAGE"
+        working-directory: platform
+      - name: SST deploy
+        run: npx sst deploy --stage "$STAGE"
+        working-directory: platform
+      - name: Verify cost-allocation tags applied (staging + prod only)
+        if: needs.resolve-stage.outputs.is_demo == 'false'
+        # Guard: provider defaultTags in sst.config.ts should tag every AWS
+        # resource. Assert the RDS instance carries Project + Environment so a
+        # future config regression that drops the tags fails the pipeline
+        # instead of silently breaking Cost Explorer cost-allocation reporting.
+        run: |
+          set -euo pipefail
+          ARN=$(aws rds describe-db-instances --region "$AWS_REGION" \
+            --db-instance-identifier "blackfyre-${STAGE}-sst" \
+            --query 'DBInstances[0].DBInstanceArn' --output text)
+          PROJECT=$(aws rds list-tags-for-resource --region "$AWS_REGION" --resource-name "$ARN" \
+            --query "TagList[?Key=='Project'].Value | [0]" --output text)
+          ENVTAG=$(aws rds list-tags-for-resource --region "$AWS_REGION" --resource-name "$ARN" \
+            --query "TagList[?Key=='Environment'].Value | [0]" --output text)
+          echo "RDS tags -> Project=$PROJECT Environment=$ENVTAG"
+          if [ "$PROJECT" != "Blackfyre" ] || [ "$ENVTAG" != "$STAGE" ]; then
+            echo "::error::Cost-allocation tags missing/incorrect on RDS (Project=$PROJECT Environment=$ENVTAG; expected Blackfyre/$STAGE). Check defaultTags in sst.config.ts."
+            exit 1
+          fi
+          echo "Cost-allocation tags verified."
+        working-directory: platform
+      - name: Run DB migrations (staging + prod only)
+        if: needs.resolve-stage.outputs.is_demo == 'false'
+        run: |
+          set -euo pipefail
+          # Resolve the migrate Lambda name from SST's post-deploy outputs file.
+          # NOTE: there is NO `sst output` subcommand — invoking it just prints
+          # the CLI help text, so the old grep silently matched nothing and this
+          # step hard-failed on every deploy. SST writes stack outputs to
+          # .sst/outputs.json after `sst deploy`; read the name from there.
+          # A missing name is a HARD error, not a skip — silently skipping
+          # migrations is how a half-migrated DB shipped green before.
+          FN=$(node -e 'process.stdout.write((require("./.sst/outputs.json").migrateLambdaName)||"")' 2>/dev/null || true)
+          if [ -z "$FN" ]; then
+            echo "::error::migrateLambdaName not found in .sst/outputs.json — aborting so the DB is never left silently un-migrated."
+            echo "----- .sst/outputs.json was: -----"; cat .sst/outputs.json 2>/dev/null || echo "(missing)"
+            exit 1
+          fi
+          echo "Invoking migrate Lambda: $FN"
+          # Capture invoke metadata (StatusCode/FunctionError) separately from
+          # the function's JSON payload (written to /tmp/migrate.json).
+          RESP=$(aws lambda invoke --function-name "$FN" --region ap-south-1 /tmp/migrate.json)
+          echo "Invoke response: $RESP"
+          echo "----- migrate payload -----"; cat /tmp/migrate.json; echo
+          # Fail on an unhandled Lambda exception ...
+          if printf '%s' "$RESP" | grep -q '"FunctionError"'; then
+            echo "::error::Migrate Lambda returned a FunctionError (unhandled exception). See payload above."
+            exit 1
+          fi
+          # ... and on a handled failure the Lambda reports as { ok: false }.
+          if ! jq -e '.ok == true' /tmp/migrate.json >/dev/null 2>&1; then
+            echo "::error::Migration failed: handler returned ok != true. See .error in the payload above."
+            exit 1
+          fi
+          echo "Migrations OK — $(jq -r '"applied: \(.applied | length), skipped: \(.skipped | length)"' /tmp/migrate.json)"
+        working-directory: platform
+
+  # ── Cloudflare Pages: Demo portal (only on stage=demo) ──
+  deploy-demo-portal:
+    needs: [resolve-stage, deploy-sst]
+    if: needs.resolve-stage.outputs.is_demo == 'true'
+    runs-on: ubuntu-latest
+    environment: demo
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # Check out the exact SHA CI validated. For workflow_dispatch,
+          # falls back to the dispatched ref. Prevents the
+          # "merge → CI green → another merge → deploy gets new code" race.
+          ref: ${{ needs.resolve-stage.outputs.ref }}
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: platform/package-lock.json
+      - run: npm ci --no-audit --no-fund
+        working-directory: platform
+      - run: npm run build --workspace=packages/shared
+        working-directory: platform
+      - name: Build portal pointing at demo Lambda
+        run: npm run build --workspace=packages/portal
+        working-directory: platform
+        env:
+          NEXT_PUBLIC_API_URL: ${{ vars.DEMO_API_URL }}
+          NEXT_PUBLIC_SSE_URL: ""
+          NEXT_PUBLIC_DEMO_MODE: "false"
+      - name: Deploy to blackfyre-portal-demo
+        run: npx wrangler pages deploy out --project-name blackfyre-portal-demo --branch main --commit-dirty=true
+        working-directory: platform/packages/portal
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+  # ── Cloudflare Pages: Portal (staging + prod) ──
+  deploy-portal:
+    needs: [resolve-stage, deploy-sst]
+    if: needs.resolve-stage.outputs.is_demo == 'false'
+    runs-on: ubuntu-latest
+    environment: ${{ needs.resolve-stage.outputs.stage }}
+    env:
+      STAGE: ${{ needs.resolve-stage.outputs.stage }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # Check out the exact SHA CI validated. For workflow_dispatch,
+          # falls back to the dispatched ref. Prevents the
+          # "merge → CI green → another merge → deploy gets new code" race.
+          ref: ${{ needs.resolve-stage.outputs.ref }}
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: platform/package-lock.json
+      - run: npm ci --no-audit --no-fund
+        working-directory: platform
+      - run: npm run build --workspace=packages/shared
+        working-directory: platform
+      - name: Build portal
+        run: npm run build --workspace=packages/portal
+        working-directory: platform
+        env:
+          NEXT_PUBLIC_API_URL: ${{ needs.resolve-stage.outputs.is_prod == 'true' && vars.PROD_API_URL || vars.STAGING_API_URL }}
+          NEXT_PUBLIC_SSE_URL: ${{ needs.resolve-stage.outputs.is_prod == 'true' && vars.PROD_SSE_URL || vars.STAGING_SSE_URL }}
+          NEXT_PUBLIC_DEMO_MODE: "false"
+      - name: Deploy
+        run: |
+          PROJECT="blackfyre-portal"
+          [ "$STAGE" = "staging" ] && PROJECT="blackfyre-portal-staging"
+          npx wrangler pages deploy out --project-name "$PROJECT" --branch main --commit-dirty=true
+        working-directory: platform/packages/portal
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+  # ── Cloudflare Pages: Admin (staging + prod) ──
+  deploy-admin:
+    needs: [resolve-stage, deploy-sst]
+    if: needs.resolve-stage.outputs.is_demo == 'false'
+    runs-on: ubuntu-latest
+    environment: ${{ needs.resolve-stage.outputs.stage }}
+    env:
+      STAGE: ${{ needs.resolve-stage.outputs.stage }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # Check out the exact SHA CI validated. For workflow_dispatch,
+          # falls back to the dispatched ref. Prevents the
+          # "merge → CI green → another merge → deploy gets new code" race.
+          ref: ${{ needs.resolve-stage.outputs.ref }}
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: platform/package-lock.json
+      - run: npm ci --no-audit --no-fund
+        working-directory: platform
+      - run: npm run build --workspace=packages/shared
+        working-directory: platform
+      - name: Build admin
+        run: npm run build --workspace=packages/admin
+        working-directory: platform
+        env:
+          NEXT_PUBLIC_API_URL: ${{ needs.resolve-stage.outputs.is_prod == 'true' && vars.PROD_API_URL || vars.STAGING_API_URL }}
+      - name: Deploy
+        run: |
+          PROJECT="blackfyre-admin"
+          [ "$STAGE" = "staging" ] && PROJECT="blackfyre-admin-staging"
+          npx wrangler pages deploy out --project-name "$PROJECT" --branch main --commit-dirty=true
+        working-directory: platform/packages/admin
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+  # ── Cloudflare Pages: Marketing website (only on prod) ──
+  deploy-website:
+    # Gate the marketing site on a SUCCESSFUL API deploy — otherwise a prod website
+    # could ship pointing at a prod API that failed to deploy.
+    needs: [resolve-stage, deploy-sst]
+    if: needs.resolve-stage.outputs.is_prod == 'true'
+    runs-on: ubuntu-latest
+    environment: prod
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # Check out the exact SHA CI validated. For workflow_dispatch,
+          # falls back to the dispatched ref. Prevents the
+          # "merge → CI green → another merge → deploy gets new code" race.
+          ref: ${{ needs.resolve-stage.outputs.ref }}
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: website/package-lock.json
+      - run: npm ci --no-audit --no-fund
+        working-directory: website
+      - run: npm run build
+        working-directory: website
+        env:
+          # Baked into the static export at build time. The marketing contact
+          # form (ContactForm.tsx) POSTs to `${NEXT_PUBLIC_API_URL}/api/v1/contact`;
+          # without this it falls back to a relative path that 404s. deploy-website
+          # only runs on prod, so this is always the prod API.
+          NEXT_PUBLIC_API_URL: ${{ vars.PROD_API_URL }}
+      - name: Deploy to Cloudflare Pages
+        run: npx wrangler pages deploy out --project-name blackfyre --branch main --commit-dirty=true
+        working-directory: website
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

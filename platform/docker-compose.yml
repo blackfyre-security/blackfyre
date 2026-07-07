@@ -1,0 +1,214 @@
+# Full local stack — mirrors what will run on AWS in production.
+#
+# Usage:
+#   docker compose up -d --build
+#   # then edit your hosts file once:
+#   #   127.0.0.1 api.blackfyre.local admin.blackfyre.local app.blackfyre.local
+#   open http://admin.blackfyre.local
+#
+# Services:
+#   postgres       — Postgres 16 (production: RDS)
+#   redis          — Redis 7 (production: ElastiCache)
+#   localstack     — emulates SQS + S3 (production: AWS SQS + S3)
+#   migrate        — one-shot, runs DB migrations then exits
+#   api            — Fastify on :4000
+#   worker-scan    — long-poll loop on ScanJobsQueue
+#   worker-monitor — long-poll loop on MonitorJobsQueue
+#   worker-ai      — long-poll loop on AiJobsQueue
+#   worker-evidence— long-poll loop on EvidenceJobsQueue
+#   admin          — Next.js standalone on :3003
+#   portal         — Next.js standalone on :3001
+#   nginx          — reverse proxy on :80 (subdomain routing)
+
+x-api-build: &api-build
+  context: .
+  dockerfile: Dockerfile.api
+
+x-api-env: &api-env
+  # docker-compose is for LOCAL development. Production deploys go via
+  # ECS task definitions with real secrets (no "dev-only-" defaults).
+  NODE_ENV: development
+  DATABASE_URL: postgres://blackfyre:blackfyre_dev@postgres:5432/blackfyre
+  REDIS_URL: redis://:blackfyre_redis_dev@redis:6379
+  JWT_SECRET: dev-only-jwt-secret-32-characters-min-replace-in-prod!!
+  CORS_ORIGINS: http://admin.blackfyre.local,http://app.blackfyre.local
+  AWS_REGION: ap-south-1
+  AWS_ACCESS_KEY_ID: test
+  AWS_SECRET_ACCESS_KEY: test
+  SQS_ENDPOINT: http://localstack:4566
+  SCAN_QUEUE_URL: http://localstack:4566/000000000000/ScanJobsQueue
+  MONITOR_QUEUE_URL: http://localstack:4566/000000000000/MonitorJobsQueue
+  AI_QUEUE_URL: http://localstack:4566/000000000000/AiJobsQueue
+  EVIDENCE_QUEUE_URL: http://localstack:4566/000000000000/EvidenceJobsQueue
+  EVIDENCE_BUCKET: blackfyre-evidence-local
+  SCAN_ARTIFACTS_BUCKET: blackfyre-scan-artifacts-local
+  ENCRYPTION_MASTER_KEY: dev-encryption-key-32-characters!!
+  SMTP_HOST: ""
+  ANTHROPIC_API_KEY: ""
+
+services:
+  # ---------------- Stateful infra ----------------
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: blackfyre
+      POSTGRES_USER: blackfyre
+      POSTGRES_PASSWORD: blackfyre_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/postgres-init.sql:/docker-entrypoint-initdb.d/00-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U blackfyre -d blackfyre"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --requirepass blackfyre_redis_dev
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "blackfyre_redis_dev", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  localstack:
+    image: localstack/localstack:3
+    ports:
+      - "4566:4566"
+    environment:
+      SERVICES: sqs,s3
+      DEFAULT_REGION: ap-south-1
+      AWS_DEFAULT_REGION: ap-south-1
+      DEBUG: 0
+    volumes:
+      - ./docker/localstack/init.sh:/etc/localstack/init/ready.d/init.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "awslocal sqs list-queues | grep -q ScanJobsQueue"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+  # ---------------- One-shot migration ----------------
+  migrate:
+    build: *api-build
+    command: ["node", "packages/api/dist/db/migrate.js"]
+    environment:
+      <<: *api-env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  # ---------------- API ----------------
+  api:
+    build: *api-build
+    ports:
+      - "4000:4000"
+    environment:
+      <<: *api-env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      localstack:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+
+  # ---------------- Workers (same image, different CMD) ----------------
+  worker-scan:
+    build: *api-build
+    command: ["node", "packages/api/dist/workers/poller-scan.js"]
+    environment:
+      <<: *api-env
+    healthcheck:
+      disable: true
+    depends_on:
+      api:
+        condition: service_healthy
+
+  worker-monitor:
+    build: *api-build
+    command: ["node", "packages/api/dist/workers/poller-monitor.js"]
+    environment:
+      <<: *api-env
+    healthcheck:
+      disable: true
+    depends_on:
+      api:
+        condition: service_healthy
+
+  worker-ai:
+    build: *api-build
+    command: ["node", "packages/api/dist/workers/poller-ai.js"]
+    environment:
+      <<: *api-env
+    healthcheck:
+      disable: true
+    depends_on:
+      api:
+        condition: service_healthy
+
+  worker-evidence:
+    build: *api-build
+    command: ["node", "packages/api/dist/workers/poller-evidence.js"]
+    environment:
+      <<: *api-env
+    healthcheck:
+      disable: true
+    depends_on:
+      api:
+        condition: service_healthy
+
+  # ---------------- Frontends ----------------
+  admin:
+    build:
+      context: .
+      dockerfile: Dockerfile.admin
+      args:
+        # Browser-side calls go via nginx, which proxies api.blackfyre.local
+        # to the api container. Both have to resolve from the host.
+        NEXT_PUBLIC_API_URL: http://api.blackfyre.local
+    ports:
+      - "3003:3003"
+    depends_on:
+      api:
+        condition: service_healthy
+
+  portal:
+    build:
+      context: .
+      dockerfile: Dockerfile.portal
+      args:
+        NEXT_PUBLIC_API_URL: http://api.blackfyre.local
+        NEXT_PUBLIC_DEMO_MODE: "false"
+    ports:
+      - "3001:3001"
+    depends_on:
+      api:
+        condition: service_healthy
+
+  # ---------------- Reverse proxy ----------------
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      api:
+        condition: service_healthy
+      admin:
+        condition: service_started
+      portal:
+        condition: service_started
+
+volumes:
+  pgdata:

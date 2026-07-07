@@ -1,0 +1,10 @@
+# Cloudflare Pages routing for static-export Next.js dynamic routes.
+# Without these, /findings/123 returns 404 because next build doesn't pre-generate
+# every possible id. We serve the same [id] shell HTML and let useParams() read
+# the actual id from the URL client-side.
+/findings/*  /findings/[id]/index.html  200
+/scans/*     /scans/[id]/index.html     200
+
+# SPA fallback: any other unknown route hits the root index, client-side router
+# handles 404 inside the app.
+/*  /index.html  200

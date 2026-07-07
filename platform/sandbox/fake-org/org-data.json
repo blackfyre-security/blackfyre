@@ -1,0 +1,223 @@
+{
+  "account": { "id": "123456789012", "alias": "acme-bank" },
+  "iam": {
+    "users": [
+      {
+        "name": "alice",
+        "arn": "arn:aws:iam::123456789012:user/alice",
+        "consoleEnabled": true,
+        "passwordLastUsed": "2024-01-15T10:00:00Z",
+        "mfaDevices": [],
+        "accessKeys": [{ "id": "AKIAIOSFODNN7ALICE001", "status": "Active" }]
+      },
+      {
+        "name": "bob",
+        "arn": "arn:aws:iam::123456789012:user/bob",
+        "consoleEnabled": true,
+        "passwordLastUsed": "2024-02-01T08:30:00Z",
+        "mfaDevices": [{ "serialNumber": "arn:aws:iam::123456789012:mfa/bob" }],
+        "accessKeys": []
+      },
+      {
+        "name": "carol",
+        "arn": "arn:aws:iam::123456789012:user/carol",
+        "consoleEnabled": true,
+        "passwordLastUsed": "2024-03-10T14:20:00Z",
+        "mfaDevices": [],
+        "accessKeys": [{ "id": "AKIAIOSFODNN7CAROL01", "status": "Active" }]
+      },
+      {
+        "name": "david",
+        "arn": "arn:aws:iam::123456789012:user/david",
+        "consoleEnabled": false,
+        "passwordLastUsed": null,
+        "mfaDevices": [],
+        "accessKeys": [{ "id": "AKIAIOSFODNN7DAVID01", "status": "Active" }]
+      },
+      {
+        "name": "eve",
+        "arn": "arn:aws:iam::123456789012:user/eve",
+        "consoleEnabled": true,
+        "passwordLastUsed": "2024-04-05T09:00:00Z",
+        "mfaDevices": [{ "serialNumber": "arn:aws:iam::123456789012:mfa/eve" }],
+        "accessKeys": []
+      },
+      {
+        "name": "frank",
+        "arn": "arn:aws:iam::123456789012:user/frank",
+        "consoleEnabled": true,
+        "passwordLastUsed": "2024-01-20T11:45:00Z",
+        "mfaDevices": [],
+        "accessKeys": [{ "id": "AKIAIOSFODNN7FRANK01", "status": "Active" }]
+      },
+      {
+        "name": "service-deploy",
+        "arn": "arn:aws:iam::123456789012:user/service-deploy",
+        "consoleEnabled": false,
+        "passwordLastUsed": null,
+        "mfaDevices": [],
+        "accessKeys": [{ "id": "AKIAIOSFODNN7SVCDE01", "status": "Active" }]
+      },
+      {
+        "name": "service-monitoring",
+        "arn": "arn:aws:iam::123456789012:user/service-monitoring",
+        "consoleEnabled": false,
+        "passwordLastUsed": null,
+        "mfaDevices": [],
+        "accessKeys": [{ "id": "AKIAIOSFODNN7SVCMO01", "status": "Active" }]
+      }
+    ],
+    "rootHasAccessKeys": true,
+    "rootMfaEnabled": false,
+    "passwordPolicy": {
+      "minimumPasswordLength": 6,
+      "requireSymbols": false,
+      "requireNumbers": false,
+      "requireUppercase": false,
+      "requireLowercase": true,
+      "maxPasswordAge": 0
+    },
+    "policies": [
+      {
+        "name": "WildcardAdmin",
+        "arn": "arn:aws:iam::123456789012:policy/WildcardAdmin",
+        "document": {
+          "Version": "2012-10-17",
+          "Statement": [{ "Effect": "Allow", "Action": "*", "Resource": "*" }]
+        }
+      },
+      {
+        "name": "S3ReadOnly",
+        "arn": "arn:aws:iam::123456789012:policy/S3ReadOnly",
+        "document": {
+          "Version": "2012-10-17",
+          "Statement": [{ "Effect": "Allow", "Action": "s3:GetObject", "Resource": "arn:aws:s3:::acme-customer-data/*" }]
+        }
+      }
+    ]
+  },
+  "s3": {
+    "buckets": [
+      {
+        "name": "acme-public-uploads",
+        "publicAccessBlock": false,
+        "encrypted": false,
+        "versioned": false,
+        "logging": false
+      },
+      {
+        "name": "acme-customer-data",
+        "publicAccessBlock": true,
+        "encrypted": true,
+        "versioned": true,
+        "logging": true
+      },
+      {
+        "name": "acme-backups",
+        "publicAccessBlock": true,
+        "encrypted": false,
+        "versioned": false,
+        "logging": false
+      },
+      {
+        "name": "acme-logs",
+        "publicAccessBlock": true,
+        "encrypted": true,
+        "versioned": false,
+        "logging": false
+      },
+      {
+        "name": "acme-static-assets",
+        "publicAccessBlock": false,
+        "encrypted": false,
+        "versioned": false,
+        "logging": false
+      },
+      {
+        "name": "acme-internal-docs",
+        "publicAccessBlock": true,
+        "encrypted": true,
+        "versioned": true,
+        "logging": true
+      }
+    ]
+  },
+  "ec2": {
+    "securityGroups": [
+      {
+        "id": "sg-001",
+        "name": "prod-web",
+        "vpcId": "vpc-abc123",
+        "ingress": [
+          { "from": 80, "to": 80, "protocol": "tcp", "cidr": "0.0.0.0/0" },
+          { "from": 443, "to": 443, "protocol": "tcp", "cidr": "0.0.0.0/0" }
+        ],
+        "egress": [
+          { "from": -1, "to": -1, "protocol": "-1", "cidr": "0.0.0.0/0" }
+        ]
+      },
+      {
+        "id": "sg-002",
+        "name": "bastion",
+        "vpcId": "vpc-abc123",
+        "ingress": [
+          { "from": 22, "to": 22, "protocol": "tcp", "cidr": "0.0.0.0/0" }
+        ],
+        "egress": [
+          { "from": -1, "to": -1, "protocol": "-1", "cidr": "0.0.0.0/0" }
+        ]
+      },
+      {
+        "id": "sg-003",
+        "name": "db-internal",
+        "vpcId": "vpc-abc123",
+        "ingress": [
+          { "from": 5432, "to": 5432, "protocol": "tcp", "cidr": "10.0.0.0/8" }
+        ],
+        "egress": [
+          { "from": -1, "to": -1, "protocol": "-1", "cidr": "0.0.0.0/0" }
+        ]
+      },
+      {
+        "id": "sg-004",
+        "name": "dev-all-open",
+        "vpcId": "vpc-abc123",
+        "ingress": [
+          { "from": 22, "to": 22, "protocol": "tcp", "cidr": "0.0.0.0/0" },
+          { "from": 3389, "to": 3389, "protocol": "tcp", "cidr": "0.0.0.0/0" }
+        ],
+        "egress": [
+          { "from": -1, "to": -1, "protocol": "-1", "cidr": "0.0.0.0/0" }
+        ]
+      }
+    ],
+    "volumes": [
+      { "id": "vol-001", "encrypted": false, "size": 100, "type": "gp3", "az": "us-east-1a" },
+      { "id": "vol-002", "encrypted": true, "size": 500, "type": "gp3", "az": "us-east-1b" },
+      { "id": "vol-003", "encrypted": false, "size": 50, "type": "gp2", "az": "us-east-1a" }
+    ]
+  },
+  "cloudtrail": {
+    "trails": []
+  },
+  "kms": {
+    "keys": [
+      {
+        "id": "key-001aaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+        "arn": "arn:aws:kms:us-east-1:123456789012:key/key-001aaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+        "rotationEnabled": false,
+        "state": "Enabled",
+        "manager": "CUSTOMER",
+        "spec": "SYMMETRIC_DEFAULT"
+      },
+      {
+        "id": "key-002aaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+        "arn": "arn:aws:kms:us-east-1:123456789012:key/key-002aaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+        "rotationEnabled": true,
+        "state": "Enabled",
+        "manager": "CUSTOMER",
+        "spec": "SYMMETRIC_DEFAULT"
+      }
+    ]
+  }
+}

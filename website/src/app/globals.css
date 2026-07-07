@@ -1,0 +1,406 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------------------------------------------------------------------------
+ * Halo design tokens
+ * Defaults = dark palette. [data-theme="light"] overrides on <html>.
+ * Accent palette is swappable at runtime via [data-accent="..."] for
+ * chartreuse (default), electric, violet, tangerine, mint.
+ * ------------------------------------------------------------------------- */
+:root,
+[data-theme="dark"] {
+  --bg: #0a0a0b;
+  --surface: #121214;
+  --surface-alt: #18181b;
+  --text: #ececee;
+  --muted: #8a8a92;
+  --dim: #5a5a60;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.14);
+  /* rgb triplet for neutral "cell" tints (e.g. scanning matrix dim cells) */
+  --cell-rgb: 255, 255, 255;
+
+  --accent: #c6f24e;
+  --accent-rgb: 198, 242, 78;
+  --accent-2: #7c3aed;
+  --accent-glow: rgba(198, 242, 78, 0.12);
+  --accent-ink: #0a0a0b;
+
+  /* Brand cool — pulled from the Blackfyre logomark's blue. Used sparingly
+     (eyebrows, mono labels, secondary accents) to give the tangerine-led
+     surface a complementary cool note instead of relying on text-text-muted
+     greys everywhere. */
+  --brand-cool: #2d7ff9;
+  --brand-cool-rgb: 45, 127, 249;
+
+  --warn: #f59e0b;
+  --crit: #f43f5e;
+
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-halo-word: cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+[data-theme="light"] {
+  --bg: #fafaf7;
+  --surface: #ffffff;
+  --surface-alt: #f4f4ef;
+  --text: #0a0a0b;
+  --muted: #65656b;
+  --dim: #9a9a9e;
+  --border: rgba(0, 0, 0, 0.08);
+  --border-strong: rgba(0, 0, 0, 0.14);
+  --cell-rgb: 10, 10, 11;
+  --accent-glow: rgba(198, 242, 78, 0.22);
+  --accent-ink: #0a0a0b;
+}
+
+[data-accent="electric"]   { --accent: #5ee3ff; --accent-rgb: 94, 227, 255; --accent-glow: rgba(94, 227, 255, 0.14); }
+[data-accent="violet"]     { --accent: #a78bfa; --accent-rgb: 167, 139, 250; --accent-glow: rgba(167, 139, 250, 0.14); }
+[data-accent="tangerine"]  { --accent: #ff7a3d; --accent-rgb: 255, 122, 61; --accent-glow: rgba(255, 122, 61, 0.14); --accent-ink: #0a0a0b; }
+[data-accent="mint"]       { --accent: #4ade80; --accent-rgb: 74, 222, 128; --accent-glow: rgba(74, 222, 128, 0.14); }
+
+/* ---------------------------------------------------------------------------
+ * Base layout
+ * ------------------------------------------------------------------------- */
+html {
+  scroll-behavior: smooth;
+  background-color: var(--bg);
+  color: var(--text);
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Subtle noise on dark; removed on light to keep the paper feel */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.012;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+}
+[data-theme="light"] body::after { opacity: 0; }
+
+/* Avoid theme-swap flash on hydration — written by the inline script in layout.tsx */
+html.no-transitions *,
+html.no-transitions *::before,
+html.no-transitions *::after {
+  transition: none !important;
+}
+
+/* ---------------------------------------------------------------------------
+ * Halo keyframes — kept in :global CSS so any page component can reference
+ * them by name without having to import anything. Tailwind utilities above
+ * alias the most common ones (animate-halo-word-in, animate-halo-pulse, etc).
+ * ------------------------------------------------------------------------- */
+@keyframes haloWordIn {
+  from { opacity: 0; transform: translateY(12px); filter: blur(6px); }
+  to   { opacity: 1; transform: none; filter: blur(0); }
+}
+@keyframes halopulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.55; transform: scale(0.92); }
+}
+@keyframes halocursor {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+@keyframes haloslidein {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes halofadeup {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* ---------------------------------------------------------------------------
+ * Halo primitives — small utility classes that read across every page.
+ * ------------------------------------------------------------------------- */
+.halo-hairline {
+  height: 1px;
+  background: var(--border);
+}
+
+.halo-label {
+  font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.halo-eyebrow {
+  font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--brand-cool);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.halo-live-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent);
+}
+
+.halo-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.halo-card-strong {
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 14px;
+}
+
+.halo-btn-accent {
+  font-family: inherit;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  background: var(--accent);
+  color: var(--accent-ink);
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 0 1px var(--accent), 0 8px 28px -8px var(--accent);
+  transition: transform 180ms var(--ease-out-quint), box-shadow 180ms var(--ease-out-quint);
+  will-change: transform;
+}
+.halo-btn-accent:hover { transform: translateY(-1px); box-shadow: 0 0 0 1px var(--accent), 0 12px 32px -8px var(--accent); }
+.halo-btn-accent:active { transform: scale(0.98); }
+
+.halo-btn-ghost {
+  font-family: inherit;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border-strong);
+  padding: 12px 20px;
+  border-radius: 8px;
+  transition: background 160ms var(--ease-out-quint), border-color 160ms var(--ease-out-quint), transform 180ms var(--ease-out-quint);
+  will-change: transform;
+}
+.halo-btn-ghost:hover { background: var(--surface-alt); border-color: var(--border-strong); transform: translateY(-1px); }
+.halo-btn-ghost:active { transform: scale(0.98); }
+
+/* Arrow-nudge primitive. Wrap the trailing arrow char in a <span class="halo-arrow">→</span>
+ * and on hover of any parent with `.halo-arrow-parent` the arrow shifts right. Used on
+ * CTAs with a `→` suffix — purely decorative, disabled under reduced-motion via the
+ * global `transition-duration: 0.001ms` reset. */
+.halo-arrow {
+  display: inline-block;
+  transition: transform 180ms var(--ease-out-quint);
+  will-change: transform;
+}
+.halo-btn-accent:hover .halo-arrow,
+.halo-btn-ghost:hover .halo-arrow,
+.halo-arrow-parent:hover .halo-arrow,
+a:hover > .halo-arrow {
+  transform: translateX(4px);
+}
+
+/* Hover lift for cards that don't already define their own hover treatment.
+ * Use on a `.halo-card` variant — GPU-only (transform + border-color). */
+.halo-card-hover {
+  transition: transform 180ms var(--ease-out-quint), border-color 180ms var(--ease-out-quint);
+  will-change: transform;
+}
+.halo-card-hover:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-strong);
+}
+
+/* Shared focus-visible ring for interactive halo controls. Only shows on
+ * keyboard/AT focus — pointer clicks never see it. */
+.halo-btn-accent:focus-visible,
+.halo-btn-ghost:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent);
+}
+
+/* Italic accent words used across display headings */
+.halo-italic {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--accent);
+}
+
+/* Hero radial glow (static layer) */
+.halo-hero-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 900px 400px at 80% 10%, var(--accent-glow), transparent 60%);
+}
+
+/* Reveal-on-scroll container kept from previous revamp — same API, Halo motion */
+.reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 520ms var(--ease-out-quint), transform 520ms var(--ease-out-quint);
+  will-change: opacity, transform;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Section separator */
+.halo-section-rule {
+  border-top: 1px solid var(--border);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   COHORT PAGE — high-motion layer
+   Scoped keyframes + helpers for /cohort. The universal
+   prefers-reduced-motion rule below neutralises all of these for
+   users who ask for less motion.
+   ════════════════════════════════════════════════════════════════ */
+@keyframes coFloat {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-14px); }
+}
+@keyframes coFloatSlow {
+  0%, 100% { transform: translateY(0) translateX(0); }
+  50%      { transform: translateY(10px) translateX(6px); }
+}
+@keyframes coOrbit {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes coOrbitRev {
+  from { transform: rotate(360deg); }
+  to   { transform: rotate(0deg); }
+}
+@keyframes coSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes coScan {
+  0%   { transform: translateY(-40%); opacity: 0; }
+  15%  { opacity: 0.9; }
+  85%  { opacity: 0.9; }
+  100% { transform: translateY(140%); opacity: 0; }
+}
+@keyframes coDraw {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes coPulseRing {
+  0%   { transform: scale(0.6); opacity: 0.7; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+@keyframes coMarquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+@keyframes coGradientPan {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+@keyframes coTwinkle {
+  0%, 100% { opacity: 0.15; }
+  50%      { opacity: 0.9; }
+}
+@keyframes coShieldGlow {
+  0%, 100% { filter: drop-shadow(0 0 6px var(--accent-glow)); }
+  50%      { filter: drop-shadow(0 0 22px var(--accent-glow)); }
+}
+@keyframes coDashFlow {
+  to { stroke-dashoffset: -200; }
+}
+
+.co-float        { animation: coFloat 6s ease-in-out infinite; }
+.co-float-slow   { animation: coFloatSlow 9s ease-in-out infinite; }
+.co-orbit        { animation: coOrbit 28s linear infinite; transform-origin: center; }
+.co-orbit-rev    { animation: coOrbitRev 40s linear infinite; transform-origin: center; }
+.co-spin-slow    { animation: coSpin 60s linear infinite; transform-origin: center; }
+.co-scan         { animation: coScan 4.5s cubic-bezier(0.4,0,0.2,1) infinite; }
+.co-shield-glow  { animation: coShieldGlow 4s ease-in-out infinite; }
+.co-twinkle      { animation: coTwinkle 3s ease-in-out infinite; }
+.co-pulse-ring   { animation: coPulseRing 3s ease-out infinite; transform-origin: center; }
+.co-dash-flow    { stroke-dasharray: 6 10; animation: coDashFlow 5s linear infinite; }
+
+/* Line-draw illustration: hidden until .is-visible toggles the run */
+.co-draw {
+  stroke-dasharray: var(--co-len, 1200);
+  stroke-dashoffset: var(--co-len, 1200);
+}
+.co-draw.is-visible { animation: coDraw 1.6s var(--ease-out-quint) forwards; }
+
+/* Animated mesh / aurora background */
+.co-aurora {
+  background:
+    radial-gradient(40% 50% at 18% 20%, var(--accent-glow), transparent 70%),
+    radial-gradient(38% 48% at 82% 24%, color-mix(in oklab, var(--accent-2) 30%, transparent), transparent 72%),
+    radial-gradient(45% 55% at 60% 90%, color-mix(in oklab, var(--accent) 16%, transparent), transparent 75%);
+  background-size: 180% 180%;
+  animation: coGradientPan 18s ease-in-out infinite;
+}
+
+/* Marquee track (duplicate children, wrapper hides overflow) */
+.co-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: coMarquee 32s linear infinite;
+}
+.co-marquee-wrap:hover .co-marquee-track { animation-play-state: paused; }
+
+/* Vertical timeline progress rail */
+.co-rail-fill {
+  transform-origin: top;
+  transform: scaleY(var(--co-progress, 0));
+  transition: transform 120ms linear;
+}
+
+/* Tilt-on-hover card lift used on cohort cards */
+.co-tilt {
+  transition: transform 320ms var(--ease-out-quint), box-shadow 320ms var(--ease-out-quint), border-color 320ms ease;
+  transform: perspective(900px) translateZ(0);
+}
+.co-tilt:hover {
+  transform: perspective(900px) translateY(-6px) rotateX(2deg);
+  box-shadow: 0 30px 60px -28px rgba(0,0,0,0.55);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .reveal { opacity: 1; transform: none; }
+  .co-draw { stroke-dashoffset: 0 !important; }
+  .co-rail-fill { transform: scaleY(1) !important; }
+  .halo-arrow,
+  .halo-card-hover,
+  .halo-btn-accent,
+  .halo-btn-ghost,
+  .co-tilt { transform: none !important; }
+}

@@ -1,0 +1,2968 @@
+{
+  "timestamp": "2026-05-07T08:19:03.332Z",
+  "totalFindings": 39,
+  "findingsBySeverity": {
+    "critical": 14,
+    "high": 9,
+    "medium": 12,
+    "low": 4
+  },
+  "findingsByCategory": {
+    "iam": 15,
+    "config": 6,
+    "encryption": 6,
+    "logging": 5,
+    "network": 7
+  },
+  "findings": [
+    {
+      "title": "IAM user \"alice\" has no MFA device",
+      "description": "IAM user alice does not have any MFA device configured. This allows password-only authentication which is vulnerable to credential theft.",
+      "severity": "critical",
+      "category": "iam",
+      "resourceType": "AWS::IAM::User",
+      "resourceId": "arn:aws:iam::123456789012:user/alice",
+      "remediationTier": "manual",
+      "autoFixAvailable": false,
+      "controlMappings": [
+        {
+          "framework": "soc2",
+          "controlId": "CC6.2",
+          "controlName": "User Authentication",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.5",
+          "controlName": "Secure Authentication",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "hipaa",
+          "controlId": "164.312(d)",
+          "controlName": "Person or Entity Authentication",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "gdpr",
+          "controlId": "Art.32(1)",
+          "controlName": "Security of Processing",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "8.3.1",
+          "controlName": "Multi-Factor Authentication",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "dpdpa",
+          "controlId": "DPDPA-S8-2",
+          "controlName": "Access Control to Personal Data Systems",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "AC-2",
+          "controlName": "Account Management",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "IA-2",
+          "controlName": "Identification and Authentication",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "IA-5",
+          "controlName": "Authenticator Management",
+          "status": "fail",
+          "weight": 2
+        }
+      ]
+    },
+    {
+      "title": "IAM user \"carol\" has no MFA device",
+      "description": "IAM user carol does not have any MFA device configured. This allows password-only authentication which is vulnerable to credential theft.",
+      "severity": "critical",
+      "category": "iam",
+      "resourceType": "AWS::IAM::User",
+      "resourceId": "arn:aws:iam::123456789012:user/carol",
+      "remediationTier": "manual",
+      "autoFixAvailable": false,
+      "controlMappings": [
+        {
+          "framework": "soc2",
+          "controlId": "CC6.2",
+          "controlName": "User Authentication",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.5",
+          "controlName": "Secure Authentication",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "hipaa",
+          "controlId": "164.312(d)",
+          "controlName": "Person or Entity Authentication",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "gdpr",
+          "controlId": "Art.32(1)",
+          "controlName": "Security of Processing",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "8.3.1",
+          "controlName": "Multi-Factor Authentication",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "dpdpa",
+          "controlId": "DPDPA-S8-2",
+          "controlName": "Access Control to Personal Data Systems",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "AC-2",
+          "controlName": "Account Management",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "IA-2",
+          "controlName": "Identification and Authentication",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "IA-5",
+          "controlName": "Authenticator Management",
+          "status": "fail",
+          "weight": 2
+        }
+      ]
+    },
+    {
+      "title": "IAM user \"david\" has no MFA device",
+      "description": "IAM user david does not have any MFA device configured. This allows password-only authentication which is vulnerable to credential theft.",
+      "severity": "critical",
+      "category": "iam",
+      "resourceType": "AWS::IAM::User",
+      "resourceId": "arn:aws:iam::123456789012:user/david",
+      "remediationTier": "manual",
+      "autoFixAvailable": false,
+      "controlMappings": [
+        {
+          "framework": "soc2",
+          "controlId": "CC6.2",
+          "controlName": "User Authentication",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.5",
+          "controlName": "Secure Authentication",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "hipaa",
+          "controlId": "164.312(d)",
+          "controlName": "Person or Entity Authentication",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "gdpr",
+          "controlId": "Art.32(1)",
+          "controlName": "Security of Processing",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "8.3.1",
+          "controlName": "Multi-Factor Authentication",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "dpdpa",
+          "controlId": "DPDPA-S8-2",
+          "controlName": "Access Control to Personal Data Systems",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "AC-2",
+          "controlName": "Account Management",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "IA-2",
+          "controlName": "Identification and Authentication",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "IA-5",
+          "controlName": "Authenticator Management",
+          "status": "fail",
+          "weight": 2
+        }
+      ]
+    },
+    {
+      "title": "IAM user \"frank\" has no MFA device",
+      "description": "IAM user frank does not have any MFA device configured. This allows password-only authentication which is vulnerable to credential theft.",
+      "severity": "critical",
+      "category": "iam",
+      "resourceType": "AWS::IAM::User",
+      "resourceId": "arn:aws:iam::123456789012:user/frank",
+      "remediationTier": "manual",
+      "autoFixAvailable": false,
+      "controlMappings": [
+        {
+          "framework": "soc2",
+          "controlId": "CC6.2",
+          "controlName": "User Authentication",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.5",
+          "controlName": "Secure Authentication",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "hipaa",
+          "controlId": "164.312(d)",
+          "controlName": "Person or Entity Authentication",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "gdpr",
+          "controlId": "Art.32(1)",
+          "controlName": "Security of Processing",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "8.3.1",
+          "controlName": "Multi-Factor Authentication",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "dpdpa",
+          "controlId": "DPDPA-S8-2",
+          "controlName": "Access Control to Personal Data Systems",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "AC-2",
+          "controlName": "Account Management",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "IA-2",
+          "controlName": "Identification and Authentication",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "IA-5",
+          "controlName": "Authenticator Management",
+          "status": "fail",
+          "weight": 2
+        }
+      ]
+    },
+    {
+      "title": "IAM user \"service-deploy\" has no MFA device",
+      "description": "IAM user service-deploy does not have any MFA device configured. This allows password-only authentication which is vulnerable to credential theft.",
+      "severity": "critical",
+      "category": "iam",
+      "resourceType": "AWS::IAM::User",
+      "resourceId": "arn:aws:iam::123456789012:user/service-deploy",
+      "remediationTier": "manual",
+      "autoFixAvailable": false,
+      "controlMappings": [
+        {
+          "framework": "soc2",
+          "controlId": "CC6.2",
+          "controlName": "User Authentication",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.5",
+          "controlName": "Secure Authentication",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "hipaa",
+          "controlId": "164.312(d)",
+          "controlName": "Person or Entity Authentication",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "gdpr",
+          "controlId": "Art.32(1)",
+          "controlName": "Security of Processing",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "8.3.1",
+          "controlName": "Multi-Factor Authentication",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "dpdpa",
+          "controlId": "DPDPA-S8-2",
+          "controlName": "Access Control to Personal Data Systems",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "AC-2",
+          "controlName": "Account Management",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "IA-2",
+          "controlName": "Identification and Authentication",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "IA-5",
+          "controlName": "Authenticator Management",
+          "status": "fail",
+          "weight": 2
+        }
+      ]
+    },
+    {
+      "title": "IAM user \"service-monitoring\" has no MFA device",
+      "description": "IAM user service-monitoring does not have any MFA device configured. This allows password-only authentication which is vulnerable to credential theft.",
+      "severity": "critical",
+      "category": "iam",
+      "resourceType": "AWS::IAM::User",
+      "resourceId": "arn:aws:iam::123456789012:user/service-monitoring",
+      "remediationTier": "manual",
+      "autoFixAvailable": false,
+      "controlMappings": [
+        {
+          "framework": "soc2",
+          "controlId": "CC6.2",
+          "controlName": "User Authentication",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.5",
+          "controlName": "Secure Authentication",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "hipaa",
+          "controlId": "164.312(d)",
+          "controlName": "Person or Entity Authentication",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "gdpr",
+          "controlId": "Art.32(1)",
+          "controlName": "Security of Processing",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "8.3.1",
+          "controlName": "Multi-Factor Authentication",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "dpdpa",
+          "controlId": "DPDPA-S8-2",
+          "controlName": "Access Control to Personal Data Systems",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "AC-2",
+          "controlName": "Account Management",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "IA-2",
+          "controlName": "Identification and Authentication",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "IA-5",
+          "controlName": "Authenticator Management",
+          "status": "fail",
+          "weight": 2
+        }
+      ]
+    },
+    {
+      "title": "IAM user \"alice\" has both console access and access keys",
+      "description": "IAM user alice has both AWS Management Console access and programmatic access keys. This increases the attack surface. Consider separating human and programmatic access.",
+      "severity": "high",
+      "category": "iam",
+      "resourceType": "AWS::IAM::User",
+      "resourceId": "arn:aws:iam::123456789012:user/alice",
+      "remediationTier": "manual",
+      "autoFixAvailable": false,
+      "controlMappings": [
+        {
+          "framework": "soc2",
+          "controlId": "CC6.1",
+          "controlName": "Logical and Physical Access Controls",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.3",
+          "controlName": "Access Restriction",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "hipaa",
+          "controlId": "164.312(a)(1)",
+          "controlName": "Access Control",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "gdpr",
+          "controlId": "Art.25(1)",
+          "controlName": "Data Protection by Design",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "7.1",
+          "controlName": "Access Restriction to System Components",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "dpdpa",
+          "controlId": "DPDPA-S8-2",
+          "controlName": "Access Control to Personal Data Systems",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "AC-2",
+          "controlName": "Account Management",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "AC-3",
+          "controlName": "Access Enforcement",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "IA-5",
+          "controlName": "Authenticator Management",
+          "status": "fail",
+          "weight": 2
+        }
+      ]
+    },
+    {
+      "title": "IAM user \"carol\" has both console access and access keys",
+      "description": "IAM user carol has both AWS Management Console access and programmatic access keys. This increases the attack surface. Consider separating human and programmatic access.",
+      "severity": "high",
+      "category": "iam",
+      "resourceType": "AWS::IAM::User",
+      "resourceId": "arn:aws:iam::123456789012:user/carol",
+      "remediationTier": "manual",
+      "autoFixAvailable": false,
+      "controlMappings": [
+        {
+          "framework": "soc2",
+          "controlId": "CC6.1",
+          "controlName": "Logical and Physical Access Controls",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.3",
+          "controlName": "Access Restriction",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "hipaa",
+          "controlId": "164.312(a)(1)",
+          "controlName": "Access Control",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "gdpr",
+          "controlId": "Art.25(1)",
+          "controlName": "Data Protection by Design",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "7.1",
+          "controlName": "Access Restriction to System Components",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "dpdpa",
+          "controlId": "DPDPA-S8-2",
+          "controlName": "Access Control to Personal Data Systems",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "AC-2",
+          "controlName": "Account Management",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "AC-3",
+          "controlName": "Access Enforcement",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "IA-5",
+          "controlName": "Authenticator Management",
+          "status": "fail",
+          "weight": 2
+        }
+      ]
+    },
+    {
+      "title": "IAM user \"frank\" has both console access and access keys",
+      "description": "IAM user frank has both AWS Management Console access and programmatic access keys. This increases the attack surface. Consider separating human and programmatic access.",
+      "severity": "high",
+      "category": "iam",
+      "resourceType": "AWS::IAM::User",
+      "resourceId": "arn:aws:iam::123456789012:user/frank",
+      "remediationTier": "manual",
+      "autoFixAvailable": false,
+      "controlMappings": [
+        {
+          "framework": "soc2",
+          "controlId": "CC6.1",
+          "controlName": "Logical and Physical Access Controls",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.3",
+          "controlName": "Access Restriction",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "hipaa",
+          "controlId": "164.312(a)(1)",
+          "controlName": "Access Control",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "gdpr",
+          "controlId": "Art.25(1)",
+          "controlName": "Data Protection by Design",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "7.1",
+          "controlName": "Access Restriction to System Components",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "dpdpa",
+          "controlId": "DPDPA-S8-2",
+          "controlName": "Access Control to Personal Data Systems",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "AC-2",
+          "controlName": "Account Management",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "AC-3",
+          "controlName": "Access Enforcement",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "IA-5",
+          "controlName": "Authenticator Management",
+          "status": "fail",
+          "weight": 2
+        }
+      ]
+    },
+    {
+      "title": "Root account has active access keys",
+      "description": "The AWS root account has active access keys. Root access keys provide unrestricted access to all resources. Delete them and use IAM users or roles instead.",
+      "severity": "critical",
+      "category": "iam",
+      "resourceType": "AWS::IAM::RootAccount",
+      "resourceId": "root",
+      "remediationTier": "manual",
+      "autoFixAvailable": false,
+      "controlMappings": [
+        {
+          "framework": "soc2",
+          "controlId": "CC6.1",
+          "controlName": "Logical and Physical Access Controls",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "soc2",
+          "controlId": "CC6.2",
+          "controlName": "User Authentication",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.5",
+          "controlName": "Secure Authentication",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.3",
+          "controlName": "Access Restriction",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "hipaa",
+          "controlId": "164.312(a)(1)",
+          "controlName": "Access Control",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "hipaa",
+          "controlId": "164.312(d)",
+          "controlName": "Person or Entity Authentication",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "gdpr",
+          "controlId": "Art.32(1)",
+          "controlName": "Security of Processing",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "8.3.1",
+          "controlName": "Multi-Factor Authentication",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "7.1",
+          "controlName": "Access Restriction to System Components",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "dpdpa",
+          "controlId": "DPDPA-S8-2",
+          "controlName": "Access Control to Personal Data Systems",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "AC-2",
+          "controlName": "Account Management",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "AC-3",
+          "controlName": "Access Enforcement",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "AC-6",
+          "controlName": "Least Privilege",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "IA-2",
+          "controlName": "Identification and Authentication",
+          "status": "fail",
+          "weight": 3
+        }
+      ]
+    },
+    {
+      "title": "Root account does not have MFA enabled",
+      "description": "The AWS root account does not have MFA enabled. Enable MFA on the root account to add a critical layer of security.",
+      "severity": "critical",
+      "category": "iam",
+      "resourceType": "AWS::IAM::RootAccount",
+      "resourceId": "root",
+      "remediationTier": "manual",
+      "autoFixAvailable": false,
+      "controlMappings": [
+        {
+          "framework": "soc2",
+          "controlId": "CC6.1",
+          "controlName": "Logical and Physical Access Controls",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "soc2",
+          "controlId": "CC6.2",
+          "controlName": "User Authentication",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.5",
+          "controlName": "Secure Authentication",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.3",
+          "controlName": "Access Restriction",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "hipaa",
+          "controlId": "164.312(a)(1)",
+          "controlName": "Access Control",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "hipaa",
+          "controlId": "164.312(d)",
+          "controlName": "Person or Entity Authentication",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "gdpr",
+          "controlId": "Art.32(1)",
+          "controlName": "Security of Processing",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "8.3.1",
+          "controlName": "Multi-Factor Authentication",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "7.1",
+          "controlName": "Access Restriction to System Components",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "dpdpa",
+          "controlId": "DPDPA-S8-2",
+          "controlName": "Access Control to Personal Data Systems",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "AC-2",
+          "controlName": "Account Management",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "AC-3",
+          "controlName": "Access Enforcement",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "AC-6",
+          "controlName": "Least Privilege",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "IA-2",
+          "controlName": "Identification and Authentication",
+          "status": "fail",
+          "weight": 3
+        }
+      ]
+    },
+    {
+      "title": "IAM password policy does not enforce full complexity",
+      "description": "The IAM password policy does not require all character types (uppercase, lowercase, numbers, symbols). Strengthen the policy to meet compliance requirements.",
+      "severity": "medium",
+      "category": "iam",
+      "resourceType": "AWS::IAM::AccountPasswordPolicy",
+      "resourceId": "password-policy",
+      "remediationTier": "auto",
+      "autoFixAvailable": true,
+      "controlMappings": [
+        {
+          "framework": "soc2",
+          "controlId": "CC6.1",
+          "controlName": "Logical and Physical Access Controls",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.5",
+          "controlName": "Secure Authentication",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "hipaa",
+          "controlId": "164.312(a)(1)",
+          "controlName": "Access Control",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "gdpr",
+          "controlId": "Art.32(1)",
+          "controlName": "Security of Processing",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "8.2.1",
+          "controlName": "Unique Identification",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "dpdpa",
+          "controlId": "DPDPA-S8-2",
+          "controlName": "Access Control to Personal Data Systems",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "IA-5",
+          "controlName": "Authenticator Management",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "IA-2",
+          "controlName": "Identification and Authentication",
+          "status": "fail",
+          "weight": 3
+        }
+      ]
+    },
+    {
+      "title": "IAM password policy minimum length is below 14 characters",
+      "description": "The IAM password policy minimum length is 6. Best practice recommends at least 14 characters.",
+      "severity": "medium",
+      "category": "iam",
+      "resourceType": "AWS::IAM::AccountPasswordPolicy",
+      "resourceId": "password-policy",
+      "remediationTier": "auto",
+      "autoFixAvailable": true,
+      "controlMappings": [
+        {
+          "framework": "soc2",
+          "controlId": "CC6.1",
+          "controlName": "Logical and Physical Access Controls",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.5",
+          "controlName": "Secure Authentication",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "hipaa",
+          "controlId": "164.312(a)(1)",
+          "controlName": "Access Control",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "gdpr",
+          "controlId": "Art.32(1)",
+          "controlName": "Security of Processing",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "8.2.1",
+          "controlName": "Unique Identification",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "dpdpa",
+          "controlId": "DPDPA-S8-2",
+          "controlName": "Access Control to Personal Data Systems",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "IA-5",
+          "controlName": "Authenticator Management",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "IA-2",
+          "controlName": "Identification and Authentication",
+          "status": "fail",
+          "weight": 3
+        }
+      ]
+    },
+    {
+      "title": "IAM password policy does not enforce rotation within 90 days",
+      "description": "Password max age is not set days. Require rotation every 90 days or fewer.",
+      "severity": "medium",
+      "category": "iam",
+      "resourceType": "AWS::IAM::AccountPasswordPolicy",
+      "resourceId": "password-policy",
+      "remediationTier": "auto",
+      "autoFixAvailable": true,
+      "controlMappings": [
+        {
+          "framework": "soc2",
+          "controlId": "CC6.1",
+          "controlName": "Logical and Physical Access Controls",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.5",
+          "controlName": "Secure Authentication",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "hipaa",
+          "controlId": "164.312(a)(1)",
+          "controlName": "Access Control",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "gdpr",
+          "controlId": "Art.32(1)",
+          "controlName": "Security of Processing",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "8.2.1",
+          "controlName": "Unique Identification",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "dpdpa",
+          "controlId": "DPDPA-S8-2",
+          "controlName": "Access Control to Personal Data Systems",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "IA-5",
+          "controlName": "Authenticator Management",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "IA-2",
+          "controlName": "Identification and Authentication",
+          "status": "fail",
+          "weight": 3
+        }
+      ]
+    },
+    {
+      "title": "IAM policy \"WildcardAdmin\" grants full wildcard access",
+      "description": "Customer-managed IAM policy WildcardAdmin (arn:aws:iam::123456789012:policy/WildcardAdmin) contains a statement with \"Action\": \"*\" and \"Resource\": \"*\". This grants unrestricted access and should be scoped down.",
+      "severity": "high",
+      "category": "iam",
+      "resourceType": "AWS::IAM::Policy",
+      "resourceId": "arn:aws:iam::123456789012:policy/WildcardAdmin",
+      "remediationTier": "manual",
+      "autoFixAvailable": false,
+      "controlMappings": [
+        {
+          "framework": "soc2",
+          "controlId": "CC6.1",
+          "controlName": "Logical and Physical Access Controls",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "soc2",
+          "controlId": "CC6.3",
+          "controlName": "Credential Management",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.5.15",
+          "controlName": "Access Control Policy",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.3",
+          "controlName": "Access Restriction",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "hipaa",
+          "controlId": "164.312(a)(1)",
+          "controlName": "Access Control",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "gdpr",
+          "controlId": "Art.25(2)",
+          "controlName": "Data Protection by Default",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "7.1",
+          "controlName": "Access Restriction to System Components",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "dpdpa",
+          "controlId": "DPDPA-S8-2",
+          "controlName": "Access Control to Personal Data Systems",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "AC-3",
+          "controlName": "Access Enforcement",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "AC-6",
+          "controlName": "Least Privilege",
+          "status": "fail",
+          "weight": 2
+        }
+      ]
+    },
+    {
+      "title": "S3 bucket \"acme-public-uploads\" has no public access block configuration",
+      "description": "S3 bucket acme-public-uploads has no public access block configuration. Enable all four public access block flags to prevent accidental public exposure.",
+      "severity": "critical",
+      "category": "config",
+      "resourceType": "AWS::S3::Bucket",
+      "resourceId": "acme-public-uploads",
+      "remediationTier": "auto",
+      "autoFixAvailable": true,
+      "controlMappings": [
+        {
+          "framework": "soc2",
+          "controlId": "CC6.1",
+          "controlName": "Logical and Physical Access Controls",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "soc2",
+          "controlId": "CC6.6",
+          "controlName": "Network Security Boundaries",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.3",
+          "controlName": "Access Restriction",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.20",
+          "controlName": "Networks Security",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "hipaa",
+          "controlId": "164.312(a)(1)",
+          "controlName": "Access Control",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "gdpr",
+          "controlId": "Art.32(1)",
+          "controlName": "Security of Processing",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "gdpr",
+          "controlId": "Art.25(2)",
+          "controlName": "Data Protection by Default",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "1.1",
+          "controlName": "Network Security Controls",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "7.1",
+          "controlName": "Access Restriction to System Components",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "dpdpa",
+          "controlId": "DPDPA-S8-1",
+          "controlName": "Encryption of Personal Data",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "dpdpa",
+          "controlId": "DPDPA-S8-2",
+          "controlName": "Access Control to Personal Data Systems",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "AC-3",
+          "controlName": "Access Enforcement",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "SC-7",
+          "controlName": "Boundary Protection",
+          "status": "fail",
+          "weight": 3
+        }
+      ]
+    },
+    {
+      "title": "S3 bucket \"acme-public-uploads\" has no server-side encryption",
+      "description": "S3 bucket acme-public-uploads does not have server-side encryption configured. Enable SSE-S3 or SSE-KMS to protect data at rest.",
+      "severity": "high",
+      "category": "encryption",
+      "resourceType": "AWS::S3::Bucket",
+      "resourceId": "acme-public-uploads",
+      "remediationTier": "auto",
+      "autoFixAvailable": true,
+      "controlMappings": [
+        {
+          "framework": "soc2",
+          "controlId": "CC6.7",
+          "controlName": "Data Transmission Protection",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.24",
+          "controlName": "Use of Cryptography",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "hipaa",
+          "controlId": "164.312(e)(1)",
+          "controlName": "Transmission Security",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "gdpr",
+          "controlId": "Art.32(1)",
+          "controlName": "Security of Processing",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "3.5",
+          "controlName": "Primary Account Number Protection",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "4.1",
+          "controlName": "Transmission Encryption",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "dpdpa",
+          "controlId": "DPDPA-S8-1",
+          "controlName": "Encryption of Personal Data",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "SC-28",
+          "controlName": "Protection of Information at Rest",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "SC-12",
+          "controlName": "Cryptographic Key Management",
+          "status": "fail",
+          "weight": 2
+        }
+      ]
+    },
+    {
+      "title": "S3 bucket \"acme-public-uploads\" does not have versioning enabled",
+      "description": "S3 bucket acme-public-uploads versioning status is \"unset\". Enable versioning to protect against accidental deletions and overwrites.",
+      "severity": "medium",
+      "category": "config",
+      "resourceType": "AWS::S3::Bucket",
+      "resourceId": "acme-public-uploads",
+      "remediationTier": "auto",
+      "autoFixAvailable": true,
+      "controlMappings": [
+        {
+          "framework": "soc2",
+          "controlId": "A1.2",
+          "controlName": "Recovery Procedures",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.16",
+          "controlName": "Monitoring Activities",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "hipaa",
+          "controlId": "164.312(c)(1)",
+          "controlName": "Integrity",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "gdpr",
+          "controlId": "Art.32(1)",
+          "controlName": "Security of Processing",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "10.1",
+          "controlName": "Audit Trail Implementation",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "dpdpa",
+          "controlId": "DPDPA-S8-4",
+          "controlName": "Data Continuity and Backup",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "CP-9",
+          "controlName": "System Backup",
+          "status": "fail",
+          "weight": 2
+        }
+      ]
+    },
+    {
+      "title": "S3 bucket \"acme-public-uploads\" does not have access logging enabled",
+      "description": "S3 bucket acme-public-uploads does not have server access logging enabled. Enable logging to track access patterns and detect unauthorized access.",
+      "severity": "low",
+      "category": "logging",
+      "resourceType": "AWS::S3::Bucket",
+      "resourceId": "acme-public-uploads",
+      "remediationTier": "manual",
+      "autoFixAvailable": false,
+      "controlMappings": [
+        {
+          "framework": "soc2",
+          "controlId": "CC7.1",
+          "controlName": "Monitoring and Detection",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.15",
+          "controlName": "Logging",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "hipaa",
+          "controlId": "164.312(b)",
+          "controlName": "Audit Controls",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "gdpr",
+          "controlId": "Art.30",
+          "controlName": "Records of Processing Activities",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "10.2",
+          "controlName": "Audit Log Content",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "dpdpa",
+          "controlId": "DPDPA-S8-3",
+          "controlName": "Audit Logging and Monitoring",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "AU-2",
+          "controlName": "Event Logging",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "AU-6",
+          "controlName": "Audit Record Review",
+          "status": "fail",
+          "weight": 2
+        }
+      ]
+    },
+    {
+      "title": "S3 bucket \"acme-backups\" has no server-side encryption",
+      "description": "S3 bucket acme-backups does not have server-side encryption configured. Enable SSE-S3 or SSE-KMS to protect data at rest.",
+      "severity": "high",
+      "category": "encryption",
+      "resourceType": "AWS::S3::Bucket",
+      "resourceId": "acme-backups",
+      "remediationTier": "auto",
+      "autoFixAvailable": true,
+      "controlMappings": [
+        {
+          "framework": "soc2",
+          "controlId": "CC6.7",
+          "controlName": "Data Transmission Protection",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.24",
+          "controlName": "Use of Cryptography",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "hipaa",
+          "controlId": "164.312(e)(1)",
+          "controlName": "Transmission Security",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "gdpr",
+          "controlId": "Art.32(1)",
+          "controlName": "Security of Processing",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "3.5",
+          "controlName": "Primary Account Number Protection",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "4.1",
+          "controlName": "Transmission Encryption",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "dpdpa",
+          "controlId": "DPDPA-S8-1",
+          "controlName": "Encryption of Personal Data",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "SC-28",
+          "controlName": "Protection of Information at Rest",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "SC-12",
+          "controlName": "Cryptographic Key Management",
+          "status": "fail",
+          "weight": 2
+        }
+      ]
+    },
+    {
+      "title": "S3 bucket \"acme-backups\" does not have versioning enabled",
+      "description": "S3 bucket acme-backups versioning status is \"unset\". Enable versioning to protect against accidental deletions and overwrites.",
+      "severity": "medium",
+      "category": "config",
+      "resourceType": "AWS::S3::Bucket",
+      "resourceId": "acme-backups",
+      "remediationTier": "auto",
+      "autoFixAvailable": true,
+      "controlMappings": [
+        {
+          "framework": "soc2",
+          "controlId": "A1.2",
+          "controlName": "Recovery Procedures",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.16",
+          "controlName": "Monitoring Activities",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "hipaa",
+          "controlId": "164.312(c)(1)",
+          "controlName": "Integrity",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "gdpr",
+          "controlId": "Art.32(1)",
+          "controlName": "Security of Processing",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "10.1",
+          "controlName": "Audit Trail Implementation",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "dpdpa",
+          "controlId": "DPDPA-S8-4",
+          "controlName": "Data Continuity and Backup",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "CP-9",
+          "controlName": "System Backup",
+          "status": "fail",
+          "weight": 2
+        }
+      ]
+    },
+    {
+      "title": "S3 bucket \"acme-backups\" does not have access logging enabled",
+      "description": "S3 bucket acme-backups does not have server access logging enabled. Enable logging to track access patterns and detect unauthorized access.",
+      "severity": "low",
+      "category": "logging",
+      "resourceType": "AWS::S3::Bucket",
+      "resourceId": "acme-backups",
+      "remediationTier": "manual",
+      "autoFixAvailable": false,
+      "controlMappings": [
+        {
+          "framework": "soc2",
+          "controlId": "CC7.1",
+          "controlName": "Monitoring and Detection",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.15",
+          "controlName": "Logging",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "hipaa",
+          "controlId": "164.312(b)",
+          "controlName": "Audit Controls",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "gdpr",
+          "controlId": "Art.30",
+          "controlName": "Records of Processing Activities",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "10.2",
+          "controlName": "Audit Log Content",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "dpdpa",
+          "controlId": "DPDPA-S8-3",
+          "controlName": "Audit Logging and Monitoring",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "AU-2",
+          "controlName": "Event Logging",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "AU-6",
+          "controlName": "Audit Record Review",
+          "status": "fail",
+          "weight": 2
+        }
+      ]
+    },
+    {
+      "title": "S3 bucket \"acme-logs\" does not have versioning enabled",
+      "description": "S3 bucket acme-logs versioning status is \"unset\". Enable versioning to protect against accidental deletions and overwrites.",
+      "severity": "medium",
+      "category": "config",
+      "resourceType": "AWS::S3::Bucket",
+      "resourceId": "acme-logs",
+      "remediationTier": "auto",
+      "autoFixAvailable": true,
+      "controlMappings": [
+        {
+          "framework": "soc2",
+          "controlId": "A1.2",
+          "controlName": "Recovery Procedures",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.16",
+          "controlName": "Monitoring Activities",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "hipaa",
+          "controlId": "164.312(c)(1)",
+          "controlName": "Integrity",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "gdpr",
+          "controlId": "Art.32(1)",
+          "controlName": "Security of Processing",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "10.1",
+          "controlName": "Audit Trail Implementation",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "dpdpa",
+          "controlId": "DPDPA-S8-4",
+          "controlName": "Data Continuity and Backup",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "CP-9",
+          "controlName": "System Backup",
+          "status": "fail",
+          "weight": 2
+        }
+      ]
+    },
+    {
+      "title": "S3 bucket \"acme-logs\" does not have access logging enabled",
+      "description": "S3 bucket acme-logs does not have server access logging enabled. Enable logging to track access patterns and detect unauthorized access.",
+      "severity": "low",
+      "category": "logging",
+      "resourceType": "AWS::S3::Bucket",
+      "resourceId": "acme-logs",
+      "remediationTier": "manual",
+      "autoFixAvailable": false,
+      "controlMappings": [
+        {
+          "framework": "soc2",
+          "controlId": "CC7.1",
+          "controlName": "Monitoring and Detection",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.15",
+          "controlName": "Logging",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "hipaa",
+          "controlId": "164.312(b)",
+          "controlName": "Audit Controls",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "gdpr",
+          "controlId": "Art.30",
+          "controlName": "Records of Processing Activities",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "10.2",
+          "controlName": "Audit Log Content",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "dpdpa",
+          "controlId": "DPDPA-S8-3",
+          "controlName": "Audit Logging and Monitoring",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "AU-2",
+          "controlName": "Event Logging",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "AU-6",
+          "controlName": "Audit Record Review",
+          "status": "fail",
+          "weight": 2
+        }
+      ]
+    },
+    {
+      "title": "S3 bucket \"acme-static-assets\" has no public access block configuration",
+      "description": "S3 bucket acme-static-assets has no public access block configuration. Enable all four public access block flags to prevent accidental public exposure.",
+      "severity": "critical",
+      "category": "config",
+      "resourceType": "AWS::S3::Bucket",
+      "resourceId": "acme-static-assets",
+      "remediationTier": "auto",
+      "autoFixAvailable": true,
+      "controlMappings": [
+        {
+          "framework": "soc2",
+          "controlId": "CC6.1",
+          "controlName": "Logical and Physical Access Controls",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "soc2",
+          "controlId": "CC6.6",
+          "controlName": "Network Security Boundaries",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.3",
+          "controlName": "Access Restriction",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.20",
+          "controlName": "Networks Security",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "hipaa",
+          "controlId": "164.312(a)(1)",
+          "controlName": "Access Control",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "gdpr",
+          "controlId": "Art.32(1)",
+          "controlName": "Security of Processing",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "gdpr",
+          "controlId": "Art.25(2)",
+          "controlName": "Data Protection by Default",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "1.1",
+          "controlName": "Network Security Controls",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "7.1",
+          "controlName": "Access Restriction to System Components",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "dpdpa",
+          "controlId": "DPDPA-S8-1",
+          "controlName": "Encryption of Personal Data",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "dpdpa",
+          "controlId": "DPDPA-S8-2",
+          "controlName": "Access Control to Personal Data Systems",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "AC-3",
+          "controlName": "Access Enforcement",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "SC-7",
+          "controlName": "Boundary Protection",
+          "status": "fail",
+          "weight": 3
+        }
+      ]
+    },
+    {
+      "title": "S3 bucket \"acme-static-assets\" has no server-side encryption",
+      "description": "S3 bucket acme-static-assets does not have server-side encryption configured. Enable SSE-S3 or SSE-KMS to protect data at rest.",
+      "severity": "high",
+      "category": "encryption",
+      "resourceType": "AWS::S3::Bucket",
+      "resourceId": "acme-static-assets",
+      "remediationTier": "auto",
+      "autoFixAvailable": true,
+      "controlMappings": [
+        {
+          "framework": "soc2",
+          "controlId": "CC6.7",
+          "controlName": "Data Transmission Protection",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.24",
+          "controlName": "Use of Cryptography",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "hipaa",
+          "controlId": "164.312(e)(1)",
+          "controlName": "Transmission Security",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "gdpr",
+          "controlId": "Art.32(1)",
+          "controlName": "Security of Processing",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "3.5",
+          "controlName": "Primary Account Number Protection",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "4.1",
+          "controlName": "Transmission Encryption",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "dpdpa",
+          "controlId": "DPDPA-S8-1",
+          "controlName": "Encryption of Personal Data",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "SC-28",
+          "controlName": "Protection of Information at Rest",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "SC-12",
+          "controlName": "Cryptographic Key Management",
+          "status": "fail",
+          "weight": 2
+        }
+      ]
+    },
+    {
+      "title": "S3 bucket \"acme-static-assets\" does not have versioning enabled",
+      "description": "S3 bucket acme-static-assets versioning status is \"unset\". Enable versioning to protect against accidental deletions and overwrites.",
+      "severity": "medium",
+      "category": "config",
+      "resourceType": "AWS::S3::Bucket",
+      "resourceId": "acme-static-assets",
+      "remediationTier": "auto",
+      "autoFixAvailable": true,
+      "controlMappings": [
+        {
+          "framework": "soc2",
+          "controlId": "A1.2",
+          "controlName": "Recovery Procedures",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.16",
+          "controlName": "Monitoring Activities",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "hipaa",
+          "controlId": "164.312(c)(1)",
+          "controlName": "Integrity",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "gdpr",
+          "controlId": "Art.32(1)",
+          "controlName": "Security of Processing",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "10.1",
+          "controlName": "Audit Trail Implementation",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "dpdpa",
+          "controlId": "DPDPA-S8-4",
+          "controlName": "Data Continuity and Backup",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "CP-9",
+          "controlName": "System Backup",
+          "status": "fail",
+          "weight": 2
+        }
+      ]
+    },
+    {
+      "title": "S3 bucket \"acme-static-assets\" does not have access logging enabled",
+      "description": "S3 bucket acme-static-assets does not have server access logging enabled. Enable logging to track access patterns and detect unauthorized access.",
+      "severity": "low",
+      "category": "logging",
+      "resourceType": "AWS::S3::Bucket",
+      "resourceId": "acme-static-assets",
+      "remediationTier": "manual",
+      "autoFixAvailable": false,
+      "controlMappings": [
+        {
+          "framework": "soc2",
+          "controlId": "CC7.1",
+          "controlName": "Monitoring and Detection",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.15",
+          "controlName": "Logging",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "hipaa",
+          "controlId": "164.312(b)",
+          "controlName": "Audit Controls",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "gdpr",
+          "controlId": "Art.30",
+          "controlName": "Records of Processing Activities",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "10.2",
+          "controlName": "Audit Log Content",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "dpdpa",
+          "controlId": "DPDPA-S8-3",
+          "controlName": "Audit Logging and Monitoring",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "AU-2",
+          "controlName": "Event Logging",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "AU-6",
+          "controlName": "Audit Record Review",
+          "status": "fail",
+          "weight": 2
+        }
+      ]
+    },
+    {
+      "title": "Security group \"prod-web\" has unrestricted outbound traffic",
+      "description": "Security group sg-001 in VPC vpc-abc123 allows all outbound traffic to 0.0.0.0/0. Consider restricting egress rules to limit data exfiltration risk.",
+      "severity": "medium",
+      "category": "network",
+      "resourceType": "AWS::EC2::SecurityGroup",
+      "resourceId": "sg-001",
+      "remediationTier": "manual",
+      "autoFixAvailable": false,
+      "controlMappings": [
+        {
+          "framework": "soc2",
+          "controlId": "CC6.6",
+          "controlName": "Network Security Boundaries",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.20",
+          "controlName": "Networks Security",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.21",
+          "controlName": "Web Services Security",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "hipaa",
+          "controlId": "164.312(e)(1)",
+          "controlName": "Transmission Security",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "gdpr",
+          "controlId": "Art.32(1)",
+          "controlName": "Security of Processing",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "1.1",
+          "controlName": "Network Security Controls",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "dpdpa",
+          "controlId": "DPDPA-S8-2",
+          "controlName": "Access Control to Personal Data Systems",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "SC-7",
+          "controlName": "Boundary Protection",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "SC-8",
+          "controlName": "Transmission Confidentiality",
+          "status": "fail",
+          "weight": 2
+        }
+      ]
+    },
+    {
+      "title": "Security group \"bastion\" allows SSH (port 22) from 0.0.0.0/0",
+      "description": "Security group sg-002 in VPC vpc-abc123 allows inbound SSH access from the entire internet. Restrict SSH access to known IP ranges or use a bastion host.",
+      "severity": "critical",
+      "category": "network",
+      "resourceType": "AWS::EC2::SecurityGroup",
+      "resourceId": "sg-002",
+      "remediationTier": "approval",
+      "autoFixAvailable": false,
+      "controlMappings": [
+        {
+          "framework": "soc2",
+          "controlId": "CC6.6",
+          "controlName": "Network Security Boundaries",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.20",
+          "controlName": "Networks Security",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "hipaa",
+          "controlId": "164.312(a)(1)",
+          "controlName": "Access Control",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "gdpr",
+          "controlId": "Art.32(1)",
+          "controlName": "Security of Processing",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "1.1",
+          "controlName": "Network Security Controls",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "1.2",
+          "controlName": "Network Security Configuration",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "dpdpa",
+          "controlId": "DPDPA-S8-2",
+          "controlName": "Access Control to Personal Data Systems",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "SC-7",
+          "controlName": "Boundary Protection",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "CM-6",
+          "controlName": "Configuration Settings",
+          "status": "fail",
+          "weight": 2
+        }
+      ]
+    },
+    {
+      "title": "Security group \"bastion\" has unrestricted outbound traffic",
+      "description": "Security group sg-002 in VPC vpc-abc123 allows all outbound traffic to 0.0.0.0/0. Consider restricting egress rules to limit data exfiltration risk.",
+      "severity": "medium",
+      "category": "network",
+      "resourceType": "AWS::EC2::SecurityGroup",
+      "resourceId": "sg-002",
+      "remediationTier": "manual",
+      "autoFixAvailable": false,
+      "controlMappings": [
+        {
+          "framework": "soc2",
+          "controlId": "CC6.6",
+          "controlName": "Network Security Boundaries",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.20",
+          "controlName": "Networks Security",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.21",
+          "controlName": "Web Services Security",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "hipaa",
+          "controlId": "164.312(e)(1)",
+          "controlName": "Transmission Security",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "gdpr",
+          "controlId": "Art.32(1)",
+          "controlName": "Security of Processing",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "1.1",
+          "controlName": "Network Security Controls",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "dpdpa",
+          "controlId": "DPDPA-S8-2",
+          "controlName": "Access Control to Personal Data Systems",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "SC-7",
+          "controlName": "Boundary Protection",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "SC-8",
+          "controlName": "Transmission Confidentiality",
+          "status": "fail",
+          "weight": 2
+        }
+      ]
+    },
+    {
+      "title": "Security group \"db-internal\" has unrestricted outbound traffic",
+      "description": "Security group sg-003 in VPC vpc-abc123 allows all outbound traffic to 0.0.0.0/0. Consider restricting egress rules to limit data exfiltration risk.",
+      "severity": "medium",
+      "category": "network",
+      "resourceType": "AWS::EC2::SecurityGroup",
+      "resourceId": "sg-003",
+      "remediationTier": "manual",
+      "autoFixAvailable": false,
+      "controlMappings": [
+        {
+          "framework": "soc2",
+          "controlId": "CC6.6",
+          "controlName": "Network Security Boundaries",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.20",
+          "controlName": "Networks Security",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.21",
+          "controlName": "Web Services Security",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "hipaa",
+          "controlId": "164.312(e)(1)",
+          "controlName": "Transmission Security",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "gdpr",
+          "controlId": "Art.32(1)",
+          "controlName": "Security of Processing",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "1.1",
+          "controlName": "Network Security Controls",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "dpdpa",
+          "controlId": "DPDPA-S8-2",
+          "controlName": "Access Control to Personal Data Systems",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "SC-7",
+          "controlName": "Boundary Protection",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "SC-8",
+          "controlName": "Transmission Confidentiality",
+          "status": "fail",
+          "weight": 2
+        }
+      ]
+    },
+    {
+      "title": "Security group \"dev-all-open\" allows SSH (port 22) from 0.0.0.0/0",
+      "description": "Security group sg-004 in VPC vpc-abc123 allows inbound SSH access from the entire internet. Restrict SSH access to known IP ranges or use a bastion host.",
+      "severity": "critical",
+      "category": "network",
+      "resourceType": "AWS::EC2::SecurityGroup",
+      "resourceId": "sg-004",
+      "remediationTier": "approval",
+      "autoFixAvailable": false,
+      "controlMappings": [
+        {
+          "framework": "soc2",
+          "controlId": "CC6.6",
+          "controlName": "Network Security Boundaries",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.20",
+          "controlName": "Networks Security",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "hipaa",
+          "controlId": "164.312(a)(1)",
+          "controlName": "Access Control",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "gdpr",
+          "controlId": "Art.32(1)",
+          "controlName": "Security of Processing",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "1.1",
+          "controlName": "Network Security Controls",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "1.2",
+          "controlName": "Network Security Configuration",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "dpdpa",
+          "controlId": "DPDPA-S8-2",
+          "controlName": "Access Control to Personal Data Systems",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "SC-7",
+          "controlName": "Boundary Protection",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "CM-6",
+          "controlName": "Configuration Settings",
+          "status": "fail",
+          "weight": 2
+        }
+      ]
+    },
+    {
+      "title": "Security group \"dev-all-open\" allows RDP (port 3389) from 0.0.0.0/0",
+      "description": "Security group sg-004 in VPC vpc-abc123 allows inbound RDP access from the entire internet. Restrict RDP access to known IP ranges or use a bastion host.",
+      "severity": "critical",
+      "category": "network",
+      "resourceType": "AWS::EC2::SecurityGroup",
+      "resourceId": "sg-004",
+      "remediationTier": "approval",
+      "autoFixAvailable": false,
+      "controlMappings": [
+        {
+          "framework": "soc2",
+          "controlId": "CC6.6",
+          "controlName": "Network Security Boundaries",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.20",
+          "controlName": "Networks Security",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "hipaa",
+          "controlId": "164.312(a)(1)",
+          "controlName": "Access Control",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "gdpr",
+          "controlId": "Art.32(1)",
+          "controlName": "Security of Processing",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "1.1",
+          "controlName": "Network Security Controls",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "1.2",
+          "controlName": "Network Security Configuration",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "dpdpa",
+          "controlId": "DPDPA-S8-2",
+          "controlName": "Access Control to Personal Data Systems",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "SC-7",
+          "controlName": "Boundary Protection",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "CM-6",
+          "controlName": "Configuration Settings",
+          "status": "fail",
+          "weight": 2
+        }
+      ]
+    },
+    {
+      "title": "Security group \"dev-all-open\" has unrestricted outbound traffic",
+      "description": "Security group sg-004 in VPC vpc-abc123 allows all outbound traffic to 0.0.0.0/0. Consider restricting egress rules to limit data exfiltration risk.",
+      "severity": "medium",
+      "category": "network",
+      "resourceType": "AWS::EC2::SecurityGroup",
+      "resourceId": "sg-004",
+      "remediationTier": "manual",
+      "autoFixAvailable": false,
+      "controlMappings": [
+        {
+          "framework": "soc2",
+          "controlId": "CC6.6",
+          "controlName": "Network Security Boundaries",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.20",
+          "controlName": "Networks Security",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.21",
+          "controlName": "Web Services Security",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "hipaa",
+          "controlId": "164.312(e)(1)",
+          "controlName": "Transmission Security",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "gdpr",
+          "controlId": "Art.32(1)",
+          "controlName": "Security of Processing",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "1.1",
+          "controlName": "Network Security Controls",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "dpdpa",
+          "controlId": "DPDPA-S8-2",
+          "controlName": "Access Control to Personal Data Systems",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "SC-7",
+          "controlName": "Boundary Protection",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "SC-8",
+          "controlName": "Transmission Confidentiality",
+          "status": "fail",
+          "weight": 2
+        }
+      ]
+    },
+    {
+      "title": "EBS volume \"vol-001\" is not encrypted",
+      "description": "EBS volume vol-001 (100GB, gp3) in us-east-1a is not encrypted. Enable encryption to protect data at rest.",
+      "severity": "high",
+      "category": "encryption",
+      "resourceType": "AWS::EC2::Volume",
+      "resourceId": "vol-001",
+      "resourceRegion": "us-east-1a",
+      "remediationTier": "manual",
+      "autoFixAvailable": false,
+      "controlMappings": [
+        {
+          "framework": "soc2",
+          "controlId": "CC6.7",
+          "controlName": "Data Transmission Protection",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.24",
+          "controlName": "Use of Cryptography",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "hipaa",
+          "controlId": "164.312(a)(1)",
+          "controlName": "Access Control",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "gdpr",
+          "controlId": "Art.32(1)",
+          "controlName": "Security of Processing",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "3.5",
+          "controlName": "Primary Account Number Protection",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "dpdpa",
+          "controlId": "DPDPA-S8-1",
+          "controlName": "Encryption of Personal Data",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "SC-28",
+          "controlName": "Protection of Information at Rest",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "SC-12",
+          "controlName": "Cryptographic Key Management",
+          "status": "fail",
+          "weight": 2
+        }
+      ]
+    },
+    {
+      "title": "EBS volume \"vol-003\" is not encrypted",
+      "description": "EBS volume vol-003 (50GB, gp2) in us-east-1a is not encrypted. Enable encryption to protect data at rest.",
+      "severity": "high",
+      "category": "encryption",
+      "resourceType": "AWS::EC2::Volume",
+      "resourceId": "vol-003",
+      "resourceRegion": "us-east-1a",
+      "remediationTier": "manual",
+      "autoFixAvailable": false,
+      "controlMappings": [
+        {
+          "framework": "soc2",
+          "controlId": "CC6.7",
+          "controlName": "Data Transmission Protection",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.24",
+          "controlName": "Use of Cryptography",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "hipaa",
+          "controlId": "164.312(a)(1)",
+          "controlName": "Access Control",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "gdpr",
+          "controlId": "Art.32(1)",
+          "controlName": "Security of Processing",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "3.5",
+          "controlName": "Primary Account Number Protection",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "dpdpa",
+          "controlId": "DPDPA-S8-1",
+          "controlName": "Encryption of Personal Data",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "SC-28",
+          "controlName": "Protection of Information at Rest",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "SC-12",
+          "controlName": "Cryptographic Key Management",
+          "status": "fail",
+          "weight": 2
+        }
+      ]
+    },
+    {
+      "title": "No CloudTrail trails configured",
+      "description": "No CloudTrail trails are configured in this account. CloudTrail provides audit logging of all AWS API calls and is critical for security monitoring and compliance.",
+      "severity": "critical",
+      "category": "logging",
+      "resourceType": "AWS::CloudTrail::Trail",
+      "resourceId": "none",
+      "remediationTier": "manual",
+      "autoFixAvailable": false,
+      "controlMappings": [
+        {
+          "framework": "soc2",
+          "controlId": "CC7.1",
+          "controlName": "Monitoring and Detection",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "soc2",
+          "controlId": "CC7.2",
+          "controlName": "Incident Response",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.15",
+          "controlName": "Logging",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.16",
+          "controlName": "Monitoring Activities",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "hipaa",
+          "controlId": "164.312(b)",
+          "controlName": "Audit Controls",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "gdpr",
+          "controlId": "Art.30",
+          "controlName": "Records of Processing Activities",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "10.1",
+          "controlName": "Audit Trail Implementation",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "10.2",
+          "controlName": "Audit Log Content",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "dpdpa",
+          "controlId": "DPDPA-S8-3",
+          "controlName": "Audit Logging and Monitoring",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "AU-2",
+          "controlName": "Event Logging",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "SI-4",
+          "controlName": "System Monitoring",
+          "status": "fail",
+          "weight": 2
+        }
+      ]
+    },
+    {
+      "title": "KMS key \"key-001aaa-bbbb-cccc-dddd-eeeeeeeeeeee\" does not have automatic rotation enabled",
+      "description": "Customer-managed KMS key arn:aws:kms:us-east-1:123456789012:key/key-001aaa-bbbb-cccc-dddd-eeeeeeeeeeee does not have automatic key rotation enabled. Enable rotation to limit the amount of data encrypted under a single key version.",
+      "severity": "medium",
+      "category": "encryption",
+      "resourceType": "AWS::KMS::Key",
+      "resourceId": "arn:aws:kms:us-east-1:123456789012:key/key-001aaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+      "remediationTier": "auto",
+      "autoFixAvailable": true,
+      "controlMappings": [
+        {
+          "framework": "soc2",
+          "controlId": "CC6.1",
+          "controlName": "Logical and Physical Access Controls",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "iso27001",
+          "controlId": "A.8.24",
+          "controlName": "Use of Cryptography",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "hipaa",
+          "controlId": "164.312(a)(1)",
+          "controlName": "Access Control",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "gdpr",
+          "controlId": "Art.32(1)",
+          "controlName": "Security of Processing",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "pcidss",
+          "controlId": "3.5",
+          "controlName": "Primary Account Number Protection",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "dpdpa",
+          "controlId": "DPDPA-S8-1",
+          "controlName": "Encryption of Personal Data",
+          "status": "fail",
+          "weight": 3
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "SC-12",
+          "controlName": "Cryptographic Key Management",
+          "status": "fail",
+          "weight": 2
+        },
+        {
+          "framework": "nist80053",
+          "controlId": "SI-2",
+          "controlName": "Flaw Remediation",
+          "status": "fail",
+          "weight": 3
+        }
+      ]
+    }
+  ],
+  "errors": []
+}

@@ -1,0 +1,20 @@
+{
+  "name": "blackfyre-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "BLACKFYRE — AI-Powered Multi-Cloud Compliance Platform",
+  "scripts": {
+    "dev:website": "cd website && npm run dev",
+    "dev:platform": "cd platform && npm run dev",
+    "build:website": "cd website && npm run build",
+    "build:platform": "cd platform && npm run build",
+    "test": "cd platform && npm test",
+    "lint": "cd platform && npm run lint --workspace=packages/admin && npm run lint --workspace=packages/portal"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "typescript": "^6.0.3"
+  }
+}

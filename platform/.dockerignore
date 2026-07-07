@@ -1,0 +1,17 @@
+node_modules
+**/node_modules
+.next
+**/.next
+dist
+**/dist
+tests
+**/tests
+*.md
+.git
+.claude
+.claude-flow
+.env*
+coverage
+.sst
+**/.sst
+infra/containers/**/__pycache__

@@ -1,0 +1,57 @@
+import type { CSSProperties } from "react";
+
+export type HaloStatusDotSize = "sm" | "md" | "lg";
+
+export interface HaloStatusDotProps {
+  /** CSS color or CSS variable reference. Defaults to `var(--accent)`. */
+  color?: string;
+  size?: HaloStatusDotSize;
+  /** Disable the pulse animation. */
+  steady?: boolean;
+  className?: string;
+  style?: CSSProperties;
+  "aria-label"?: string;
+}
+
+const SIZE_PX: Record<HaloStatusDotSize, number> = {
+  sm: 5,
+  md: 7,
+  lg: 10,
+};
+
+/**
+ * Small glowing status dot. Purely presentational — safe in server
+ * components. Pulse uses the global `.status-dot-live` keyframe already
+ * defined in admin `globals.css`.
+ */
+export default function HaloStatusDot({
+  color = "var(--accent)",
+  size = "md",
+  steady = false,
+  className,
+  style,
+  "aria-label": ariaLabel,
+}: HaloStatusDotProps) {
+  const px = SIZE_PX[size];
+  const composed: CSSProperties = {
+    width: px,
+    height: px,
+    background: color,
+    boxShadow: `0 0 ${Math.round(px * 1.6)}px ${color}`,
+    ...style,
+  };
+  return (
+    <span
+      aria-label={ariaLabel}
+      role={ariaLabel ? "status" : undefined}
+      className={[
+        "inline-block rounded-full shrink-0",
+        steady ? "" : "status-dot-live",
+        className ?? "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+      style={composed}
+    />
+  );
+}

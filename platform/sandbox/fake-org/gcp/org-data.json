@@ -1,0 +1,375 @@
+{
+  "organization": {
+    "id": "organizations/123456789",
+    "displayName": "Acme Bank"
+  },
+  "projects": [
+    {
+      "projectId": "acme-bank-prod",
+      "projectNumber": "111222333444",
+      "displayName": "Acme Bank Production"
+    },
+    {
+      "projectId": "acme-bank-dev",
+      "projectNumber": "555666777888",
+      "displayName": "Acme Bank Development"
+    },
+    {
+      "projectId": "acme-bank-data",
+      "projectNumber": "999000111222",
+      "displayName": "Acme Bank Data Platform"
+    }
+  ],
+  "gcsBuckets": [
+    {
+      "name": "acme-public",
+      "projectId": "acme-bank-prod",
+      "location": "US-EAST1",
+      "uniformBucketLevelAccess": false,
+      "versioningEnabled": false,
+      "cmekKey": null,
+      "retentionPolicyEnabled": false,
+      "iamBindings": [
+        { "role": "roles/storage.objectViewer", "members": ["allUsers"] }
+      ]
+    },
+    {
+      "name": "acme-assets",
+      "projectId": "acme-bank-prod",
+      "location": "US-EAST1",
+      "uniformBucketLevelAccess": true,
+      "versioningEnabled": true,
+      "cmekKey": null,
+      "retentionPolicyEnabled": false,
+      "iamBindings": []
+    },
+    {
+      "name": "acme-backups",
+      "projectId": "acme-bank-prod",
+      "location": "US-CENTRAL1",
+      "uniformBucketLevelAccess": false,
+      "versioningEnabled": false,
+      "cmekKey": null,
+      "retentionPolicyEnabled": true,
+      "iamBindings": [
+        { "role": "roles/storage.admin", "members": ["allAuthenticatedUsers"] }
+      ]
+    },
+    {
+      "name": "acme-logs",
+      "projectId": "acme-bank-prod",
+      "location": "US-EAST1",
+      "uniformBucketLevelAccess": true,
+      "versioningEnabled": true,
+      "cmekKey": "projects/acme-bank-prod/locations/us-east1/keyRings/acme-kr/cryptoKeys/logs-key",
+      "retentionPolicyEnabled": true,
+      "iamBindings": []
+    },
+    {
+      "name": "acme-ml-data",
+      "projectId": "acme-bank-data",
+      "location": "US-CENTRAL1",
+      "uniformBucketLevelAccess": false,
+      "versioningEnabled": false,
+      "cmekKey": null,
+      "retentionPolicyEnabled": false,
+      "iamBindings": []
+    },
+    {
+      "name": "acme-exports",
+      "projectId": "acme-bank-data",
+      "location": "US-EAST1",
+      "uniformBucketLevelAccess": true,
+      "versioningEnabled": true,
+      "cmekKey": "projects/acme-bank-data/locations/us-east1/keyRings/data-kr/cryptoKeys/export-key",
+      "retentionPolicyEnabled": true,
+      "iamBindings": []
+    }
+  ],
+  "bigqueryDatasets": [
+    {
+      "datasetId": "analytics",
+      "projectId": "acme-bank-data",
+      "location": "US",
+      "cmekKey": null,
+      "iamBindings": [
+        { "role": "roles/bigquery.dataViewer", "members": ["allAuthenticatedUsers"] }
+      ],
+      "defaultTableExpirationMs": null
+    },
+    {
+      "datasetId": "reporting",
+      "projectId": "acme-bank-data",
+      "location": "US",
+      "cmekKey": null,
+      "iamBindings": [],
+      "defaultTableExpirationMs": null
+    },
+    {
+      "datasetId": "ml_features",
+      "projectId": "acme-bank-data",
+      "location": "US-CENTRAL1",
+      "cmekKey": null,
+      "iamBindings": [],
+      "defaultTableExpirationMs": 7776000000
+    },
+    {
+      "datasetId": "audit_logs",
+      "projectId": "acme-bank-prod",
+      "location": "US",
+      "cmekKey": "projects/acme-bank-prod/locations/us/keyRings/audit-kr/cryptoKeys/audit-key",
+      "iamBindings": [],
+      "defaultTableExpirationMs": 7776000000
+    }
+  ],
+  "cloudSqlInstances": [
+    {
+      "name": "prod-db",
+      "projectId": "acme-bank-prod",
+      "region": "us-east1",
+      "databaseVersion": "POSTGRES_14",
+      "ipAddresses": [
+        { "type": "PRIMARY", "ipAddress": "34.75.11.22" }
+      ],
+      "authorizedNetworks": [
+        { "name": "allow-all", "value": "0.0.0.0/0" }
+      ],
+      "requireSsl": false,
+      "backupEnabled": true,
+      "publicIpEnabled": true
+    },
+    {
+      "name": "analytics-db",
+      "projectId": "acme-bank-data",
+      "region": "us-central1",
+      "databaseVersion": "MYSQL_8_0",
+      "ipAddresses": [
+        { "type": "PRIMARY", "ipAddress": "35.200.44.55" }
+      ],
+      "authorizedNetworks": [],
+      "requireSsl": false,
+      "backupEnabled": false,
+      "publicIpEnabled": true
+    },
+    {
+      "name": "reporting-db",
+      "projectId": "acme-bank-data",
+      "region": "us-east1",
+      "databaseVersion": "POSTGRES_15",
+      "ipAddresses": [],
+      "authorizedNetworks": [],
+      "requireSsl": true,
+      "backupEnabled": true,
+      "publicIpEnabled": false
+    }
+  ],
+  "gkeClusters": [
+    {
+      "name": "gke-prod",
+      "projectId": "acme-bank-prod",
+      "location": "us-east1",
+      "resourceId": "projects/acme-bank-prod/locations/us-east1/clusters/gke-prod",
+      "workloadIdentityEnabled": false,
+      "shieldedNodesEnabled": false,
+      "privateClusterEnabled": false,
+      "networkPolicyEnabled": false,
+      "masterAuthorizedNetworksEnabled": false
+    },
+    {
+      "name": "gke-data",
+      "projectId": "acme-bank-data",
+      "location": "us-central1",
+      "resourceId": "projects/acme-bank-data/locations/us-central1/clusters/gke-data",
+      "workloadIdentityEnabled": true,
+      "shieldedNodesEnabled": true,
+      "privateClusterEnabled": true,
+      "networkPolicyEnabled": true,
+      "masterAuthorizedNetworksEnabled": true
+    }
+  ],
+  "iamBindings": [
+    {
+      "projectId": "acme-bank-prod",
+      "role": "roles/owner",
+      "members": [
+        "user:alice@acmebank.com",
+        "user:bob@acmebank.com",
+        "user:sysadmin@acmebank.com"
+      ]
+    },
+    {
+      "projectId": "acme-bank-prod",
+      "role": "roles/editor",
+      "members": [
+        "user:carol@acmebank.com",
+        "user:devops@acmebank.com"
+      ]
+    },
+    {
+      "projectId": "acme-bank-data",
+      "role": "roles/owner",
+      "members": [
+        "user:dataeng@acmebank.com"
+      ]
+    },
+    {
+      "projectId": "acme-bank-data",
+      "role": "roles/editor",
+      "members": [
+        "user:analyst@acmebank.com",
+        "user:ml-engineer@acmebank.com"
+      ]
+    },
+    {
+      "projectId": "acme-bank-dev",
+      "role": "roles/owner",
+      "members": [
+        "user:dev-lead@acmebank.com"
+      ]
+    }
+  ],
+  "kmsKeys": [
+    {
+      "name": "projects/acme-bank-prod/locations/us-east1/keyRings/acme-kr/cryptoKeys/app-key",
+      "keyRing": "acme-kr",
+      "location": "us-east1",
+      "projectId": "acme-bank-prod",
+      "rotationPeriod": null,
+      "iamBindings": []
+    },
+    {
+      "name": "projects/acme-bank-prod/locations/us-east1/keyRings/acme-kr/cryptoKeys/db-key",
+      "keyRing": "acme-kr",
+      "location": "us-east1",
+      "projectId": "acme-bank-prod",
+      "rotationPeriod": "7776000s",
+      "iamBindings": []
+    },
+    {
+      "name": "projects/acme-bank-prod/locations/us-east1/keyRings/acme-kr/cryptoKeys/logs-key",
+      "keyRing": "acme-kr",
+      "location": "us-east1",
+      "projectId": "acme-bank-prod",
+      "rotationPeriod": null,
+      "iamBindings": [
+        { "role": "roles/cloudkms.cryptoKeyEncrypterDecrypter", "members": ["allUsers"] }
+      ]
+    },
+    {
+      "name": "projects/acme-bank-data/locations/us-east1/keyRings/data-kr/cryptoKeys/export-key",
+      "keyRing": "data-kr",
+      "location": "us-east1",
+      "projectId": "acme-bank-data",
+      "rotationPeriod": "15552000s",
+      "iamBindings": []
+    },
+    {
+      "name": "projects/acme-bank-data/locations/us-central1/keyRings/data-kr/cryptoKeys/ml-key",
+      "keyRing": "data-kr",
+      "location": "us-central1",
+      "projectId": "acme-bank-data",
+      "rotationPeriod": null,
+      "iamBindings": []
+    },
+    {
+      "name": "projects/acme-bank-data/locations/us/keyRings/audit-kr/cryptoKeys/audit-key",
+      "keyRing": "audit-kr",
+      "location": "us",
+      "projectId": "acme-bank-data",
+      "rotationPeriod": "7776000s",
+      "iamBindings": []
+    }
+  ],
+  "sccFindings": [
+    {
+      "name": "organizations/123456789/sources/scc/findings/f001",
+      "category": "PUBLIC_BUCKET_ACL",
+      "resourceName": "//storage.googleapis.com/acme-public",
+      "severity": "CRITICAL",
+      "state": "ACTIVE",
+      "description": "Bucket acme-public has allUsers in its IAM policy"
+    },
+    {
+      "name": "organizations/123456789/sources/scc/findings/f002",
+      "category": "OPEN_FIREWALL",
+      "resourceName": "//compute.googleapis.com/projects/acme-bank-prod/global/firewalls/default-allow-ssh",
+      "severity": "HIGH",
+      "state": "ACTIVE",
+      "description": "Firewall rule allows SSH from 0.0.0.0/0"
+    },
+    {
+      "name": "organizations/123456789/sources/scc/findings/f003",
+      "category": "OPEN_FIREWALL",
+      "resourceName": "//compute.googleapis.com/projects/acme-bank-prod/global/firewalls/default-allow-rdp",
+      "severity": "HIGH",
+      "state": "ACTIVE",
+      "description": "Firewall rule allows RDP from 0.0.0.0/0"
+    },
+    {
+      "name": "organizations/123456789/sources/scc/findings/f004",
+      "category": "SQL_NO_ROOT_PASSWORD",
+      "resourceName": "//sqladmin.googleapis.com/projects/acme-bank-prod/instances/prod-db",
+      "severity": "HIGH",
+      "state": "ACTIVE",
+      "description": "Cloud SQL instance has no root password set"
+    },
+    {
+      "name": "organizations/123456789/sources/scc/findings/f005",
+      "category": "AUDIT_LOGGING_DISABLED",
+      "resourceName": "//cloudresourcemanager.googleapis.com/projects/acme-bank-dev",
+      "severity": "MEDIUM",
+      "state": "ACTIVE",
+      "description": "Cloud Audit Logs data access logging is disabled"
+    },
+    {
+      "name": "organizations/123456789/sources/scc/findings/f006",
+      "category": "MFA_NOT_ENFORCED",
+      "resourceName": "//cloudresourcemanager.googleapis.com/organizations/123456789",
+      "severity": "HIGH",
+      "state": "ACTIVE",
+      "description": "Organization policy does not enforce MFA for users"
+    },
+    {
+      "name": "organizations/123456789/sources/scc/findings/f007",
+      "category": "KMS_KEY_NOT_ROTATED",
+      "resourceName": "//cloudkms.googleapis.com/projects/acme-bank-prod/locations/us-east1/keyRings/acme-kr/cryptoKeys/app-key",
+      "severity": "MEDIUM",
+      "state": "ACTIVE",
+      "description": "KMS key has not been rotated in over 90 days"
+    },
+    {
+      "name": "organizations/123456789/sources/scc/findings/f008",
+      "category": "GKE_WORKLOAD_IDENTITY_DISABLED",
+      "resourceName": "//container.googleapis.com/projects/acme-bank-prod/locations/us-east1/clusters/gke-prod",
+      "severity": "MEDIUM",
+      "state": "ACTIVE",
+      "description": "GKE cluster does not use Workload Identity"
+    }
+  ],
+  "serviceAccounts": [
+    {
+      "email": "sa-deployer@acme-bank-prod.iam.gserviceaccount.com",
+      "projectId": "acme-bank-prod",
+      "keys": [
+        {
+          "name": "projects/acme-bank-prod/serviceAccounts/sa-deployer@acme-bank-prod.iam.gserviceaccount.com/keys/key001",
+          "keyType": "USER_MANAGED",
+          "validAfterTime": "2025-06-15T00:00:00Z"
+        }
+      ],
+      "hasAdminRole": true
+    },
+    {
+      "email": "sa-dataproc@acme-bank-data.iam.gserviceaccount.com",
+      "projectId": "acme-bank-data",
+      "keys": [
+        {
+          "name": "projects/acme-bank-data/serviceAccounts/sa-dataproc@acme-bank-data.iam.gserviceaccount.com/keys/key002",
+          "keyType": "USER_MANAGED",
+          "validAfterTime": "2024-11-01T00:00:00Z"
+        }
+      ],
+      "hasAdminRole": false
+    }
+  ]
+}

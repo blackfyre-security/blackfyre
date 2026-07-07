@@ -1,0 +1,81 @@
+# Dependencies
+node_modules/
+
+# Next.js
+.next/
+out/
+
+# Build
+build/
+dist/
+
+# Environment (NEVER commit secrets)
+.env
+.env*.local
+.env.production
+
+# AWS / cloud-provider credential CSVs downloaded from consoles
+*accessKeys*.csv
+*credentials*.csv
+*_accessKeys.csv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Cloudflare
+.wrangler/
+
+# SST
+.sst/
+sst-env.d.ts
+**/sst-env.d.ts
+
+# Browser test screenshots — local-only output
+platform/packages/admin/tests/browser/__screenshots__/
+
+# Zone.Identifier files (Windows download artifacts)
+*:Zone.Identifier
+
+# Vercel (legacy)
+.vercel
+
+# Certificates
+*.pem
+
+# Misc
+.turbo/
+.cache/
+
+# Development tools
+.superpowers/
+.omc/
+.claude-flow/
+.verdent/
+.planning/
+
+# Claude memory (must stay local — never commit)
+.claude/memory/
+**/.claude/memory/
+memory/
+platform/packages/api/src/migrations/999_staging_seed.sql

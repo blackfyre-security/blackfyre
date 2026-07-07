@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "moduleResolution": "bundler"
+  },
+  "references": [
+    { "path": "./website" },
+    { "path": "./platform" }
+  ],
+  "exclude": ["node_modules", "website", "platform"]
+}

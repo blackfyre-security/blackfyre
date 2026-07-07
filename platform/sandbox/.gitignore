@@ -1,0 +1,9 @@
+node_modules/
+package-lock.json
+.pglite-data/
+fake-org/node_modules/
+fake-org/package-lock.json
+fake-org/server.log
+fake-org/server.pid
+fake-org/last-scan.json
+fake-org/scan-bundle.json

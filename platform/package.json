@@ -1,0 +1,31 @@
+{
+  "name": "blackfyre-platform",
+  "private": true,
+  "workspaces": [
+    "packages/shared",
+    "packages/ui",
+    "packages/api",
+    "packages/portal",
+    "packages/admin",
+    "packages/cli"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=packages/api",
+    "build": "npm run build --workspace=packages/shared && npm run build --workspace=packages/api",
+    "test": "npm run test --workspace=packages/api",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:migrate": "npm run migrate --workspace=packages/api"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@pulumi/docker-build": "^0.0.17",
+    "sst": "^4.13.1",
+    "vercel": "^53.3.2"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "^4.60.4"
+  }
+}

@@ -1,0 +1,156 @@
+import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
+import { Upload } from "@aws-sdk/lib-storage";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import archiver from "archiver";
+import PDFDocument from "pdfkit";
+import { randomUUID } from "node:crypto";
+import { PassThrough } from "node:stream";
+
+interface EvidenceRow {
+  id: string;
+  findingId: string;
+  tenantId: string;
+  type: string;
+  sha256Hash: string;
+  s3ObjectKey?: string | null;
+  framework?: string | null;
+  collectedAt: Date;
+  collectedBy: string;
+}
+
+export class EvidenceBundleService {
+  private client: S3Client;
+  private bucket: string;
+
+  constructor(bucket: string, region: string = "us-east-1") {
+    this.bucket = bucket;
+    this.client = new S3Client({ region });
+  }
+
+  /**
+   * Generate an audit bundle for a framework.
+   * Assembles a zip containing:
+   * 1. PDF cover page with framework info, date, evidence summary
+   * 2. Each evidence artifact fetched from S3
+   *
+   * The zip is streamed to S3 via multipart upload (avoids Lambda /tmp and 6MB response limits).
+   * Returns a presigned download URL (15-minute expiry).
+   */
+  async generateAuditBundle(
+    tenantId: string,
+    framework: string,
+    evidenceRows: EvidenceRow[],
+  ): Promise<{ bundleS3Key: string; presignedUrl: string; evidenceCount: number }> {
+    const bundleId = randomUUID();
+    const bundleS3Key = `bundles/${tenantId}/${framework}/${bundleId}.zip`;
+
+    // Create a PassThrough stream to pipe archiver output to S3 upload
+    const passThrough = new PassThrough();
+
+    // Set up archiver
+    const archive = archiver("zip", { zlib: { level: 6 } });
+    archive.pipe(passThrough);
+
+    // Start S3 multipart upload (consumes the passThrough stream)
+    const upload = new Upload({
+      client: this.client,
+      params: {
+        Bucket: this.bucket,
+        Key: bundleS3Key,
+        Body: passThrough,
+        ContentType: "application/zip",
+      },
+    });
+
+    // Generate PDF cover page
+    const pdfBuffer = await this.generateCoverPdf(framework, tenantId, evidenceRows);
+    archive.append(pdfBuffer, { name: `${framework}-audit-cover.pdf` });
+
+    // Fetch and append each evidence item from S3
+    const itemsWithS3Key = evidenceRows.filter((r) => r.s3ObjectKey);
+    for (const item of itemsWithS3Key) {
+      try {
+        const response = await this.client.send(
+          new GetObjectCommand({ Bucket: this.bucket, Key: item.s3ObjectKey! }),
+        );
+        const bytes = await response.Body!.transformToByteArray();
+        const ext = item.type === "screenshot" ? "png" : "json";
+        archive.append(Buffer.from(bytes), {
+          name: `evidence/${item.id}.${ext}`,
+        });
+      } catch (err) {
+        // Skip items that fail to fetch -- log but don't fail the bundle
+        console.warn(`[evidence-bundle] Failed to fetch ${item.s3ObjectKey}:`, err);
+      }
+    }
+
+    // Finalize archive (no more entries)
+    await archive.finalize();
+
+    // Wait for S3 upload to complete
+    await upload.done();
+
+    // Generate presigned download URL (15-minute expiry)
+    const presignedUrl = await getSignedUrl(
+      this.client,
+      new GetObjectCommand({ Bucket: this.bucket, Key: bundleS3Key }),
+      { expiresIn: 900 },
+    );
+
+    return {
+      bundleS3Key,
+      presignedUrl,
+      evidenceCount: evidenceRows.length,
+    };
+  }
+
+  /**
+   * Generate a PDF cover page for the audit bundle.
+   * Contains framework name, generation date, evidence summary table.
+   */
+  private async generateCoverPdf(
+    framework: string,
+    tenantId: string,
+    evidenceRows: EvidenceRow[],
+  ): Promise<Buffer> {
+    return new Promise<Buffer>((resolve, reject) => {
+      const doc = new PDFDocument();
+      const chunks: Buffer[] = [];
+
+      doc.on("data", (chunk: Buffer) => chunks.push(chunk));
+      doc.on("end", () => resolve(Buffer.concat(chunks)));
+      doc.on("error", reject);
+
+      // Cover page content
+      doc.fontSize(24).text("BLACKFYRE Audit Evidence Package", { align: "center" });
+      doc.moveDown();
+      doc.fontSize(16).text(`Framework: ${framework.toUpperCase()}`, { align: "center" });
+      doc.moveDown();
+      doc.fontSize(12).text(`Generated: ${new Date().toISOString()}`);
+      doc.text(`Tenant: ${tenantId}`);
+      doc.text(`Total Evidence Items: ${evidenceRows.length}`);
+      doc.moveDown();
+
+      // Evidence summary table
+      doc.fontSize(14).text("Evidence Summary");
+      doc.moveDown(0.5);
+
+      for (const item of evidenceRows.slice(0, 50)) {
+        doc.fontSize(10).text(
+          `[${item.type}] ${item.id} — SHA-256: ${item.sha256Hash.slice(0, 16)}... — ${item.collectedAt.toISOString()}`,
+        );
+      }
+
+      if (evidenceRows.length > 50) {
+        doc.moveDown();
+        doc.fontSize(10).text(`... and ${evidenceRows.length - 50} more items`);
+      }
+
+      doc.moveDown();
+      doc.fontSize(8).text("This document was generated by BLACKFYRE AI Security Platform.");
+      doc.text("Evidence files are stored with S3 Object Lock (WORM) and SHA-256 integrity verification.");
+
+      doc.end();
+    });
+  }
+}

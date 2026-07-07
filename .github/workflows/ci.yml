@@ -1,0 +1,123 @@
+# REAL IMPL (BLACKFYRE 2026-06): quality gates turned ON.
+#   - API unit tests RUN on every PR/push (npm run test:unit) and are BLOCKING.
+#   - Typecheck (tsc --noEmit) is BLOCKING (no continue-on-error / soft-fail).
+#   - Lint (admin + portal) is BLOCKING.
+#   - npm audit (high+ severity) ALWAYS RUNS and surfaces a visible ::warning::
+#     annotation; kept non-blocking so transient advisories don't wedge deploys.
+# Build/deploy live in deploy.yml / build-images.yml and are intentionally untouched.
+name: CI
+
+on:
+  pull_request:
+    branches: [main, staging]
+  push:
+    branches: [main, staging]
+  workflow_dispatch:
+
+# Cancel in-progress runs for the same PR/branch when new commits land
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  platform:
+    runs-on: ubuntu-latest
+    name: Platform — build + typecheck + lint + unit tests
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: platform/package-lock.json
+      - run: npm ci --no-audit --no-fund
+        working-directory: platform
+      - name: Build @blackfyre/shared
+        run: npm run build --workspace=packages/shared
+        working-directory: platform
+      # BLOCKING GATE: any type error fails the job (no continue-on-error).
+      - name: Typecheck api (blocking)
+        run: npx tsc --noEmit -p packages/api/tsconfig.json
+        working-directory: platform
+      # BLOCKING GATE: API unit suite must run and pass on every PR/push.
+      - name: Test api — unit (blocking)
+        run: npm run test:unit --workspace=packages/api
+        working-directory: platform
+      - name: Build portal (static export)
+        run: npm run build --workspace=packages/portal
+        working-directory: platform
+        env:
+          NEXT_PUBLIC_API_URL: ${{ vars.STAGING_API_URL || 'https://api.example.com' }}
+          NEXT_PUBLIC_DEMO_MODE: "false"
+      - name: Build admin (static export)
+        run: npm run build --workspace=packages/admin
+        working-directory: platform
+        env:
+          NEXT_PUBLIC_API_URL: ${{ vars.STAGING_API_URL || 'https://api.example.com' }}
+      # BLOCKING GATE: lint must pass for the Next.js apps that define a lint script.
+      - name: Lint admin (blocking)
+        run: npm run lint --workspace=packages/admin --if-present
+        working-directory: platform
+      - name: Lint portal (blocking)
+        run: npm run lint --workspace=packages/portal --if-present
+        working-directory: platform
+
+  website:
+    runs-on: ubuntu-latest
+    name: Website — build
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: website/package-lock.json
+      - run: npm ci --no-audit --no-fund
+        working-directory: website
+      - name: Build static export
+        run: npm run build
+        working-directory: website
+
+  audit:
+    runs-on: ubuntu-latest
+    name: Security audit (npm audit, high+) — warn-only
+    # Non-blocking by design: advisories appear as ::warning:: annotations so the
+    # team sees them every run, but a freshly-published advisory can't wedge a
+    # deploy. Flip continue-on-error -> false to make this a hard gate.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "20"
+      # REAL IMPL (BLACKFYRE 2026-06): always run the audit; emit a GitHub
+      # ::warning:: annotation listing high/critical counts when any are found,
+      # so the result is a visible warn rather than a silently-green step.
+      - name: Audit platform (high+ severity)
+        working-directory: platform
+        run: |
+          set +e
+          npm audit --audit-level=high --omit=dev --json > audit.json
+          code=$?
+          high=$(node -e "try{const a=require('./audit.json').metadata.vulnerabilities;process.stdout.write(String((a.high||0)+(a.critical||0)))}catch(e){process.stdout.write('0')}")
+          if [ "$code" -ne 0 ] || [ "${high:-0}" -gt 0 ]; then
+            echo "::warning title=npm audit (platform)::${high:-?} high/critical advisory(ies) found — review 'npm audit --omit=dev'."
+            npm audit --audit-level=high --omit=dev || true
+          else
+            echo "platform: no high/critical production advisories."
+          fi
+          exit 0
+      - name: Audit website (high+ severity)
+        working-directory: website
+        run: |
+          set +e
+          npm audit --audit-level=high --omit=dev --json > audit.json
+          code=$?
+          high=$(node -e "try{const a=require('./audit.json').metadata.vulnerabilities;process.stdout.write(String((a.high||0)+(a.critical||0)))}catch(e){process.stdout.write('0')}")
+          if [ "$code" -ne 0 ] || [ "${high:-0}" -gt 0 ]; then
+            echo "::warning title=npm audit (website)::${high:-?} high/critical advisory(ies) found — review 'npm audit --omit=dev'."
+            npm audit --audit-level=high --omit=dev || true
+          else
+            echo "website: no high/critical production advisories."
+          fi
+          exit 0

@@ -1,0 +1,58 @@
+version: 2
+updates:
+  # Platform (monorepo: api, admin, portal, shared, ui, cli)
+  - package-ecosystem: "npm"
+    directory: "/platform"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Asia/Kolkata"
+    open-pull-requests-limit: 5
+    groups:
+      platform-minor-patch:
+        applies-to: version-updates
+        update-types:
+          - "minor"
+          - "patch"
+      platform-security:
+        applies-to: security-updates
+    labels:
+      - "dependencies"
+      - "platform"
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+
+  # Marketing website
+  - package-ecosystem: "npm"
+    directory: "/website"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Asia/Kolkata"
+    open-pull-requests-limit: 3
+    groups:
+      website-minor-patch:
+        applies-to: version-updates
+        update-types:
+          - "minor"
+          - "patch"
+      website-security:
+        applies-to: security-updates
+    labels:
+      - "dependencies"
+      - "website"
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    labels:
+      - "dependencies"
+      - "ci"

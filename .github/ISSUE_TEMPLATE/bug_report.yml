@@ -1,0 +1,32 @@
+name: Bug report
+description: Something is broken in the platform, portal, admin, or demo
+labels: ["bug"]
+body:
+  - type: input
+    id: env
+    attributes:
+      label: Environment
+      placeholder: "e.g. demo.blackfyre.tech / app-staging.blackfyre.tech / local dev"
+    validations:
+      required: true
+  - type: textarea
+    id: describe
+    attributes:
+      label: What happened
+      placeholder: "Steps to reproduce, what you expected, what you saw."
+    validations:
+      required: true
+  - type: textarea
+    id: console
+    attributes:
+      label: Browser console / server logs (if relevant)
+      render: shell
+  - type: input
+    id: browser
+    attributes:
+      label: Browser & version (if UI bug)
+      placeholder: "e.g. Chrome 130, Firefox 128"
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots

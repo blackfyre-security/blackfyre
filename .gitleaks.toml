@@ -1,0 +1,30 @@
+# Blackfyre gitleaks configuration.
+#
+# Extends the upstream default ruleset. The allowlist below covers ONLY
+# synthetic fixtures and test values that trip the generic detectors — every
+# entry has been verified by hand to contain no real credential. Production
+# secrets are never committed: they are read from the environment / SST
+# secrets at runtime (see docs/developer/configuration.md).
+
+title = "Blackfyre gitleaks config"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Synthetic demo fixtures and test-only credential strings (no real secrets)"
+
+# Whole-file allowlists — these files exist purely to exercise scanners/redaction
+# with fake data. All AWS ids here derive from AWS's own documented example key
+# AKIAIOSFODNN7EXAMPLE.
+paths = [
+  '''sandbox/fake-org/org-data\.json''',
+  '''platform/sandbox/fake-org/org-data\.json''',
+  '''platform/packages/api/tests/unit/security-regression\.test\.ts''',
+  '''platform/packages/api/tests/unit/security-audit-findings\.test\.ts''',
+]
+
+# The AWS documentation example-key family, used across the demo fixtures.
+regexes = [
+  '''AKIAIOSFODNN7[A-Z0-9]+''',
+]

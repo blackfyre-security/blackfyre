@@ -1,0 +1,5 @@
+
+# Playwright / Vitest test outputs
+.vitest-attachments/
+test-results/
+playwright-report/

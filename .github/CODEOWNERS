@@ -1,0 +1,22 @@
+# CODEOWNERS — advisory only. Branch protection does NOT require approving
+# review by an owner. This file just auto-tags reviewers when you open a PR
+# so the right person gets a heads-up. Either of us can self-merge anything.
+
+# Infrastructure (deploys + cost + security exposure)
+/platform/infra/                                @YOUR_GITHUB_USERNAME
+/platform/sst.config.ts                         @YOUR_GITHUB_USERNAME
+/.github/workflows/                             @YOUR_GITHUB_USERNAME
+/.github/dependabot.yml                         @YOUR_GITHUB_USERNAME
+/platform/packages/api/src/lambda.ts            @YOUR_GITHUB_USERNAME
+/platform/packages/api/src/db/                  @YOUR_GITHUB_USERNAME
+/platform/packages/api/src/migrations/          @YOUR_GITHUB_USERNAME
+
+# Frontend (portal + admin + marketing)
+/platform/packages/portal/                      @NarasimaPandiyan
+/platform/packages/admin/                       @NarasimaPandiyan
+/website/                                       @NarasimaPandiyan
+
+# Demo / sandbox (shared)
+/sandbox/                                       @YOUR_GITHUB_USERNAME @NarasimaPandiyan
+/platform/packages/api/src/demo-server.ts       @YOUR_GITHUB_USERNAME @NarasimaPandiyan
+/platform/packages/api/src/demo-lambda.ts       @YOUR_GITHUB_USERNAME @NarasimaPandiyan
