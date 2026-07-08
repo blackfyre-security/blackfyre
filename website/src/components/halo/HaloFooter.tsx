@@ -107,9 +107,9 @@ function BrandBlock() {
       <img
         src="/brand/blackfyre-logomark.png"
         alt="Blackfyre"
-        width={295}
-        height={64}
-        className="h-auto w-auto max-h-16 max-w-full"
+        width={1483}
+        height={344}
+        className="h-11 w-auto max-w-full"
       />
       <p className="halo-label mt-3">Open source &middot; Apache-2.0</p>
       <p className="mt-4 max-w-[300px] text-[13px] leading-relaxed text-text-muted">
