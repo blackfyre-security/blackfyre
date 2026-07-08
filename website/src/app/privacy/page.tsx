@@ -29,9 +29,14 @@ export default function PrivacyPolicy() {
           <div className="halo-hairline mt-10" />
           <p className="mt-10 text-[16px] leading-[1.75] text-text-muted">
             Blackfyre Consulting (&ldquo;we&rdquo;, &ldquo;us&rdquo;, or &ldquo;our&rdquo;), Chennai, India, operates the
-            BLACKFYRE security platform and related professional services. This policy explains how we collect,
+            Blackfyre hosted service and related professional services. This policy explains how we collect,
             use, store, and protect personal data. We are committed to compliance with the EU General Data
             Protection Regulation (GDPR) and India&apos;s Digital Personal Data Protection Act 2023 (DPDPA).
+          </p>
+          <p className="mt-4 text-[15px] leading-[1.7] text-text-muted">
+            <span className="font-medium text-text">Self-hosting?</span> The open-source Blackfyre software
+            you run on your own infrastructure sends no data to Blackfyre Consulting — this policy covers only
+            data you share with us directly (the contact form, the hosted service, or a services engagement).
           </p>
         </header>
 

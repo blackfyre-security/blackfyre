@@ -27,11 +27,21 @@ export default function TermsOfService() {
             Effective date: 1 April 2026 &middot; Last updated: 1 April 2026
           </p>
           <div className="halo-hairline mt-10" />
-          <p className="mt-10 text-[16px] leading-[1.75] text-text-muted">
-            These Terms of Service (&ldquo;Terms&rdquo;) govern your access to and use of the BLACKFYRE platform
-            and professional services provided by Blackfyre Consulting (&ldquo;Blackfyre&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo;),
-            a consulting firm based in Chennai, India. By accessing our platform or engaging our services
-            you agree to be bound by these Terms.
+          <div className="mt-8 rounded-lg border border-border bg-surface-alt p-4 text-[13.5px] leading-relaxed text-text-muted">
+            <span className="font-medium text-text">Open-source note.</span> Blackfyre is open source under
+            the Apache-2.0 licence, and these Terms are being updated for the open-source release. The
+            software you <span className="text-text">self-host</span> is governed by the project&apos;s{" "}
+            <a href="https://github.com/blackfyre-security/blackfyre/blob/main/LICENSE" className="text-accent underline-offset-4 hover:underline">
+              LICENSE
+            </a>
+            {" "}— the paid-service terms below do not apply to it.
+          </div>
+          <p className="mt-8 text-[16px] leading-[1.75] text-text-muted">
+            These Terms of Service (&ldquo;Terms&rdquo;) govern your use of the Blackfyre{" "}
+            <span className="text-text">hosted service</span> and the professional services provided by
+            Blackfyre Consulting (&ldquo;Blackfyre&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo;), a firm based in Chennai, India.
+            Use of the open-source software itself is governed by the Apache-2.0 licence. By using our hosted
+            service or engaging our services you agree to be bound by these Terms.
           </p>
         </header>
 
@@ -60,12 +70,22 @@ export default function TermsOfService() {
             <div className="space-y-4">
               <div className="halo-card p-5">
                 <p className="mb-2 font-display text-[15px] font-medium tracking-display text-text">
-                  SaaS Platform
+                  Open-source software
                 </p>
                 <p className="text-[14px] leading-relaxed">
-                  The BLACKFYRE platform is a multi-tenant, cloud-hosted security management product
-                  available in three subscription tiers: Comply, Protect, and Defend. Features vary by
-                  tier as described on our pricing page.
+                  Blackfyre is open-source software licensed under Apache-2.0. You may run it on your own
+                  infrastructure free of charge; your use of the source is governed by the LICENSE and it is
+                  provided &ldquo;as is&rdquo;, without warranty.
+                </p>
+              </div>
+              <div className="halo-card p-5">
+                <p className="mb-2 font-display text-[15px] font-medium tracking-display text-text">
+                  Hosted option
+                </p>
+                <p className="text-[14px] leading-relaxed">
+                  An optional managed cloud at blackfyre.tech, currently in early access. Pricing and any
+                  service commitments for a paid hosted tier will be set out separately when that tier
+                  becomes generally available.
                 </p>
               </div>
               <div className="halo-card p-5">
@@ -117,7 +137,7 @@ export default function TermsOfService() {
                 "Resell or sublicense access to the platform without our written consent.",
                 "Use the platform in violation of any applicable law or regulation.",
                 "Introduce malware, viruses, or any code designed to disrupt platform operations.",
-                "Exceed the resource usage limits for your subscription tier.",
+                "Place undue load on, or otherwise abuse, the hosted service beyond its documented limits.",
               ].map((item) => (
                 <li key={item} className="flex gap-3">
                   <span className="mt-[10px] h-1.5 w-1.5 flex-shrink-0 rounded-full bg-crit" />
@@ -147,7 +167,7 @@ export default function TermsOfService() {
                   {[
                     ["GST", "18% GST applied to all invoices as required under Indian tax law."],
                     ["Payment terms", "Net 30 days from invoice date."],
-                    ["Platform subscriptions", "Billed monthly or annually in advance."],
+                    ["Hosted option", "Pricing set out separately when the hosted tier becomes generally available."],
                     ["Professional services", "50% upfront, 50% on delivery unless otherwise agreed."],
                     ["Late payments", "1.5% per month on overdue balances after 30-day grace period."],
                   ].map(([item, detail]) => (
@@ -212,10 +232,11 @@ export default function TermsOfService() {
               8. Intellectual Property
             </h2>
             <p className="mb-3">
-              The BLACKFYRE platform, its underlying technology, brand assets, and proprietary methodologies
-              are the sole intellectual property of Blackfyre Consulting. We grant you a limited,
-              non-exclusive, non-transferable licence to use the platform for your internal business
-              purposes during the subscription term.
+              The Blackfyre <span className="text-text">source code</span> is released under the Apache-2.0
+              licence — you are free to use, modify, and redistribute it under those terms. The Blackfyre
+              <span className="text-text"> name and logo are trademarks</span> of Blackfyre Consulting and are
+              not granted by the code licence; forks must rename. The hosted service and brand assets remain
+              the property of Blackfyre Consulting.
             </p>
             <p>
               Reports, recommendations, and deliverables produced under a professional services engagement
@@ -250,7 +271,7 @@ export default function TermsOfService() {
             </h2>
             <div className="space-y-3">
               <p>
-                Either party may terminate a platform subscription by providing 30 days&apos; written notice
+                Either party may terminate use of the hosted service by providing 30 days&apos; written notice
                 prior to the next renewal date. Professional services engagements may be terminated
                 per the terms of the applicable SOW.
               </p>
