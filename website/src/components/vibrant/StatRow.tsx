@@ -1,3 +1,5 @@
+import { Counter } from "./motion";
+
 interface Stat {
   value: string;
   label: string;
@@ -33,7 +35,7 @@ export default function StatRow({
         {stats.map((s) => (
           <div key={s.label}>
             <p className={`whitespace-nowrap font-mono text-[clamp(20px,4vw,30px)] font-extrabold leading-none tracking-tight ${s.color ?? "text-zinc-900"}`}>
-              {s.value}
+              {/^\d+$/.test(s.value) ? <Counter value={Number(s.value)} /> : s.value}
             </p>
             <p className="mt-1 font-mono text-[11px] uppercase tracking-wide text-zinc-500">{s.label}</p>
           </div>

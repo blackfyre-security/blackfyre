@@ -23,6 +23,7 @@ import CTABanner from "@/components/vibrant/CTABanner";
 import StepTimeline from "@/components/vibrant/StepTimeline";
 import { CaseStudyCardDark, FeatureCardLight } from "@/components/vibrant/Cards";
 import { DeviceCluster } from "@/components/vibrant/Mockups";
+import { Parallax } from "@/components/vibrant/motion";
 import { LimeButton, GhostButton, GitHubIcon } from "@/components/vibrant/buttons";
 
 import { SITE } from "@/data/site";
@@ -153,9 +154,9 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="hidden lg:block">
+          <Parallax className="hidden lg:block" shift={-6}>
             <DeviceCluster />
-          </div>
+          </Parallax>
         </div>
 
         <LogoRow

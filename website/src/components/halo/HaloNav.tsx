@@ -46,9 +46,9 @@ function BrandMark() {
         src="/brand/blackfyre-logomark.png"
         alt=""
         aria-hidden="true"
-        width={221}
-        height={48}
-        className="mt-2 h-12 w-auto transition-transform group-hover:scale-[1.03]"
+        width={1600}
+        height={347}
+        className="h-10 w-auto transition-transform group-hover:scale-[1.03]"
       />
     </Link>
   );
