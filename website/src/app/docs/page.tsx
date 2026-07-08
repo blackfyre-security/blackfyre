@@ -1,274 +1,302 @@
 import type { Metadata } from "next";
-import type { ReactNode } from "react";
+import {
+  Sparkles,
+  Terminal,
+  Boxes,
+  Layers,
+  Users,
+  BookOpen,
+  ArrowUpRight,
+} from "lucide-react";
+
 import HaloNav from "@/components/halo/HaloNav";
 import HaloFooter from "@/components/halo/HaloFooter";
-import HaloSectionHead from "@/components/halo/HaloSectionHead";
-import HaloCTA from "@/components/halo/HaloCTA";
-import HaloReveal from "@/components/halo/HaloReveal";
+
+import Section from "@/components/vibrant/Section";
+import SectionHead from "@/components/vibrant/SectionHead";
+import StatRow from "@/components/vibrant/StatRow";
+import { CaseStudyCardDark } from "@/components/vibrant/Cards";
+import { DeviceCluster } from "@/components/vibrant/Mockups";
+import { LimeButton, GhostButton, GitHubIcon } from "@/components/vibrant/buttons";
+import { ACCENTS, type Accent } from "@/components/vibrant/accents";
+
 import { SITE, DOCS, QUICKSTART, type DocLink } from "@/data/site";
+import { FRAMEWORK_COUNT, TOTAL_CONTROLS } from "@/data/frameworks";
 
 export const metadata: Metadata = {
   title: "Docs — Blackfyre",
   description:
-    "Documentation hub for Blackfyre, the open-source multi-cloud compliance platform: local setup, self-hosting, architecture decisions, ADRs, and project policies.",
+    "Documentation hub for Blackfyre, the open-source multi-cloud compliance platform: local setup, self-hosting, architecture decisions, ADRs, and project policies — all linking straight into the public repository.",
 };
 
+const REPO_DOCS_URL = `${SITE.repoUrl}/tree/main/docs`;
 const LOCAL_DEV_URL =
   DOCS.find((d) => d.title.toLowerCase().includes("local development"))?.url ??
   SITE.repoUrl;
-const REPO_DOCS_URL = `${SITE.repoUrl}/tree/main/docs`;
 
-// Bucket the single source of truth (DOCS) into reading-order groups. The
-// first three predicates carve out their sets; PROJECT is the catch-all, so
-// every one of the 22 links lands in exactly one group and none are dropped.
+/* ── Bucket the single source of truth (DOCS) into reading-order groups. ────
+   The first three predicates carve out their sets; PROJECT is the catch-all,
+   so every one of the 22 links lands in exactly one group and none are dropped. */
 const START = DOCS.filter((d) =>
   /local development|self-hosting|configuration/i.test(d.title),
 );
 const DEVELOPER = DOCS.filter((d) =>
-  /monorepo|api overview|migration|testing|deployment|llm provider/i.test(
-    d.title,
-  ),
+  /monorepo|api overview|migration|testing|deployment|llm provider/i.test(d.title),
 );
 const ARCHITECTURE = DOCS.filter((d) => /^architecture|adr-/i.test(d.title));
-const PLACED = new Set(
-  [...START, ...DEVELOPER, ...ARCHITECTURE].map((d) => d.url),
-);
+const PLACED = new Set([...START, ...DEVELOPER, ...ARCHITECTURE].map((d) => d.url));
 const PROJECT = DOCS.filter((d) => !PLACED.has(d.url));
 
-function DocCard({ doc, kicker }: { doc: DocLink; kicker: string }) {
+/* ── Light doc card — title + blurb + external ↗, accent-tinted number/arrow ── */
+function DocCard({ doc, n, accent }: { doc: DocLink; n: number; accent: Accent }) {
+  const a = ACCENTS[accent];
   return (
     <a
       href={doc.url}
       target="_blank"
       rel="noreferrer"
-      className="halo-card halo-card-hover group flex flex-col p-6"
+      className="group flex flex-col rounded-2xl border border-zinc-200/80 bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
     >
       <div className="flex items-start justify-between gap-3">
-        <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-text-dim">
-          {kicker}
+        <span className={`font-mono text-[10px] font-bold uppercase tracking-wider ${a.textLight}`}>
+          {String(n).padStart(2, "0")}
         </span>
-        <span
-          aria-hidden="true"
-          className="font-mono text-[13px] text-text-dim transition-colors group-hover:text-accent"
-        >
-          ↗
-        </span>
+        <ArrowUpRight
+          aria-hidden
+          className={`h-4 w-4 flex-shrink-0 ${a.textLight} opacity-40 transition-opacity duration-300 group-hover:opacity-100`}
+        />
       </div>
-      <h3 className="mt-3 font-sans text-[16px] font-medium tracking-[-0.02em] text-text">
+      <h3 className="mt-3 text-base font-bold leading-snug tracking-tight text-zinc-900">
         {doc.title}
       </h3>
       {doc.blurb && (
-        <p className="mt-2 flex-1 font-sans text-[13px] leading-[1.55] text-text-muted">
-          {doc.blurb}
-        </p>
+        <p className="mt-2 flex-1 text-xs leading-relaxed text-zinc-500">{doc.blurb}</p>
       )}
     </a>
   );
 }
 
-function DocGroup({
-  eyebrow,
-  title,
-  titleAccent,
-  blurb,
-  docs,
-  grid,
-  children,
-}: {
-  eyebrow: string;
-  title: string;
-  titleAccent?: string;
-  blurb: string;
-  docs: readonly DocLink[];
-  grid: string;
-  children?: ReactNode;
-}) {
-  return (
-    <HaloReveal
-      as="section"
-      delay={0}
-      className="border-b border-border px-6 py-24 sm:px-12"
-    >
-      <HaloSectionHead
-        eyebrow={eyebrow}
-        title={title}
-        titleAccent={titleAccent}
-        blurb={blurb}
-      />
-      <div className={`mx-auto mt-12 grid max-w-[1160px] grid-cols-1 gap-4 ${grid}`}>
-        {docs.map((d, i) => (
-          <DocCard
-            key={d.url}
-            doc={d}
-            kicker={String(i + 1).padStart(2, "0")}
-          />
-        ))}
-      </div>
-      {children}
-    </HaloReveal>
-  );
-}
+/* ── mono file-tree illustration for the closing dark repo callout ─────────── */
+const TreeRow = ({ path, tag, c }: { path: string; tag: string; c: string }) => (
+  <div className="flex items-center justify-between font-mono text-[9px]">
+    <span className="text-zinc-500">{path}</span>
+    <span className={c}>{tag}</span>
+  </div>
+);
+const DocsTreeIll = () => (
+  <div className="w-full space-y-1.5 px-4">
+    <TreeRow path="docs/developer/*" tag="6 guides" c="text-lime-300" />
+    <TreeRow path="docs/adr/000{1-4}" tag="4 ADRs" c="text-lime-300" />
+    <TreeRow path="docs/ARCHITECTURE.md" tag="topology" c="text-zinc-400" />
+    <TreeRow path="SECURITY · LICENSE" tag="policies" c="text-zinc-400" />
+  </div>
+);
 
 export default function DocsPage() {
   return (
     <>
       <HaloNav />
 
-      {/* ── Hero ────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden border-b border-border bg-surface">
-        <div className="halo-hero-glow" aria-hidden="true" />
-        <div className="relative mx-auto max-w-[1280px] px-6 py-24 sm:px-12 sm:py-28">
-          <p className="halo-eyebrow">
-            <span className="halo-live-dot" aria-hidden="true" />
-            § 01 · Docs
-          </p>
-          <h1 className="mt-5 max-w-[880px] font-display font-medium leading-[1.05] tracking-tightest text-text text-[clamp(44px,5.6vw,68px)] [text-wrap:balance]">
-            Everything you need to{" "}
-            <span className="text-accent italic font-normal">run</span> Blackfyre.
-          </h1>
-          <p className="mt-6 max-w-[660px] font-sans text-[17px] leading-[1.55] text-text-muted">
-            Blackfyre is open source, Apache-2.0, and free to self-host forever.
-            These guides link straight into the repository — from a ~15-minute
-            local stack to running production on your own AWS account, plus the
-            architecture decisions and policies behind it. Nothing here is
-            behind a login.
-          </p>
-          <div className="mt-8 flex flex-wrap items-center gap-3">
-            <a
-              href={SITE.repoUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="halo-btn-accent"
-            >
-              View source{" "}
-              <span className="halo-arrow" aria-hidden="true">
-                &rarr;
-              </span>
-            </a>
-            <a href="#quickstart" className="halo-btn-ghost">
-              Quickstart
-            </a>
-          </div>
-          <div className="mt-9 flex flex-wrap gap-1.5">
-            {[
-              `${DOCS.length} guides`,
-              "4 ADRs",
-              "Local + production",
-              "Apache-2.0",
-              "Self-host free",
-            ].map((chip) => (
-              <span
-                key={chip}
-                className="rounded-md border border-border bg-surface-alt px-2.5 py-1 font-mono text-[10.5px] uppercase tracking-[0.1em] text-text-muted"
-              >
-                {chip}
-              </span>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Repo callout strip ──────────────────────────────────── */}
-      <HaloReveal
-        as="section"
-        delay={0}
-        className="border-b border-border bg-surface-alt px-6 py-8 sm:px-12"
-      >
-        <div className="mx-auto flex max-w-[1160px] flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-          <p className="max-w-[720px] font-sans text-[14px] leading-[1.55] text-text-muted">
-            <span className="font-mono text-accent">›</span> Every card below
-            opens a file in the source tree. The complete, always-current docs
-            live in the <span className="text-text">repository</span> —
-            versioned alongside the code they describe, never stale.
-          </p>
-          <a
-            href={REPO_DOCS_URL}
-            target="_blank"
-            rel="noreferrer"
-            className="shrink-0 inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-[0.06em] text-accent"
-          >
-            Browse /docs <span aria-hidden="true">↗</span>
-          </a>
-        </div>
-      </HaloReveal>
-
-      {/* ── § 02 · Get started ──────────────────────────────────── */}
-      <DocGroup
-        eyebrow="§ 02 · Get started"
-        title="Clone it and have it running."
-        titleAccent="running"
-        blurb="Stand up the full stack locally with no cloud account or API keys, then graduate to production on your own AWS when you're ready."
-        docs={START}
-        grid="sm:grid-cols-2 lg:grid-cols-3"
-      >
-        <div id="quickstart" className="mx-auto mt-10 max-w-[1160px] scroll-mt-24">
-          <div className="halo-card-strong overflow-hidden">
-            <div className="flex items-center justify-between border-b border-border px-5 py-3">
-              <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-accent">
-                Quickstart · local stack
-              </span>
-              <span className="font-mono text-[10.5px] text-text-dim">
-                no cloud account · no API keys
-              </span>
+      {/* ── HERO · light · blue ─────────────────────────────────────────── */}
+      <Section variant="light">
+        <div className="grid gap-16 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+          <div>
+            <SectionHead
+              size="hero"
+              accent="blue"
+              on="light"
+              eyebrow="Docs · Apache-2.0"
+              eyebrowIcon={<Sparkles className="h-3.5 w-3.5" />}
+              title={<>Everything you need to</>}
+              accentWord="run Blackfyre."
+              sub={
+                <>
+                  Blackfyre is open source and free to self-host forever. Every guide here links
+                  straight into the repository — from a{" "}
+                  <strong className="font-semibold text-zinc-900">~15-minute local stack</strong>{" "}
+                  to production on your own AWS, plus the architecture decisions and policies behind
+                  it. Nothing is behind a login.
+                </>
+              }
+            />
+            <div className="mt-8 flex flex-wrap gap-3">
+              <LimeButton href={SITE.repoUrl} external icon={<GitHubIcon />}>
+                Star on GitHub
+              </LimeButton>
+              <GhostButton href={REPO_DOCS_URL} external icon={<ArrowUpRight className="h-4 w-4" />}>
+                Browse /docs
+              </GhostButton>
             </div>
-            <pre className="overflow-x-auto px-5 py-5 font-mono text-[12.5px] leading-[1.65] text-text-muted">
-              <code>{QUICKSTART}</code>
-            </pre>
+
+            <StatRow
+              className="mt-10"
+              kicker="What's documented"
+              stats={[
+                { value: String(DOCS.length), label: "Guides" },
+                { value: "4", label: "ADRs" },
+                { value: "2", label: "Deploy tiers", color: "text-blue-600" },
+                { value: "Free", label: "Apache-2.0" },
+              ]}
+            />
+
+            <div className="mt-8 flex flex-wrap gap-1.5">
+              {[
+                `${DOCS.length} guides`,
+                "Local + production",
+                `${FRAMEWORK_COUNT} frameworks · ${TOTAL_CONTROLS} controls`,
+                "Self-host free",
+              ].map((chip) => (
+                <span
+                  key={chip}
+                  className="rounded-md border border-zinc-200 bg-zinc-50 px-2.5 py-1 font-mono text-[10.5px] uppercase tracking-[0.1em] text-zinc-500"
+                >
+                  {chip}
+                </span>
+              ))}
+            </div>
           </div>
-          <p className="mt-3 font-mono text-[11px] text-text-dim">
-            Full walkthrough, troubleshooting, and reset flow →{" "}
-            <a
-              href={LOCAL_DEV_URL}
-              target="_blank"
-              rel="noreferrer"
-              className="text-accent"
-            >
-              Local development guide ↗
-            </a>
-          </p>
+
+          <div className="hidden lg:block">
+            <DeviceCluster />
+          </div>
         </div>
-      </DocGroup>
+      </Section>
 
-      {/* ── § 03 · Developer ────────────────────────────────────── */}
-      <DocGroup
-        eyebrow="§ 03 · Developer"
-        title="Work inside the monorepo."
-        titleAccent="monorepo"
-        blurb="How the packages fit together, how the API is composed, how migrations and tests run, how code ships, and where the AI provider routing lives."
-        docs={DEVELOPER}
-        grid="sm:grid-cols-2 lg:grid-cols-3"
-      />
+      {/* ── GET STARTED · warm · amber ──────────────────────────────────── */}
+      <Section variant="warm">
+        <SectionHead
+          accent="amber"
+          on="light"
+          eyebrow="Get started"
+          eyebrowIcon={<Terminal className="h-3.5 w-3.5" />}
+          title="Clone it and have it"
+          accentWord="running."
+          accentStyle="solid"
+          sub="Stand up the full stack locally with no cloud account or API keys, then graduate to production on your own AWS when you're ready."
+        />
+        <div className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {START.map((d, i) => (
+            <DocCard key={d.url} doc={d} n={i + 1} accent="amber" />
+          ))}
+        </div>
 
-      {/* ── § 04 · Architecture & decisions ─────────────────────── */}
-      <DocGroup
-        eyebrow="§ 04 · Architecture & decisions"
-        title="The shape, and why it's shaped that way."
-        titleAccent="why"
-        blurb="The deployment topology plus the four architecture decision records — tenant isolation, the queue design, scanner orchestration, and AI model routing — written down and defensible."
-        docs={ARCHITECTURE}
-        grid="sm:grid-cols-2 lg:grid-cols-3"
-      />
+        {/* dark terminal quickstart card — a touch of contrast on the warm band */}
+        <div className="mt-10 overflow-hidden rounded-2xl border border-zinc-800 bg-[#09090e]">
+          <div className="flex items-center justify-between border-b border-zinc-800 px-5 py-3">
+            <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-lime-300">
+              Quickstart · local stack
+            </span>
+            <span className="font-mono text-[10.5px] text-zinc-500">
+              no cloud account · no API keys
+            </span>
+          </div>
+          <pre className="overflow-x-auto px-5 py-5 font-mono text-[12px] leading-[1.65] text-zinc-400">
+            <code>{QUICKSTART}</code>
+          </pre>
+        </div>
+        <p className="mt-3 font-mono text-[11px] text-zinc-500">
+          Full walkthrough, troubleshooting, and reset flow →{" "}
+          <a href={LOCAL_DEV_URL} target="_blank" rel="noreferrer" className="text-amber-700">
+            Local development guide ↗
+          </a>
+        </p>
+      </Section>
 
-      {/* ── § 05 · Project & policies ───────────────────────────── */}
-      <DocGroup
-        eyebrow="§ 05 · Project & policies"
-        title="How the project is run."
-        titleAccent="run"
-        blurb="Roadmap, how to contribute, governance, the security and data-collection policies, the code of conduct, trademark terms, and the license — the social contract of the repo."
-        docs={PROJECT}
-        grid="sm:grid-cols-2 lg:grid-cols-4"
-      />
+      {/* ── DEVELOPER · light · purple ──────────────────────────────────── */}
+      <Section variant="light">
+        <SectionHead
+          accent="purple"
+          on="light"
+          eyebrow="Developer"
+          eyebrowIcon={<Boxes className="h-3.5 w-3.5" />}
+          title="Work inside the"
+          accentWord="monorepo."
+          sub="How the packages fit together, how the Fastify API is composed, how migrations and tests run, how code ships, and where the AI provider routing lives."
+        />
+        <div className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {DEVELOPER.map((d, i) => (
+            <DocCard key={d.url} doc={d} n={i + 1} accent="purple" />
+          ))}
+        </div>
+      </Section>
 
-      <HaloCTA
-        title="Read the code, not the marketing."
-        titleAccent="code"
-        sub="Every guide on this page points into a public, Apache-2.0 repository. Clone it, audit it, and self-host it for free."
-        eyebrow="§ Start"
-        primaryLabel="Star on GitHub"
-        primaryHref={SITE.repoUrl}
-        secondaryLabel="Browse /docs"
-        secondaryHref={REPO_DOCS_URL}
-      />
+      {/* ── ARCHITECTURE & DECISIONS · warm · amber ─────────────────────── */}
+      <Section variant="warm">
+        <SectionHead
+          accent="amber"
+          on="light"
+          eyebrow="Architecture & decisions"
+          eyebrowIcon={<Layers className="h-3.5 w-3.5" />}
+          title="The shape, and"
+          accentWord="why it's shaped that way."
+          accentStyle="solid"
+          sub="The deployment topology plus the four architecture decision records — tenant isolation, the queue design, scanner orchestration, and AI model routing — written down and defensible."
+        />
+        <div className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {ARCHITECTURE.map((d, i) => (
+            <DocCard key={d.url} doc={d} n={i + 1} accent="amber" />
+          ))}
+        </div>
+      </Section>
+
+      {/* ── PROJECT & POLICIES · light · pink ───────────────────────────── */}
+      <Section variant="light">
+        <SectionHead
+          accent="pink"
+          on="light"
+          eyebrow="Project & policies"
+          eyebrowIcon={<Users className="h-3.5 w-3.5" />}
+          title="How the project is"
+          accentWord="run."
+          sub="Roadmap, how to contribute, governance, the security and data-collection policies, the code of conduct, trademark terms, and the license — the social contract of the repo."
+        />
+        <div className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {PROJECT.map((d, i) => (
+            <DocCard key={d.url} doc={d} n={i + 1} accent="pink" />
+          ))}
+        </div>
+      </Section>
+
+      {/* ── CLOSING CALLOUT + CTA · dark · lime ─────────────────────────── */}
+      <Section variant="dark" orbs={false}>
+        <div className="grid gap-16 lg:grid-cols-[1fr_0.85fr] lg:items-center">
+          <div>
+            <SectionHead
+              accent="lime"
+              on="dark"
+              eyebrow="Start"
+              eyebrowIcon={<BookOpen className="h-3.5 w-3.5" />}
+              title="Read the code,"
+              accentWord="not the marketing."
+              sub="Every card on this page opens a file in the source tree. The complete, always-current docs live in the repository — versioned alongside the code they describe, never stale. Clone it, audit it, self-host it for free."
+            />
+            <div className="mt-8 flex flex-wrap gap-3">
+              <LimeButton href={SITE.repoUrl} external icon={<GitHubIcon />}>
+                Star on GitHub
+              </LimeButton>
+              <GhostButton
+                href={REPO_DOCS_URL}
+                external
+                on="dark"
+                icon={<ArrowUpRight className="h-4 w-4" />}
+              >
+                Browse /docs
+              </GhostButton>
+            </div>
+          </div>
+
+          <CaseStudyCardDark
+            badge="REPOSITORY"
+            icon={BookOpen}
+            title="It all lives in /docs"
+            desc="Guides, ADRs, and policies sit next to the code in a public, Apache-2.0 tree — the source of truth this page mirrors."
+            accent="lime"
+            illustration={<DocsTreeIll />}
+            linkLabel="Browse /docs"
+            linkHref={REPO_DOCS_URL}
+          />
+        </div>
+      </Section>
 
       <HaloFooter />
     </>

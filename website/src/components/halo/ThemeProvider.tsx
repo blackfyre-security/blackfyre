@@ -30,7 +30,7 @@ interface ThemeProviderProps {
 export function ThemeProvider({
   children,
   defaultTheme = "dark",
-  defaultAccent = "tangerine",
+  defaultAccent = "chartreuse",
 }: ThemeProviderProps) {
   const [theme, setThemeState] = useState<HaloTheme>(defaultTheme);
   const [accent, setAccentState] = useState<HaloAccent>(defaultAccent);
