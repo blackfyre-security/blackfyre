@@ -2,10 +2,10 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { AGENTS } from "@/lib/halo-data";
+import { AUDITOR_COUNT } from "@/data/auditors";
+import { FRAMEWORK_COUNT, TOTAL_CONTROLS } from "@/data/frameworks";
+import { SITE } from "@/data/site";
 import { useInterval } from "@/lib/halo-hooks";
-
-const ROTATING_WORDS = ["mapped", "scored", "attested", "evidenced"] as const;
 
 const COLS = 22;
 const ROWS = 8;
@@ -24,23 +24,27 @@ interface Particle {
   seed: number;
 }
 
-interface Stat {
-  k: string;
-  l: string;
-}
+const STATS: readonly { k: string; l: string }[] = [
+  { k: String(AUDITOR_COUNT), l: "auditors" },
+  { k: String(FRAMEWORK_COUNT), l: "frameworks" },
+  { k: String(TOTAL_CONTROLS), l: "controls" },
+  { k: "Apache-2.0", l: "license" },
+];
 
-const STATS: readonly Stat[] = [
-  { k: "34", l: "agents" },
-  { k: "9", l: "frameworks" },
-  { k: "10m", l: "first scan" },
-  { k: "99.87%", l: "uptime" },
+const COVERAGE: readonly { l: string; v: string }[] = [
+  { l: "Clouds", v: "AWS · Azure · GCP · on-prem" },
+  { l: "Auditors", v: String(AUDITOR_COUNT) },
+  { l: "Frameworks", v: String(FRAMEWORK_COUNT) },
+  { l: "Controls", v: String(TOTAL_CONTROLS) },
+  { l: "Also", v: "Prowler · Checkov · Semgrep · Bandit" },
+  { l: "Access", v: "read-only cross-account IAM" },
 ];
 
 /**
- * Hero surface: headline + CTAs on the left, animated 22x8 posture-scan
- * matrix on the right, cursor-tracking radial glow across the section,
- * and 18 drifting particles. All motion is client-side; SSR output is
- * the initial frame (frame=0).
+ * Hero surface: OSS-first headline + CTAs on the left, an animated
+ * posture-scan matrix over a code-derived coverage panel on the right,
+ * a cursor-tracking radial glow, and drifting accent particles. All motion
+ * is client-side and decorative; every figure is code-of-record.
  */
 export default function HaloHero() {
   const heroRef = useRef<HTMLElement | null>(null);
@@ -63,9 +67,6 @@ export default function HaloHero() {
     el.addEventListener("mousemove", onMove);
     return () => el.removeEventListener("mousemove", onMove);
   }, []);
-
-  const wordIdx = Math.floor(frame / 45) % ROTATING_WORDS.length;
-  const currentWord = ROTATING_WORDS[wordIdx];
 
   // Stable cells; seed gives the sweep an organic offset per cell.
   const cells = useMemo<MatrixCell[]>(() => {
@@ -146,47 +147,46 @@ export default function HaloHero() {
         {/* Left column */}
         <div>
           <div className="flex items-center gap-2.5 font-mono text-[11px] uppercase tracking-[0.18em] text-text-muted">
-            <span
-              className="inline-block h-1.5 w-1.5 rounded-full animate-halo-pulse"
-              style={{
-                background: "var(--accent)",
-                boxShadow: "0 0 10px var(--accent)",
-              }}
-            />
-            Live · 34 agents online
+            <span className="halo-live-dot animate-halo-pulse" />
+            Open source · Apache-2.0
           </div>
 
           <h1 className="mt-7 font-display font-medium leading-[0.96] tracking-tightest text-text text-[clamp(48px,6.4vw,88px)] [text-wrap:balance]">
-            Security posture,
+            Compliance posture,
             <br />
             <span className="text-text-muted">continuously </span>
-            <span className="relative inline-block italic font-normal text-accent">
-              <span
-                key={wordIdx}
-                className="inline-block animate-halo-word-in"
-              >
-                {currentWord}.
-              </span>
-            </span>
+            <span className="italic font-normal text-accent">proven.</span>
           </h1>
 
-          <p className="mb-0 mt-7 max-w-[520px] font-sans text-lg leading-[1.55] text-text-muted">
-            Thirty-four autonomous agents scan your infrastructure every minute,
-            map findings to nine frameworks, and hand your team an auditable
-            trail — without a compliance ops function sitting behind them.
+          <p className="mb-0 mt-7 max-w-[540px] font-sans text-lg leading-[1.55] text-text-muted">
+            Blackfyre is an open-source, multi-cloud compliance and security
+            platform — {AUDITOR_COUNT} auditors across AWS, Azure, GCP and
+            on-prem, mapping findings to {FRAMEWORK_COUNT} frameworks and{" "}
+            {TOTAL_CONTROLS} controls. Self-host it free, forever.
           </p>
 
           <div className="mt-9 flex flex-wrap items-center gap-3">
-            <Link href="/contact" className="halo-btn-accent">
-              Talk to us &rarr;
+            <a
+              href={SITE.repoUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="halo-btn-accent halo-arrow-parent"
+            >
+              Star on GitHub{" "}
+              <span className="halo-arrow" aria-hidden="true">
+                &rarr;
+              </span>
+            </a>
+            <Link href="/self-host" className="halo-btn-ghost">
+              Quickstart
             </Link>
             <span className="ml-1 font-mono text-xs text-text-dim">
-              Reply within 24 hours
+              Self-host free · no vendor lock-in
             </span>
           </div>
 
           {/* Stat strip */}
-          <div className="mt-14 grid max-w-[540px] grid-cols-2 gap-6 sm:grid-cols-4">
+          <div className="mt-14 grid max-w-[560px] grid-cols-2 gap-6 sm:grid-cols-4">
             {STATS.map((s) => (
               <div key={s.l}>
                 <div className="font-sans text-[28px] font-medium tracking-[-0.02em] text-text">
@@ -200,36 +200,30 @@ export default function HaloHero() {
           </div>
         </div>
 
-        {/* Right column — scanning matrix */}
+        {/* Right column — scanning matrix over coverage panel */}
         <div className="relative overflow-hidden rounded-[14px] border border-border bg-surface p-[22px]">
           <div className="mb-[18px] flex items-center justify-between">
             <div
               className="font-mono text-[11px] uppercase tracking-[0.12em]"
               style={{ color: "var(--brand-cool)" }}
             >
-              POSTURE MAP · eu-west-2
+              SCANNER COVERAGE
             </div>
-            <div className="font-mono text-[11px] text-accent">● SCANNING</div>
+            <div className="font-mono text-[11px] text-accent">● READ-ONLY</div>
           </div>
 
-          {/* Matrix */}
+          {/* Decorative scan sweep */}
           <div
             className="mb-[18px] grid gap-[3px]"
-            style={{
-              gridTemplateColumns: `repeat(${COLS}, 1fr)`,
-            }}
+            style={{ gridTemplateColumns: `repeat(${COLS}, 1fr)` }}
             aria-hidden="true"
           >
             {cells.map(({ r, c, seed }) => {
-              // Sweep pulse from left to right; trailing gradient.
               const sweep = (frame * 0.015 + seed) % 1;
               const colPhase = (c / COLS + frame * 0.008) % 1;
               const intensity = Math.max(0, 1 - Math.abs(sweep - colPhase) * 5);
               const hot = intensity > 0.7;
-              const warn = seed > 0.96 && Math.floor(frame / 40) % 3 === 0;
-              const background = warn
-                ? "var(--warn)"
-                : hot
+              const background = hot
                 ? "var(--accent)"
                 : `rgba(var(--cell-rgb, 255 255 255), ${0.04 + intensity * 0.2})`;
               return (
@@ -239,7 +233,7 @@ export default function HaloHero() {
                   style={{
                     aspectRatio: "1 / 1",
                     background,
-                    opacity: warn ? 0.9 : 0.3 + intensity * 0.7,
+                    opacity: 0.3 + intensity * 0.7,
                     transition: "background 200ms",
                   }}
                 />
@@ -247,35 +241,17 @@ export default function HaloHero() {
             })}
           </div>
 
-          {/* Agent ticker */}
-          <div
-            className="grid grid-cols-1 gap-x-[18px] gap-y-1.5 border-t border-border pt-3.5 sm:grid-cols-2"
-          >
-            {AGENTS.map((a, i) => {
-              const active = Math.floor(frame / 20) % AGENTS.length === i;
-              return (
-                <div
-                  key={a.id}
-                  className="flex items-center justify-between font-mono text-[11px]"
-                  style={{
-                    color: active ? "var(--text)" : "var(--muted)",
-                    transition: "color 200ms",
-                  }}
-                >
-                  <span className="flex items-center gap-2">
-                    <span
-                      className="h-[5px] w-[5px] rounded-full"
-                      style={{
-                        background: active ? "var(--accent)" : "var(--dim)",
-                        boxShadow: active ? "0 0 8px var(--accent)" : "none",
-                      }}
-                    />
-                    {a.id} · {a.name}
-                  </span>
-                  <span>{a.findings === 0 ? "✓" : `${a.findings}`}</span>
-                </div>
-              );
-            })}
+          {/* Code-of-record coverage rows */}
+          <div className="grid gap-y-2 border-t border-border pt-3.5">
+            {COVERAGE.map((row) => (
+              <div
+                key={row.l}
+                className="flex items-baseline justify-between gap-4 font-mono text-[11px]"
+              >
+                <span className="text-text-dim">{row.l}</span>
+                <span className="text-right text-text-muted">{row.v}</span>
+              </div>
+            ))}
           </div>
         </div>
       </div>

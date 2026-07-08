@@ -4,6 +4,7 @@ import Script from "next/script";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { ThemeProvider } from "@/components/halo/ThemeProvider";
 import CookieConsentBanner from "@/components/CookieConsentBanner";
+import { SITE } from "@/data/site";
 import "./globals.css";
 
 // Self-hosted (next/font/local) so the build is hermetic — no fonts.googleapis.com
@@ -31,35 +32,38 @@ const mono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "BLACKFYRE — AI-Powered Security Platform",
+  metadataBase: new URL(SITE.hostedUrl),
+  title: "Blackfyre — Open-source multi-cloud compliance & security platform",
   description:
-    "Enterprise-grade autonomous security platform. Compliance automation, multi-cloud scanning, AI-powered remediation, and professional security services. Built for Indian enterprises.",
+    "Open-source, self-hostable multi-cloud compliance & security platform — 55 auditors, 9 frameworks, 678 controls across AWS, Azure, GCP and on-prem. Apache-2.0.",
   keywords: [
-    "cybersecurity",
+    "open source security",
     "compliance automation",
+    "multi-cloud security",
+    "cloud security posture",
+    "AWS",
+    "Azure",
+    "GCP",
+    "self-hosted",
     "SOC 2",
     "ISO 27001",
-    "VAPT",
-    "vCISO",
-    "DPDPA",
-    "security platform",
-    "India",
+    "Apache-2.0",
   ],
-  authors: [{ name: "BLACKFYRE" }],
+  authors: [{ name: SITE.name }],
   openGraph: {
-    title: "BLACKFYRE — AI-Powered Security Platform",
+    title: "Blackfyre — Open-source multi-cloud compliance & security platform",
     description:
-      "Autonomous security for enterprises. Connect your infrastructure → complete security report in 10 minutes → stay continuously protected.",
-    url: "https://blackfyre.tech",
-    siteName: "BLACKFYRE",
+      "Self-hostable, Apache-2.0 compliance & security scanning: 55 auditors, 9 frameworks, 678 controls, tamper-evident evidence, and database-enforced multi-tenancy.",
+    url: SITE.hostedUrl,
+    siteName: SITE.name,
     type: "website",
-    locale: "en_IN",
+    locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: "BLACKFYRE — AI-Powered Security Platform",
+    title: "Blackfyre — Open-source multi-cloud compliance & security platform",
     description:
-      "Enterprise-grade autonomous security. Compliance, scanning, remediation — one platform.",
+      "Open-source multi-cloud compliance & security. 55 auditors · 9 frameworks · 678 controls · AWS/Azure/GCP + on-prem. Self-host free under Apache-2.0.",
   },
   robots: { index: true, follow: true },
 };

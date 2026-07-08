@@ -1,24 +1,36 @@
-"use client";
+import type { Metadata } from "next";
 
 import HaloNav from "@/components/halo/HaloNav";
 import HaloFooter from "@/components/halo/HaloFooter";
 import HaloSectionHead from "@/components/halo/HaloSectionHead";
-import ContactForm from "@/components/ContactForm";
 import HaloReveal from "@/components/halo/HaloReveal";
+import ContactForm from "@/components/ContactForm";
+import { SITE } from "@/data/site";
 
-const WHAT_TO_EXPECT: { label: string; detail: string }[] = [
+export const metadata: Metadata = {
+  title: "Contact — Blackfyre",
+  description:
+    "Contact the Blackfyre team for hosted / managed-cloud early access, enterprise SSO and support, or security disclosures. Bug reports and feature requests go to GitHub Issues.",
+};
+
+const ISSUES_URL = `${SITE.repoUrl}/issues`;
+const SECURITY_URL = `${SITE.repoUrl}/blob/main/SECURITY.md`;
+
+const REASONS: { label: string; detail: string }[] = [
   {
-    label: "24-hour reply",
-    detail: "A real reply from the founding team — not a ticket auto-reply.",
-  },
-  {
-    label: "Honest assessment",
-    detail: "We'll tell you if we're the right fit, and flag it early if we're not.",
-  },
-  {
-    label: "Next step proposed",
+    label: "Hosted & managed cloud",
     detail:
-      "Either a 30-minute call, a written scope, or a pointer to someone better suited.",
+      "Early access to a managed Blackfyre — we run the AWS stack so you don't have to. Self-hosting stays free forever under Apache-2.0.",
+  },
+  {
+    label: "Enterprise SSO & support",
+    detail:
+      "SAML, SCIM provisioning, auditor-scoped roles, and a support relationship for teams standardizing on Blackfyre.",
+  },
+  {
+    label: "Security disclosures",
+    detail:
+      "Report a vulnerability privately. See the security policy for scope and the coordinated-disclosure process.",
   },
 ];
 
@@ -27,13 +39,41 @@ export default function ContactPage() {
     <>
       <HaloNav />
 
-      <HaloReveal as="section" delay={0} className="border-b border-border px-6 py-20 sm:px-12 sm:py-24">
-        <HaloSectionHead
-          eyebrow="§ Talk to us"
-          title="Tell us what you're shipping."
-          titleAccent="shipping"
-          blurb="A short message gets you a real reply from the founding team within 24 hours. No drip campaign, no sequence — just one human reading what you sent."
-        />
+      <HaloReveal
+        as="section"
+        delay={0}
+        className="relative overflow-hidden border-b border-border px-6 py-20 sm:px-12 sm:py-24"
+      >
+        <div className="halo-hero-glow" aria-hidden />
+        <div className="relative">
+          <HaloSectionHead
+            eyebrow="§ Contact"
+            title="Hosted, enterprise, and security."
+            titleAccent="security"
+            blurb="Blackfyre is open source and free to self-host. Use this channel for a managed / hosted deployment, enterprise SSO and support, or to disclose a security issue. For bug reports and feature requests, open a GitHub issue — that's where the work happens in the open."
+          />
+          <div className="mx-auto mt-8 flex max-w-[720px] flex-wrap justify-center gap-3">
+            <a
+              href={SITE.repoUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="halo-btn-accent"
+            >
+              Star on GitHub{" "}
+              <span className="halo-arrow" aria-hidden="true">
+                →
+              </span>
+            </a>
+            <a
+              href={ISSUES_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="halo-btn-ghost"
+            >
+              Open a GitHub issue
+            </a>
+          </div>
+        </div>
       </HaloReveal>
 
       <HaloReveal as="section" delay={120} className="px-6 py-20 sm:px-12 sm:py-24">
@@ -41,10 +81,11 @@ export default function ContactPage() {
           <div className="halo-card p-8 sm:p-10">
             <p className="halo-eyebrow">§ Message</p>
             <h2 className="mt-3 font-display text-[clamp(24px,3vw,32px)] font-medium leading-[1.1] tracking-display text-text">
-              Send us a note.
+              Tell us what you need.
             </h2>
             <p className="mt-2 text-[14px] leading-relaxed text-text-muted">
-              Routed to marketing@blackfyre.tech · reply within 24 hours.
+              Routed to marketing@blackfyre.tech — a human reads every note and
+              routes hosted, enterprise, or security requests to the right person.
             </p>
             <div className="mt-8">
               <ContactForm />
@@ -53,11 +94,16 @@ export default function ContactPage() {
 
           <aside className="flex flex-col gap-8">
             <div className="halo-card p-8">
-              <p className="halo-eyebrow">§ What to expect</p>
-              <ul className="mt-5 divide-y divide-border">
-                {WHAT_TO_EXPECT.map((item) => (
-                  <li key={item.label} className="flex items-start gap-4 py-4 first:pt-0 last:pb-0">
-                    <span className="halo-live-dot mt-1.5 shrink-0" aria-hidden />
+              <p className="halo-eyebrow">§ What this inbox is for</p>
+              <ul className="mt-5 space-y-5">
+                {REASONS.map((item) => (
+                  <li key={item.label} className="flex items-start gap-3">
+                    <span
+                      className="mt-0.5 shrink-0 font-mono text-accent"
+                      aria-hidden
+                    >
+                      ✓
+                    </span>
                     <div>
                       <p className="font-display text-[15px] font-medium tracking-display text-text">
                         {item.label}
@@ -72,6 +118,38 @@ export default function ContactPage() {
             </div>
 
             <div className="halo-card p-8">
+              <p className="halo-label">Bugs &amp; feature requests</p>
+              <p className="mt-3 text-[14px] leading-relaxed text-text-muted">
+                Found a bug or want a feature? Open an issue on{" "}
+                <a
+                  href={ISSUES_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-accent underline-offset-4 hover:underline"
+                >
+                  GitHub Issues
+                </a>{" "}
+                so the whole community can follow along.
+              </p>
+            </div>
+
+            <div className="halo-card p-8">
+              <p className="halo-label">Security disclosures</p>
+              <p className="mt-3 text-[14px] leading-relaxed text-text-muted">
+                Please report vulnerabilities privately per the{" "}
+                <a
+                  href={SECURITY_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-accent underline-offset-4 hover:underline"
+                >
+                  security policy
+                </a>{" "}
+                — not through public issues.
+              </p>
+            </div>
+
+            <div className="halo-card p-8">
               <p className="halo-label">Direct email</p>
               <p className="mt-3 text-[14px] leading-relaxed text-text-muted">
                 Prefer to write first? Reach us at{" "}
@@ -82,15 +160,6 @@ export default function ContactPage() {
                   marketing@blackfyre.tech
                 </a>
                 .
-              </p>
-            </div>
-
-            <div className="halo-card p-8">
-              <p className="halo-label">Who reads this</p>
-              <p className="mt-3 text-[14px] leading-relaxed text-text-muted">
-                The founding team. Same people who&apos;ll write the first line
-                of code, sit in your architecture reviews, and ship the release
-                notes.
               </p>
             </div>
           </aside>

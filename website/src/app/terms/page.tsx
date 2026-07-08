@@ -164,33 +164,21 @@ export default function TermsOfService() {
           {/* Section 6 */}
           <section>
             <h2 className="mb-5 font-display text-[24px] font-medium leading-[1.2] tracking-display text-text">
-              6. Service Level Agreement
+              6. Service Levels &amp; Warranty
             </h2>
-            <div className="halo-card space-y-4 p-5">
-              <div className="flex items-start gap-4">
-                <span className="font-display text-[28px] font-medium leading-none tracking-display text-accent">
-                  99.9%
-                </span>
-                <div>
-                  <p className="font-display text-[14px] font-medium tracking-display text-text">
-                    Platform Uptime
-                  </p>
-                  <p className="text-[14px] leading-relaxed">
-                    Measured monthly, excluding scheduled maintenance windows (notified 48 hours in advance).
-                  </p>
-                </div>
-              </div>
-              <div className="space-y-1.5 border-t border-border pt-4 text-[14px]">
-                <p>
-                  <span className="font-medium text-text">P1 Incidents (platform down):</span> 1-hour response, 4-hour resolution target.
-                </p>
-                <p>
-                  <span className="font-medium text-text">P2 Incidents (major feature degraded):</span> 4-hour response, 24-hour resolution target.
-                </p>
-                <p>
-                  <span className="font-medium text-text">SLA credits:</span> 10% of monthly fee per 0.1% below committed uptime, capped at 30% of monthly fee.
-                </p>
-              </div>
+            <div className="halo-card space-y-4 p-5 text-[14px] leading-relaxed">
+              <p>
+                <span className="font-medium text-text">Self-hosted (Apache-2.0):</span> the
+                software is provided &ldquo;as is&rdquo;, without warranty of any kind. You run it
+                on infrastructure you control, and its availability is your responsibility. See the
+                LICENSE for the full disclaimer.
+              </p>
+              <p className="border-t border-border pt-4">
+                <span className="font-medium text-text">Hosted option:</span> the managed cloud is
+                in early access and does not carry a committed uptime SLA. Any service levels for a
+                paid hosted tier will be set out in a separate agreement if and when that tier
+                becomes generally available.
+              </p>
             </div>
           </section>
 
