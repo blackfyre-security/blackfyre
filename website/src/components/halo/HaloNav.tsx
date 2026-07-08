@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SITE } from "@/data/site";
-import ThemeToggle from "./ThemeToggle";
 
 interface HaloNavLink {
   href: string;
@@ -47,9 +46,9 @@ function BrandMark() {
         src="/brand/blackfyre-logomark.png"
         alt=""
         aria-hidden="true"
-        width={221}
-        height={48}
-        className="mt-2 h-12 w-auto transition-transform group-hover:scale-[1.03]"
+        width={1600}
+        height={347}
+        className="h-10 w-auto transition-transform group-hover:scale-[1.03]"
       />
     </Link>
   );
@@ -122,10 +121,8 @@ export default function HaloNav() {
     <>
       <header
         className={cn(
-          "sticky top-0 z-40 border-b transition-all duration-300 ease-out",
-          scrolled
-            ? "border-border bg-bg/70 backdrop-blur-xl backdrop-saturate-150"
-            : "border-transparent bg-transparent backdrop-blur-0",
+          "sticky top-0 z-40 border-b border-border bg-bg/90 backdrop-blur-md transition-all duration-300 ease-out",
+          scrolled && "bg-bg/95 backdrop-blur-xl backdrop-saturate-150",
         )}
       >
         <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-6 px-6 py-4 md:px-12">
@@ -162,8 +159,6 @@ export default function HaloNav() {
           </div>
 
           <div className="hidden items-center gap-3 lg:flex">
-            <ThemeToggle />
-            <span aria-hidden="true" className="mx-1 h-5 w-px bg-border" />
             <a
               href={SITE.repoUrl}
               target="_blank"
@@ -256,13 +251,6 @@ export default function HaloNav() {
                 );
               })}
             </ul>
-
-            <div className="mt-10 border-t border-border pt-8">
-              <p className="halo-label mb-5">Preferences</p>
-              <div className="flex items-center gap-4">
-                <ThemeToggle />
-              </div>
-            </div>
 
             <div className="mt-10 border-t border-border pt-8">
               <p className="halo-label mb-5">Get started</p>
