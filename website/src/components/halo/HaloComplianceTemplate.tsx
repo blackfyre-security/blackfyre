@@ -481,6 +481,11 @@ export default function HaloComplianceTemplate({ framework }: HaloComplianceTemp
                   <p className="mt-0.5 font-mono text-[10px] uppercase tracking-wide text-zinc-500">{s.k}</p>
                 </div>
               ))}
+              {view.families.length > 6 && (
+                <span className="rounded-[3px] border border-border bg-surface-alt px-2.5 py-1 font-mono text-[10.5px] tracking-[0.06em] text-text-dim">
+                  +{view.families.length - 6}
+                </span>
+              )}
             </div>
 
             {view.scopeNote && (

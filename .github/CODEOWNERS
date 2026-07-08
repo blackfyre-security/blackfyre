@@ -3,13 +3,13 @@
 # so the right person gets a heads-up. Either of us can self-merge anything.
 
 # Infrastructure (deploys + cost + security exposure)
-/platform/infra/                                @YOUR_GITHUB_USERNAME
-/platform/sst.config.ts                         @YOUR_GITHUB_USERNAME
-/.github/workflows/                             @YOUR_GITHUB_USERNAME
-/.github/dependabot.yml                         @YOUR_GITHUB_USERNAME
-/platform/packages/api/src/lambda.ts            @YOUR_GITHUB_USERNAME
-/platform/packages/api/src/db/                  @YOUR_GITHUB_USERNAME
-/platform/packages/api/src/migrations/          @YOUR_GITHUB_USERNAME
+/platform/infra/                                @giridharmkb1904-commits
+/platform/sst.config.ts                         @giridharmkb1904-commits
+/.github/workflows/                             @giridharmkb1904-commits
+/.github/dependabot.yml                         @giridharmkb1904-commits
+/platform/packages/api/src/lambda.ts            @giridharmkb1904-commits
+/platform/packages/api/src/db/                  @giridharmkb1904-commits
+/platform/packages/api/src/migrations/          @giridharmkb1904-commits
 
 # Frontend (portal + admin + marketing)
 /platform/packages/portal/                      @NarasimaPandiyan
@@ -17,6 +17,6 @@
 /website/                                       @NarasimaPandiyan
 
 # Demo / sandbox (shared)
-/sandbox/                                       @YOUR_GITHUB_USERNAME @NarasimaPandiyan
-/platform/packages/api/src/demo-server.ts       @YOUR_GITHUB_USERNAME @NarasimaPandiyan
-/platform/packages/api/src/demo-lambda.ts       @YOUR_GITHUB_USERNAME @NarasimaPandiyan
+/sandbox/                                       @giridharmkb1904-commits @NarasimaPandiyan
+/platform/packages/api/src/demo-server.ts       @giridharmkb1904-commits @NarasimaPandiyan
+/platform/packages/api/src/demo-lambda.ts       @giridharmkb1904-commits @NarasimaPandiyan

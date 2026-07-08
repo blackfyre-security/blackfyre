@@ -477,6 +477,22 @@ export default function PlatformPage() {
               ))}
             </div>
           </div>
+          <p className="mt-6 font-sans text-sm leading-[1.6] text-text-muted">
+            Found a vulnerability? Blackfyre runs a private disclosure process —
+            see{" "}
+            <a
+              href={
+                DOCS.find((d) => d.title === "Security Policy")?.url ??
+                SITE.repoUrl
+              }
+              target="_blank"
+              rel="noreferrer"
+              className="text-accent underline decoration-border underline-offset-4 hover:decoration-accent"
+            >
+              SECURITY.md
+            </a>
+            .
+          </p>
         </div>
       </Section>
 
