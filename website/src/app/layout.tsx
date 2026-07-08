@@ -119,13 +119,16 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
-              "@type": "Organization",
-              name: "BLACKFYRE",
-              alternateName: "Blackfyre Consulting",
+              "@type": "SoftwareApplication",
+              name: "Blackfyre",
+              applicationCategory: "SecurityApplication",
+              operatingSystem: "Cloud, self-hosted (AWS)",
+              license: "https://www.apache.org/licenses/LICENSE-2.0",
               url: "https://blackfyre.tech",
               email: "founder@blackfyre.tech",
               description:
-                "AI-powered autonomous security platform with compliance automation, multi-cloud scanning, and professional security services.",
+                "Open-source multi-cloud compliance & security platform. Scan AWS, Azure and GCP against 678 controls across 9 frameworks with 55 auditors, AI-assisted analysis and a tamper-evident evidence vault. Apache-2.0 — self-host free.",
+              offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
               address: {
                 "@type": "PostalAddress",
                 addressLocality: "Chennai",
