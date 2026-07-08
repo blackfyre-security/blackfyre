@@ -28,7 +28,7 @@ export function Counter({ value, className }: { value: number; className?: strin
           ease: "power2.out",
           scrollTrigger: { trigger: el, start: "top 88%", once: true },
           onUpdate: () => {
-            el.textContent = Math.round(counter.n).toLocaleString();
+            el.textContent = Math.round(counter.n).toLocaleString("en-US");
           },
         });
       });
@@ -38,7 +38,7 @@ export function Counter({ value, className }: { value: number; className?: strin
   );
   return (
     <span ref={ref} className={className}>
-      {value.toLocaleString()}
+      {value.toLocaleString("en-US")}
     </span>
   );
 }

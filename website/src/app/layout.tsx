@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import Script from "next/script";
 import ErrorBoundary from "@/components/ErrorBoundary";
-import { ThemeProvider } from "@/components/halo/ThemeProvider";
 import CookieConsentBanner from "@/components/CookieConsentBanner";
 import { SITE } from "@/data/site";
 import "./globals.css";
@@ -103,10 +102,8 @@ export default function RootLayout({
       <body className="font-sans antialiased bg-bg text-text">
         <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-surface focus:text-text">Skip to content</a>
         <ErrorBoundary>
-          <ThemeProvider>
-            <main id="main-content">{children}</main>
-            <CookieConsentBanner />
-          </ThemeProvider>
+          <main id="main-content">{children}</main>
+          <CookieConsentBanner />
         </ErrorBoundary>
         <Script
           defer
