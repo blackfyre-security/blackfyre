@@ -17,15 +17,15 @@ export interface HaloHowItWorksProps {
  */
 export default function HaloHowItWorks({
   steps = HOW_STEPS,
-  eyebrow = "03 · HOW IT WORKS",
+  eyebrow = "§ 03 · HOW IT WORKS",
   heading = (
     <>
-      From signup to audit bundle in{" "}
-      <span className="italic font-normal">an afternoon.</span>
+      Read-only in. Auditor-ready{" "}
+      <span className="italic font-normal">evidence out.</span>
     </>
   ),
-  lede = "Every step is scoped. No surprises, no vendor-managed silence. Go from connected to evidence-ready without a readiness consultant.",
-  activeCount = 3,
+  lede = "No write access to your cloud, no vendor-managed black box. Connect a read-only role and Blackfyre does the rest — open source, on your own infrastructure.",
+  activeCount = 5,
   className,
 }: HaloHowItWorksProps) {
   return (

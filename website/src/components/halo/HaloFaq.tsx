@@ -21,8 +21,8 @@ export interface HaloFaqProps {
  */
 export default function HaloFaq({
   items = DEFAULT_FAQ,
-  eyebrow = "05 · FAQ",
-  heading = "Things people ask.",
+  eyebrow = "§ 06 · FAQ",
+  heading = "Questions, answered.",
   defaultOpen = 0,
   className,
 }: HaloFaqProps) {

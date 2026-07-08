@@ -1,19 +1,18 @@
 /**
- * Halo demo data — copy ported from the reference prototype.
- * Used for in-page animated product illustrations (agent scan matrix,
- * evidence feed, compliance bars). Not a source of truth for real
- * marketing copy; the live site content lives in `@/data/content`.
+ * Halo in-page copy/data for the open-source Blackfyre site. All figures are
+ * code-of-record (55 auditors · 9 frameworks · 678 controls · 3 clouds + on-prem).
+ * Types are stable; canonical framework/auditor/site data lives in `@/data/*`.
  */
 
 export const FRAMEWORKS = [
-  "SOC 2 Type II",
-  "ISO 27001:2022",
+  "SOC 2",
+  "ISO 27001",
   "HIPAA",
   "GDPR",
-  "PCI-DSS v4.0",
+  "PCI DSS",
   "DPDPA",
-  "CERT-In",
   "ISO 42001",
+  "PDPPL",
   "NIST 800-53",
 ] as const;
 
@@ -27,12 +26,16 @@ export interface Agent {
   findings: number;
 }
 
+/**
+ * Illustrative sample of the 55 SDK auditors (real auditor names). Not a live
+ * feed — the full catalog is in `@/data/auditors`.
+ */
 export const AGENTS: readonly Agent[] = [
-  { id: "IAM-01", name: "IAM Posture", scope: "identity", scans: 1284, findings: 3 },
-  { id: "NET-02", name: "Network Egress", scope: "network", scans: 2104, findings: 12 },
-  { id: "STO-03", name: "Storage Encryption", scope: "data", scans: 892, findings: 0 },
-  { id: "CMP-04", name: "Compute Hardening", scope: "compute", scans: 3420, findings: 7 },
-  { id: "SEC-05", name: "Secrets Drift", scope: "secrets", scans: 671, findings: 2 },
+  { id: "IAM", name: "AWS IAM Auditor", scope: "identity", scans: 0, findings: 0 },
+  { id: "S3", name: "AWS S3 Auditor", scope: "data", scans: 0, findings: 0 },
+  { id: "EC2", name: "AWS EC2 & VPC Auditor", scope: "network", scans: 0, findings: 0 },
+  { id: "LMB", name: "AWS Lambda Auditor", scope: "compute", scans: 0, findings: 0 },
+  { id: "SEC", name: "AWS Secrets Manager Auditor", scope: "secrets", scans: 0, findings: 0 },
 ] as const;
 
 export interface ComplianceScore {
@@ -42,14 +45,19 @@ export interface ComplianceScore {
   pct: number;
 }
 
+/**
+ * Per-framework control counts (code-of-record). `pass`/`pct` describe control
+ * coverage mapped by the platform, not any real customer posture.
+ */
 export const COMPLIANCE_SCORES: readonly ComplianceScore[] = [
-  { fw: "SOC 2 Type II", controls: 142, pass: 139, pct: 97.9 },
-  { fw: "ISO 27001:2022", controls: 114, pass: 112, pct: 98.2 },
-  { fw: "HIPAA", controls: 68, pass: 66, pct: 97.1 },
-  { fw: "DPDPA", controls: 42, pass: 41, pct: 97.6 },
-  { fw: "PCI-DSS v4.0", controls: 96, pass: 91, pct: 94.8 },
+  { fw: "NIST 800-53", controls: 298, pass: 298, pct: 100 },
+  { fw: "HIPAA", controls: 113, pass: 113, pct: 100 },
+  { fw: "GDPR", controls: 99, pass: 99, pct: 100 },
+  { fw: "ISO 27001", controls: 93, pass: 93, pct: 100 },
+  { fw: "ISO 42001", controls: 22, pass: 22, pct: 100 },
 ] as const;
 
+/** Placeholder wordmarks — retained for the (unused) HaloCustomers component; never rendered on the OSS site. */
 export const CUSTOMERS = [
   "AXIOM",
   "NORTHWIND",
@@ -58,7 +66,7 @@ export const CUSTOMERS = [
   "KEYSTONE",
   "HELIOS",
   "SABLE",
-  "VANTA\u00B7GO",
+  "VANTA·GO",
   "ORION PAY",
   "BLUELINK",
 ] as const;
@@ -75,33 +83,33 @@ export interface HowStep {
 export const HOW_STEPS: readonly HowStep[] = [
   {
     n: "01",
-    t: "Connect",
-    d: "OIDC into AWS, Azure, GCP. Optional on-prem agent. Read-only by default.",
-    min: "< 5 min",
+    t: "Connect a read-only role",
+    d: "Grant Blackfyre a read-only, least-privilege cross-account IAM role. No write keys, ever. On-prem targets connect over AD / SNMP / IdP / EDR.",
+    min: "read-only",
   },
   {
     n: "02",
-    t: "Scan",
-    d: "34 agents scan identity, network, storage, compute, secrets, and code paths.",
-    min: "~10 min",
+    t: "Auditors scan",
+    d: "55 SDK auditors sweep AWS, Azure, GCP and on-prem — plus Prowler (900+ AWS checks) and Checkov / Semgrep / Bandit running as container Lambdas.",
+    min: "55 auditors",
   },
   {
     n: "03",
-    t: "Map",
-    d: "Findings auto-mapped to the frameworks you're accountable to (SOC 2, ISO…).",
-    min: "Continuous",
+    t: "Findings map to controls",
+    d: "Every finding maps to the affected controls across 9 frameworks and 678 controls, with weighted per-framework scoring.",
+    min: "678 controls",
   },
   {
     n: "04",
-    t: "Remediate",
-    d: "AI drafts a playbook; your team approves; agent applies the change with audit.",
-    min: "Per finding",
+    t: "AI + heuristics remediate",
+    d: "Claude (Anthropic API or AWS Bedrock) drafts gap analysis, MITRE ATT&CK mapping and remediation. With no key it degrades to deterministic heuristics.",
+    min: "AI + heuristics",
   },
   {
     n: "05",
-    t: "Evidence",
-    d: "Every control backed by SHA-256-pinned evidence in WORM storage, ready to export.",
-    min: "Always",
+    t: "Evidence for auditors",
+    d: "Results land in a tamper-evident vault: SHA-256 hash per item, S3 Object Lock + versioning, AES-256-GCM PII encryption — export-ready for auditors.",
+    min: "tamper-evident",
   },
 ] as const;
 
@@ -112,17 +120,14 @@ export interface LogLine {
   msg: string;
 }
 
+/** Illustrative scan-log lines for in-page demos. Not a live feed. */
 export const LOG_LINES: readonly LogLine[] = [
-  { t: "00:00:01.204", agent: "IAM-01", level: "ok", msg: "Scanned 142 principals. 0 privilege escalations." },
-  { t: "00:00:01.418", agent: "STO-03", level: "ok", msg: "All 38 buckets encrypted (SSE-KMS). WORM policy verified." },
-  { t: "00:00:01.602", agent: "NET-02", level: "warn", msg: "3 security groups with 0.0.0.0/0 on port 22. Suggested fix queued." },
-  { t: "00:00:01.811", agent: "CMP-04", level: "ok", msg: "Hardening baseline 98% on 214/218 instances." },
-  { t: "00:00:02.012", agent: "SEC-05", level: "crit", msg: "Secret in commit b4f201 (git-sha). Rotated & remediation playbook drafted." },
-  { t: "00:00:02.220", agent: "IAM-01", level: "ok", msg: "MFA enforced across all admin roles. Evidence pinned." },
-  { t: "00:00:02.441", agent: "CMP-04", level: "ok", msg: "Kernel CVE-2024-1086 patched on 14 hosts." },
-  { t: "00:00:02.640", agent: "NET-02", level: "ok", msg: "TLS 1.3 enforced on 62 public endpoints." },
-  { t: "00:00:02.848", agent: "STO-03", level: "warn", msg: "S3 versioning off on 2 buckets. Evidence collected; fix proposed." },
-  { t: "00:00:03.011", agent: "IAM-01", level: "ok", msg: "Access review cycle auto-scheduled for 72 roles." },
+  { t: "00:00:01.204", agent: "IAM", level: "ok", msg: "Enumerated principals via AWS SDK. No privilege escalations." },
+  { t: "00:00:01.418", agent: "S3", level: "ok", msg: "Buckets checked for public access + SSE-KMS encryption." },
+  { t: "00:00:01.602", agent: "EC2", level: "warn", msg: "Security group allows 0.0.0.0/0 on port 22. Mapped to controls." },
+  { t: "00:00:01.811", agent: "PROWLER", level: "ok", msg: "Prowler container Lambda: 900+ AWS checks complete." },
+  { t: "00:00:02.012", agent: "SEC", level: "crit", msg: "Secret exposure flagged. Evidence pinned with SHA-256." },
+  { t: "00:00:02.220", agent: "CHECKOV", level: "ok", msg: "IaC scan (Terraform/CFN/K8s) normalized into findings." },
 ] as const;
 
 export interface FaqItem {
@@ -132,23 +137,27 @@ export interface FaqItem {
 
 export const FAQ: readonly FaqItem[] = [
   {
-    q: "How long until findings appear?",
-    a: "~10 minutes after first agent connection. A full posture map is built from the first scan cycle onward.",
+    q: "Is it really free?",
+    a: "Yes. Blackfyre is Apache-2.0 licensed — self-host it on your own infrastructure, with every feature, no license fee, forever. The full source is on GitHub.",
   },
   {
-    q: "Do you support on-prem?",
-    a: "Yes. A lightweight agent runs on Linux/Windows and reports to the same control plane as cloud scans.",
+    q: "How do the scanners access my cloud?",
+    a: "Through a read-only, least-privilege cross-account IAM role — no write keys. Scanners collect the minimum posture data needed and never touch PII, customer records, or business content.",
   },
   {
-    q: "Is evidence audit-defensible?",
-    a: "Evidence is stored in S3 WORM with SHA-256 integrity and one-click bundle export for auditors.",
+    q: "Do I need an API key for the AI features?",
+    a: "No. AI is provider-agnostic: point it at Anthropic's API or use AWS Bedrock via the Lambda's IAM role (no key). With no provider configured it degrades gracefully to deterministic heuristics.",
   },
   {
-    q: "How is AI used in remediation?",
-    a: "Gap analysis + playbook drafts. Every change is human-approved; the agent never writes to prod unsupervised.",
+    q: "How is multi-tenancy isolated?",
+    a: "By the database, not the app. Postgres 16 row-level security runs below the ORM — a non-owner role, FORCE ROW LEVEL SECURITY, and a request-scoped tenant binding that fails closed (ADR-0001).",
   },
   {
-    q: "What about India-specific frameworks?",
-    a: "DPDPA, CERT-In 6-hour SLA tracking, and RBI cyber framework are first-class — not bolt-ons.",
+    q: "Which frameworks are covered?",
+    a: "Nine, mapping 678 controls: SOC 2, ISO 27001, HIPAA, GDPR, PCI DSS, DPDPA, ISO 42001, PDPPL, and NIST 800-53. Every finding maps to the controls it affects.",
+  },
+  {
+    q: "Is there a hosted option?",
+    a: "A managed cloud is planned at blackfyre.tech — join for early access. Production isn't live yet, so self-hosting is the way to run Blackfyre today.",
   },
 ] as const;

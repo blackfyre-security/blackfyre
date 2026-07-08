@@ -48,10 +48,10 @@ export interface ProfessionalService {
 }
 
 export const stats: Stat[] = [
-  { value: "34", label: "Autonomous Scanning Agents", numericValue: 34, suffix: "" },
+  { value: "55", label: "Cloud & On-Prem Auditors", numericValue: 55, suffix: "" },
   { value: "9", label: "Compliance Frameworks", numericValue: 9, suffix: "" },
-  { value: "24/7", label: "Autonomous Monitoring", numericValue: 24, suffix: "/7" },
-  { value: "99.87%", label: "Platform Uptime", numericValue: 99.87, suffix: "%" },
+  { value: "678", label: "Mapped Controls", numericValue: 678, suffix: "" },
+  { value: "3", label: "Clouds + On-Prem", numericValue: 3, suffix: "" },
 ];
 
 export const serviceCategories: ServiceCategory[] = [
@@ -401,12 +401,12 @@ export interface PlatformFeature {
 export const platformFeatures: PlatformFeature[] = [
   {
     title: "Multi-Cloud Scanning",
-    description: "40+ specialized agents audit IAM, storage, compute, networking, and encryption across AWS, Azure, GCP, and on-premises.",
+    description: "55 auditors cover IAM, storage, compute, networking, encryption, logging, database, monitoring, and containers across AWS, Azure, GCP, and on-premises — plus Prowler and Checkov/Semgrep/Bandit.",
     icon: "Layers",
   },
   {
-    title: "8 Compliance Frameworks",
-    description: "SOC 2, ISO 27001, HIPAA, GDPR, PCI-DSS, DPDPA, ISO 42001, PDPPL with weighted control scoring.",
+    title: "9 Compliance Frameworks",
+    description: "SOC 2, ISO 27001, HIPAA, GDPR, PCI DSS, DPDPA, ISO 42001, PDPPL, and NIST 800-53 — 678 controls with weighted per-framework scoring.",
     icon: "ShieldCheck",
   },
   {
@@ -440,7 +440,7 @@ export interface TierFeatureRow {
 
 export const tierComparison: TierFeatureRow[] = [
   { feature: "Cloud Providers", comply: "1", protect: "Up to 3", defend: "Unlimited" },
-  { feature: "Compliance Frameworks", comply: "2", protect: "6", defend: "All 8" },
+  { feature: "Compliance Frameworks", comply: "2", protect: "6", defend: "All 9" },
   { feature: "Scan Frequency", comply: "Weekly", protect: "Daily", defend: "Continuous" },
   { feature: "AI Analysis", comply: "—", protect: "Yes", defend: "Yes + Threat Intel" },
   { feature: "Users", comply: "5", protect: "25", defend: "Unlimited" },

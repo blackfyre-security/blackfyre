@@ -3,54 +3,41 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, ChevronDown } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { SITE } from "@/data/site";
 import ThemeToggle from "./ThemeToggle";
-
-const PORTAL_URL = process.env.NEXT_PUBLIC_PORTAL_URL || "https://app.blackfyre.tech";
-
-interface HaloNavChild {
-  href: string;
-  label: string;
-  desc: string;
-}
 
 interface HaloNavLink {
   href: string;
   label: string;
-  children?: HaloNavChild[];
 }
 
-// Real routes on the site. "Docs" doesn't have a dedicated route yet so it
-// points at /blog as the closest live equivalent. "Services" is a dropdown so
-// the software-delivery pages (/webapp, /mobile) have a top-level entry point.
+// OSS-first primary nav. Every link points at a real route or an on-page
+// section anchor (#) — no agency/services pages, no sales CTA.
 const NAV_LINKS: HaloNavLink[] = [
   { href: "/platform", label: "Platform" },
-  {
-    href: "/services",
-    label: "Services",
-    children: [
-      {
-        href: "/services",
-        label: "Security & advisory",
-        desc: "vCISO, VAPT, compliance, AI security",
-      },
-      {
-        href: "/webapp",
-        label: "Web development",
-        desc: "Marketing sites, SaaS, internal tools",
-      },
-      {
-        href: "/mobile",
-        label: "Mobile apps",
-        desc: "Android & iOS, native or cross-platform",
-      },
-    ],
-  },
-  { href: "/agents", label: "Agents" },
+  { href: "/agents", label: "Auditors" },
+  { href: "/platform#frameworks", label: "Frameworks" },
+  { href: "/docs", label: "Docs" },
+  { href: "/self-host", label: "Self-host" },
   { href: "/pricing", label: "Pricing" },
-  { href: "/blog", label: "Docs" },
+  { href: "/contribute", label: "Contribute" },
+  { href: "/blog", label: "Blog" },
 ];
+
+function GitHubMark({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden="true"
+      className={className}
+    >
+      <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.605-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222 0 1.606-.014 2.898-.014 3.293 0 .322.216.694.825.576C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
+    </svg>
+  );
+}
 
 function BrandMark() {
   return (
@@ -68,6 +55,14 @@ function BrandMark() {
   );
 }
 
+// Section-anchor links (containing "#") are never marked "active" — they jump
+// within a page rather than owning a route.
+function isRouteActive(href: string, pathname: string | null): boolean {
+  if (href.includes("#")) return false;
+  if (!pathname) return false;
+  return pathname === href || (href !== "/" && pathname.startsWith(href + "/"));
+}
+
 export default function HaloNav() {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
@@ -76,8 +71,7 @@ export default function HaloNav() {
   const previouslyFocusedRef = useRef<HTMLElement | null>(null);
 
   // Scroll-elevation state for backdrop-blur.
-  // We sweep through `scrolled` levels for a smooth blur ramp once the user
-  // is past the hero. rAF-throttled so the listener stays cheap on long pages.
+  // rAF-throttled so the listener stays cheap on long pages.
   useEffect(() => {
     let ticking = false;
     const handleScroll = () => {
@@ -138,68 +132,11 @@ export default function HaloNav() {
           <div className="flex items-center gap-8">
             <BrandMark />
             <nav
-              className="hidden items-center gap-6 md:flex"
+              className="hidden items-center gap-6 lg:flex"
               aria-label="Primary"
             >
               {NAV_LINKS.map((link) => {
-                const isActive =
-                  pathname === link.href ||
-                  (link.href !== "/" && pathname?.startsWith(link.href + "/")) ||
-                  !!link.children?.some(
-                    (c) =>
-                      c.href !== "/services" &&
-                      (pathname === c.href ||
-                        pathname?.startsWith(c.href + "/")),
-                  );
-
-                if (link.children) {
-                  return (
-                    <div key={link.href} className="group relative">
-                      <Link
-                        href={link.href}
-                        aria-haspopup="true"
-                        className={cn(
-                          "relative inline-flex items-center gap-1 font-sans text-[13.5px] transition-colors",
-                          isActive
-                            ? "text-text"
-                            : "text-text-muted hover:text-text",
-                        )}
-                      >
-                        {link.label}
-                        <ChevronDown
-                          className="h-3.5 w-3.5 transition-transform duration-200 group-hover:rotate-180"
-                          aria-hidden="true"
-                        />
-                        {isActive && (
-                          <span
-                            aria-hidden="true"
-                            className="absolute -bottom-1 left-0 right-[18px] h-[2px] bg-accent"
-                          />
-                        )}
-                      </Link>
-                      {/* pt-3 bridges the gap so the panel survives the hover hand-off */}
-                      <div className="invisible absolute left-1/2 top-full z-50 w-[18rem] -translate-x-1/2 pt-3 opacity-0 transition-all duration-150 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
-                        <div className="overflow-hidden rounded-xl border border-border-strong bg-surface p-1.5 shadow-halo-glow">
-                          {link.children.map((child) => (
-                            <Link
-                              key={child.href + child.label}
-                              href={child.href}
-                              className="block rounded-lg px-3.5 py-2.5 transition-colors hover:bg-surface-alt"
-                            >
-                              <span className="block font-sans text-[13.5px] text-text">
-                                {child.label}
-                              </span>
-                              <span className="mt-0.5 block font-sans text-[12px] leading-snug text-text-muted">
-                                {child.desc}
-                              </span>
-                            </Link>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                }
-
+                const isActive = isRouteActive(link.href, pathname);
                 return (
                   <Link
                     key={link.href}
@@ -224,24 +161,24 @@ export default function HaloNav() {
             </nav>
           </div>
 
-          <div className="hidden items-center gap-3 md:flex">
+          <div className="hidden items-center gap-3 lg:flex">
             <ThemeToggle />
-            <span
-              aria-hidden="true"
-              className="mx-1 h-5 w-px bg-border"
-            />
-            <Link
-              href={`${PORTAL_URL}/login`}
-              className="font-sans text-[13.5px] text-text-muted transition-colors hover:text-text"
+            <span aria-hidden="true" className="mx-1 h-5 w-px bg-border" />
+            <a
+              href={SITE.repoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="halo-btn-ghost inline-flex items-center gap-2 !py-2.5 !text-[13px]"
             >
-              Log in
-            </Link>
-            <Link
-              href="/contact"
-              className="rounded-md bg-accent px-3.5 py-2 font-sans text-[13px] font-medium text-[color:var(--accent-ink)] shadow-halo-glow transition-transform active:scale-[0.98]"
+              <GitHubMark className="h-4 w-4" />
+              GitHub
+            </a>
+            <a
+              href={SITE.hostedUrl}
+              className="halo-btn-accent !py-2.5 !text-[13px]"
             >
-              Talk to us
-            </Link>
+              Hosted option
+            </a>
           </div>
 
           <button
@@ -249,7 +186,7 @@ export default function HaloNav() {
             onClick={() => setMenuOpen(true)}
             aria-label="Open menu"
             aria-expanded={menuOpen}
-            className="md:hidden inline-flex h-9 w-9 items-center justify-center rounded-md border border-border text-text-muted transition-colors hover:text-text"
+            className="lg:hidden inline-flex h-9 w-9 items-center justify-center rounded-md border border-border text-text-muted transition-colors hover:text-text"
           >
             <Menu className="h-4 w-4" aria-hidden="true" />
           </button>
@@ -263,7 +200,7 @@ export default function HaloNav() {
         aria-label="Main menu"
         aria-hidden={!menuOpen}
         className={cn(
-          "fixed inset-0 z-50 bg-bg transition-all duration-200 md:hidden",
+          "fixed inset-0 z-50 bg-bg transition-all duration-200 lg:hidden",
           menuOpen
             ? "pointer-events-auto translate-y-0 opacity-100"
             : "pointer-events-none -translate-y-1 opacity-0",
@@ -289,21 +226,7 @@ export default function HaloNav() {
             <p className="halo-label mb-5">Menu</p>
             <ul className="flex flex-col">
               {NAV_LINKS.map((link, idx) => {
-                const isActive =
-                  pathname === link.href ||
-                  (link.href !== "/" && pathname?.startsWith(link.href + "/")) ||
-                  !!link.children?.some(
-                    (c) =>
-                      c.href !== "/services" &&
-                      (pathname === c.href ||
-                        pathname?.startsWith(c.href + "/")),
-                  );
-                // On mobile, the parent link already covers /services, so drop
-                // the duplicate "Security & advisory" child and surface the
-                // software-delivery pages as sub-links.
-                const subLinks = link.children?.filter(
-                  (c) => c.href !== link.href,
-                );
+                const isActive = isRouteActive(link.href, pathname);
                 return (
                   <li
                     key={link.href}
@@ -329,21 +252,6 @@ export default function HaloNav() {
                         )}
                       </span>
                     </Link>
-                    {subLinks && subLinks.length > 0 && (
-                      <ul className="-mt-1 mb-5 ml-1 flex flex-col gap-3.5">
-                        {subLinks.map((child) => (
-                          <li key={child.href}>
-                            <Link
-                              href={child.href}
-                              onClick={() => setMenuOpen(false)}
-                              className="block font-sans text-[15px] text-text-muted transition-colors hover:text-text"
-                            >
-                              {child.label}
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
                   </li>
                 );
               })}
@@ -357,22 +265,25 @@ export default function HaloNav() {
             </div>
 
             <div className="mt-10 border-t border-border pt-8">
-              <p className="halo-label mb-5">Account</p>
-              <div className="flex flex-col items-start gap-5">
+              <p className="halo-label mb-5">Get started</p>
+              <div className="flex flex-col items-stretch gap-3.5">
                 <a
-                  href={`${PORTAL_URL}/login`}
+                  href={SITE.repoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   onClick={() => setMenuOpen(false)}
-                  className="font-sans text-[13.5px] text-text-muted transition-colors hover:text-text"
+                  className="halo-btn-ghost inline-flex items-center justify-center gap-2"
                 >
-                  Log in
+                  <GitHubMark className="h-4 w-4" />
+                  Star on GitHub
                 </a>
-                <Link
-                  href="/contact"
+                <a
+                  href={SITE.hostedUrl}
                   onClick={() => setMenuOpen(false)}
-                  className="rounded-md bg-accent px-4 py-2.5 font-sans text-[13px] font-medium text-[color:var(--accent-ink)] shadow-halo-glow"
+                  className="halo-btn-accent text-center"
                 >
-                  Talk to us
-                </Link>
+                  Hosted option
+                </a>
               </div>
             </div>
           </nav>
@@ -380,7 +291,7 @@ export default function HaloNav() {
           <div className="mt-12">
             <div className="halo-hairline mb-5" />
             <p className="halo-label">
-              Security &middot; Chennai &middot; 2026
+              Open source &middot; Apache-2.0
             </p>
           </div>
         </div>

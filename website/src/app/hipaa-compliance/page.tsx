@@ -1,17 +1,12 @@
 import type { Metadata } from "next";
 import HaloComplianceTemplate from "@/components/halo/HaloComplianceTemplate";
-import HaloReveal from "@/components/halo/HaloReveal";
 
 export const metadata: Metadata = {
-  title: "HIPAA Compliance for Healthcare Technology — BLACKFYRE",
+  title: "HIPAA compliance — Blackfyre",
   description:
-    "Protect ePHI with automated technical-safeguard monitoring, continuous evidence collection, and auditor-ready compliance packages across AWS, Azure, GCP.",
+    "Blackfyre maps AWS, Azure, GCP and on-prem findings to the HIPAA Security Rule safeguards with weighted scoring and a tamper-evident evidence vault. It never reads ePHI. Open source.",
 };
 
 export default function Page() {
-  return (
-    <HaloReveal delay={0}>
-      <HaloComplianceTemplate framework="hipaa" />
-    </HaloReveal>
-  );
+  return <HaloComplianceTemplate framework="hipaa" />;
 }

@@ -1,17 +1,12 @@
 import type { Metadata } from "next";
 import HaloComplianceTemplate from "@/components/halo/HaloComplianceTemplate";
-import HaloReveal from "@/components/halo/HaloReveal";
 
 export const metadata: Metadata = {
-  title: "NIST 800-53 Rev 5 — Full 20-Family Coverage | BLACKFYRE",
+  title: "NIST 800-53 — Blackfyre",
   description:
-    "Complete NIST SP 800-53 Rev 5 control coverage with baseline selection (Low, Moderate, High) and FedRAMP readiness pathway.",
+    "Blackfyre maps multi-cloud and on-prem findings to the NIST SP 800-53 Rev 5 controls across all 20 families, with weighted scoring and tamper-evident evidence for your ATO path. Open source.",
 };
 
 export default function Page() {
-  return (
-    <HaloReveal delay={0}>
-      <HaloComplianceTemplate framework="nist" />
-    </HaloReveal>
-  );
+  return <HaloComplianceTemplate framework="nist80053" />;
 }
