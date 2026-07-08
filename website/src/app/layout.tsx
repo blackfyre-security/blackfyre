@@ -74,9 +74,8 @@ export const metadata: Metadata = {
 const themeInit = `
 (function() {
   try {
-    var saved = localStorage.getItem('bfy-theme');
     var d = document.documentElement;
-    d.setAttribute('data-theme', saved === 'light' ? 'light' : 'dark');
+    d.setAttribute('data-theme', 'dark');
     d.setAttribute('data-accent', 'chartreuse');
     d.classList.add('no-transitions');
     requestAnimationFrame(function() {
