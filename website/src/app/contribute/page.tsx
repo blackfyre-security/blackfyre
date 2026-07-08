@@ -1,10 +1,33 @@
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
+import {
+  GitBranch,
+  Sparkles,
+  ScanLine,
+  FileCheck2,
+  BookOpen,
+  Users,
+  ShieldCheck,
+  Workflow,
+  CheckCircle2,
+  ArrowUpRight,
+  Star,
+} from "lucide-react";
+
 import HaloNav from "@/components/halo/HaloNav";
 import HaloFooter from "@/components/halo/HaloFooter";
-import HaloSectionHead from "@/components/halo/HaloSectionHead";
-import HaloCTA from "@/components/halo/HaloCTA";
-import HaloReveal from "@/components/halo/HaloReveal";
+
+import Section from "@/components/vibrant/Section";
+import SectionHead from "@/components/vibrant/SectionHead";
+import StatRow from "@/components/vibrant/StatRow";
+import LogoRow from "@/components/vibrant/LogoRow";
+import StepTimeline from "@/components/vibrant/StepTimeline";
+import { CaseStudyCardDark } from "@/components/vibrant/Cards";
+import { LimeButton, GhostButton, GitHubIcon } from "@/components/vibrant/buttons";
+
 import { SITE, DOCS } from "@/data/site";
+import { AUDITOR_COUNT } from "@/data/auditors";
+import { FRAMEWORK_COUNT, TOTAL_CONTROLS } from "@/data/frameworks";
 
 export const metadata: Metadata = {
   title: "Contribute — Blackfyre",
@@ -12,8 +35,7 @@ export const metadata: Metadata = {
     "Help build the open compliance platform. The fork-and-PR flow, mandatory DCO sign-off, Conventional Commits, the pre-PR build + test gate, governance, and where to start.",
 };
 
-// Resolve a docs URL by a title fragment so links stay bound to the single
-// source of truth in @/data/site. Falls back to the repo root.
+/* ── docs URL resolution (bound to the single source of truth in @/data/site) ── */
 function docUrl(needle: string): string {
   return (
     DOCS.find((d) => d.title.toLowerCase().includes(needle.toLowerCase()))?.url ??
@@ -27,151 +49,185 @@ const ROADMAP_URL = docUrl("Roadmap");
 const COC_URL = docUrl("Code of Conduct");
 const LOCAL_DEV_URL = docUrl("Local development");
 const SCANNER_ADR_URL = docUrl("Scanner orchestration");
-
-const GOOD_FIRST_ISSUES_URL = `${SITE.repoUrl}/labels/good%20first%20issue`;
 const ISSUES_URL = `${SITE.repoUrl}/issues`;
-const NEW_ISSUE_URL = `${SITE.repoUrl}/issues/new`;
 
-// ── § 02 · How to contribute (from CONTRIBUTING.md) ─────────────────────────
-interface Step {
-  n: string;
-  label: string;
-  title: string;
-  desc: string;
-  code?: string;
-  note?: string;
-}
-
-const STEPS: readonly Step[] = [
+/* ── § 02 · How to contribute (from CONTRIBUTING.md) ─────────────────────── */
+const STEPS = [
   {
     n: "01",
-    label: "FORK",
     title: "Fork & clone",
-    desc: "Fork the repository on GitHub, then clone your fork locally. You'll open pull requests from your fork — nobody pushes directly to the main repo.",
-    code: "git clone https://github.com/<you>/blackfyre.git",
+    desc: "Fork the repo on GitHub and clone your fork. Every change lands via a pull request from your fork — nobody pushes directly to main.",
   },
   {
     n: "02",
-    label: "BRANCH",
     title: "Branch off main",
-    desc: "Create a topic branch off main for your change. Never commit to main directly — every change lands via PR.",
-    code: "git checkout -b feat/short-description",
+    desc: "Cut a topic branch off main for your change (git checkout -b feat/short-description). Never commit to main directly.",
   },
   {
     n: "03",
-    label: "COMMITS",
     title: "Conventional Commits",
-    desc: "Write commit messages in Conventional Commits style: a type prefix (feat, fix, docs, ci, chore, refactor, test) plus an optional package scope and an imperative summary.",
-    code: "feat(api): add findings filter by framework",
+    desc: "Write messages Conventional-Commits style — a type prefix (feat, fix, docs, ci, chore, refactor, test), an optional scope, and an imperative summary.",
   },
   {
     n: "04",
-    label: "DCO — MANDATORY",
-    title: "Sign off every commit",
-    desc: "Every commit must be signed off. The -s flag appends a Signed-off-by trailer certifying — under the Developer Certificate of Origin — that you wrote the change (or have the right to submit it) and are licensing it under Apache-2.0. Unsigned commits fail the DCO check and cannot be merged.",
-    code: 'git commit -s -m "feat: add scan result pagination"',
-    note: "Forgot to sign off? Amend and force-push: git commit --amend -s && git push --force-with-lease",
+    title: "Sign off — DCO, mandatory",
+    desc: "Sign off every commit with git commit -s. The Signed-off-by trailer certifies, under the Developer Certificate of Origin, that you can license the change under Apache-2.0. Unsigned commits fail CI and cannot merge.",
   },
   {
     n: "05",
-    label: "GATE",
     title: "Build + unit tests",
-    desc: "Run the pre-PR gate locally before you push — the same checks CI runs on every PR. Both must pass or merge is blocked.",
-    code: "cd platform\nnpm run build\nnpm run test:unit --workspace=packages/api",
+    desc: "Run the pre-PR gate locally — npm run build and the offline unit suite (npm run test:unit) — the same checks CI runs. Both must pass or merge is blocked.",
   },
   {
     n: "06",
-    label: "PR",
     title: "Open a pull request",
-    desc: "Push your branch and open a PR against main. Link the issue you discussed, keep it small and focused, and split unrelated changes apart. Draft PRs are welcome for early feedback on direction.",
+    desc: "Push your branch and open a PR against main. Link the issue, keep it small and focused, split unrelated changes. Draft PRs are welcome for early feedback.",
   },
   {
     n: "07",
-    label: "CI",
     title: "CI + review, then merge",
-    desc: "CI installs, builds, runs the unit suite, and verifies the DCO sign-off on every commit. Once the checks are green and a maintainer approves, your change is merged.",
+    desc: "CI installs, builds, runs the unit suite, and verifies the DCO sign-off on every commit. Green checks plus a maintainer approval, and it merges.",
   },
 ];
 
-// CI checks (from CONTRIBUTING.md "What CI checks on every PR")
-const CI_CHECKS: readonly { cmd: string; what: string }[] = [
+const CI_CHECKS: { cmd: string; what: string }[] = [
   { cmd: "npm ci", what: "Dependency install" },
   { cmd: "npm run build", what: "Build all packages" },
-  { cmd: "npm run test:unit --workspace=packages/api", what: "Offline, fully-mocked unit suite" },
+  { cmd: "npm run test:unit", what: "Offline, fully-mocked unit suite" },
   { cmd: "DCO", what: "Sign-off on every commit" },
 ];
 
-// ── § 03 · Ways to help (from ROADMAP.md) ───────────────────────────────────
-interface Way {
-  label: string;
-  title: string;
-  desc: string;
-  tags: readonly string[];
-  href: string;
-  linkLabel: string;
-}
+/* ── § 03 · tiny mono illustrations (on #09090e, inside dark cards) ───────── */
+const IllRow = ({ k, v, c }: { k: string; v: string; c: string }) => (
+  <div className="flex items-center justify-between font-mono text-[9px]">
+    <span className="text-zinc-500">{k}</span>
+    <span className={c}>{v}</span>
+  </div>
+);
+const ScannerIll = () => (
+  <div className="w-full space-y-1.5 px-4">
+    <IllRow k="coverage" v="aws · azure · gcp" c="text-blue-400" />
+    <IllRow k="sdk auditors" v="in-process" c="text-blue-400" />
+    <IllRow k="prowler / iac" v="container lambda" c="text-zinc-400" />
+    <IllRow k="normalize" v="→ 1 findings path" c="text-zinc-400" />
+  </div>
+);
+const FrameworkIll = () => (
+  <div className="w-full space-y-1.5 px-4">
+    <IllRow k="shipped" v={`${FRAMEWORK_COUNT} frameworks`} c="text-purple-400" />
+    <IllRow k="controls" v={String(TOTAL_CONTROLS)} c="text-purple-400" />
+    <IllRow k="as data" v="packages/shared" c="text-zinc-400" />
+    <IllRow k="add yours" v="+ mapping, no code" c="text-zinc-400" />
+  </div>
+);
+const DocsIll = () => (
+  <div className="w-full space-y-1.5 px-4">
+    <IllRow k="local setup" v="~15 min" c="text-pink-400" />
+    <IllRow k="dev docs" v="guides · ADRs" c="text-pink-400" />
+    <IllRow k="fresh clone" v="keep it honest" c="text-zinc-400" />
+  </div>
+);
+const TriageIll = () => (
+  <div className="w-full space-y-1.5 px-4">
+    <IllRow k="reproduce" v="bug reports" c="text-emerald-400" />
+    <IllRow k="label" v="incoming issues" c="text-emerald-400" />
+    <IllRow k="review" v="open PRs" c="text-zinc-400" />
+    <IllRow k="path" v="→ committer" c="text-zinc-400" />
+  </div>
+);
 
-const WAYS: readonly Way[] = [
+const WAYS = [
   {
-    label: "SCANNERS",
+    badge: "SCANNERS",
+    icon: ScanLine,
+    accent: "blue" as const,
     title: "New auditors & scanners",
-    desc: "Deepen AWS/Azure/GCP coverage — more services per cloud, more checks per service — or help give the Prowler and IaC container scanners a local story. Every agent normalizes through one findings path, the seed of a future scanner plugin API.",
-    tags: ["auditors", "Prowler / IaC", "plugin API"],
-    href: SCANNER_ADR_URL,
+    desc: "Deepen AWS/Azure/GCP coverage — more services, more checks — or give the Prowler and IaC container scanners a better local story. Every agent normalizes through one findings path.",
+    ill: <ScannerIll />,
     linkLabel: "Read ADR-0003",
+    linkHref: SCANNER_ADR_URL,
   },
   {
-    label: "FRAMEWORKS",
+    badge: "FRAMEWORKS",
+    icon: FileCheck2,
+    accent: "purple" as const,
     title: "Framework control mappings",
-    desc: "New compliance frameworks land as data — control catalogs and mappings in packages/shared, not code. That makes them well-scoped and a great first contribution beyond the shipped nine.",
-    tags: ["frameworks-as-data", "good first issue"],
-    href: ROADMAP_URL,
+    desc: "New frameworks land as data — control catalogs and mappings in packages/shared, not code. Well-scoped and a great first contribution beyond the shipped nine.",
+    ill: <FrameworkIll />,
     linkLabel: "See the roadmap",
+    linkHref: ROADMAP_URL,
   },
   {
-    label: "DOCS",
+    badge: "DOCS",
+    icon: BookOpen,
+    accent: "pink" as const,
     title: "Documentation",
     desc: "Keep the 15-minute local setup honest on a fresh clone, sharpen the developer docs, or improve an ADR. Documentation PRs are first-class here.",
-    tags: ["docs", "local-dev"],
-    href: LOCAL_DEV_URL,
+    ill: <DocsIll />,
     linkLabel: "Local development",
+    linkHref: LOCAL_DEV_URL,
   },
   {
-    label: "BUGS",
-    title: "Bug reports",
-    desc: "Hit something broken? Open an issue with a clear description, impact, and steps to reproduce. Reproducible reports are among the most valuable contributions.",
-    tags: ["issues", "repro steps"],
-    href: NEW_ISSUE_URL,
-    linkLabel: "Open an issue",
-  },
-  {
-    label: "TRIAGE",
+    badge: "TRIAGE",
+    icon: Users,
+    accent: "emerald" as const,
     title: "Triage & review",
     desc: "Help reproduce reported bugs, label incoming issues, and review open pull requests. Sustained, quality help here is the path from contributor to committer.",
-    tags: ["triage", "review"],
-    href: ISSUES_URL,
+    ill: <TriageIll />,
     linkLabel: "Browse issues",
+    linkHref: ISSUES_URL,
   },
 ];
 
-// ── § 06 · Resources (from @/data/site DOCS) ────────────────────────────────
-const RESOURCE_TITLES: readonly string[] = [
-  "Contributing",
-  "Governance",
-  "Roadmap",
-  "Code of Conduct",
-  "Security Policy",
-];
-
+/* ── § 04 · Resources (from @/data/site DOCS) ────────────────────────────── */
+const RESOURCE_TITLES = ["Contributing", "Governance", "Roadmap", "Code of Conduct", "Security Policy"];
 const RESOURCES = RESOURCE_TITLES.map(
   (needle) => DOCS.find((d) => d.title.toLowerCase().includes(needle.toLowerCase()))!,
 ).filter(Boolean);
 
-function Check() {
+/* ── hero terminal card (mono git-flow, dark on the light hero) ──────────── */
+const TermLine = ({ children }: { children: ReactNode }) => (
+  <div className="flex gap-2">
+    <span className="select-none text-zinc-600">$</span>
+    <span className="text-zinc-200">{children}</span>
+  </div>
+);
+
+function GitFlowCard() {
   return (
-    <span aria-hidden="true" className="mt-0.5 shrink-0 font-mono text-[13px] text-accent">
-      ✓
-    </span>
+    <div className="rounded-2xl border border-zinc-800 bg-[#09090e] p-5 shadow-[0_24px_60px_-20px_rgba(0,0,0,0.5)]">
+      <div className="flex items-center gap-1.5 border-b border-zinc-800/80 pb-3">
+        <span className="h-2.5 w-2.5 rounded-full bg-zinc-700" />
+        <span className="h-2.5 w-2.5 rounded-full bg-zinc-700" />
+        <span className="h-2.5 w-2.5 rounded-full bg-zinc-700" />
+        <span className="ml-2 font-mono text-[10px] text-zinc-500">contributor@fork · blackfyre</span>
+      </div>
+      <div className="mt-4 space-y-2 overflow-x-auto font-mono text-[12px] leading-relaxed">
+        <TermLine>git clone …/blackfyre.git</TermLine>
+        <TermLine>git checkout -b feat/new-auditor</TermLine>
+        <TermLine>git commit -s -m &quot;feat: add auditor&quot;</TermLine>
+        <div className="pl-4 text-[#c6f24e]">Signed-off-by: You &lt;you@dev&gt;</div>
+        <TermLine>git push -u origin HEAD</TermLine>
+        <div className="pl-4 text-blue-400">→ opened PR · CI running ✓</div>
+      </div>
+    </div>
+  );
+}
+
+function Resource({ title, url, blurb }: { title: string; url: string; blurb?: string }) {
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noreferrer"
+      className="group flex flex-col rounded-2xl border border-zinc-200/80 bg-white p-6 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
+    >
+      <div className="flex items-start justify-between gap-3">
+        <h3 className="text-base font-bold tracking-tight text-zinc-900">{title}</h3>
+        <ArrowUpRight className="h-4 w-4 flex-shrink-0 text-zinc-400 transition-colors group-hover:text-emerald-600" />
+      </div>
+      {blurb && <p className="mt-2.5 flex-1 text-xs leading-relaxed text-zinc-500">{blurb}</p>}
+    </a>
   );
 }
 
@@ -180,337 +236,305 @@ export default function ContributePage() {
     <>
       <HaloNav />
 
-      {/* ── Hero ────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden border-b border-border bg-surface">
-        <div className="halo-hero-glow" aria-hidden="true" />
-        <div className="relative mx-auto max-w-[1280px] px-6 py-24 sm:px-12 sm:py-28">
-          <p className="halo-eyebrow">
-            <span className="halo-live-dot" aria-hidden="true" />
-            § 01 · Contribute
-          </p>
-          <h1 className="mt-5 max-w-[880px] font-display font-medium leading-[1.05] tracking-tightest text-text text-[clamp(44px,5.6vw,68px)] [text-wrap:balance]">
-            Build the{" "}
-            <span className="text-accent italic font-normal">open</span> compliance
-            platform.
-          </h1>
-          <p className="mt-6 max-w-[660px] font-sans text-[17px] leading-[1.55] text-text-muted">
-            Blackfyre is Apache-2.0 and built in the open via the standard
-            fork-and-PR flow. Whether you&apos;re adding a cloud auditor, mapping a new
-            framework as data, fixing a bug, or sharpening the docs — here&apos;s exactly
-            how a change gets from your fork to merged.
-          </p>
-          <div className="mt-8 flex flex-wrap items-center gap-3">
-            <a
-              href={GOOD_FIRST_ISSUES_URL}
-              target="_blank"
-              rel="noreferrer"
-              className="halo-btn-accent"
-            >
-              Good first issues{" "}
-              <span className="halo-arrow" aria-hidden="true">
-                &rarr;
-              </span>
-            </a>
-            <a
-              href={CONTRIBUTING_URL}
-              target="_blank"
-              rel="noreferrer"
-              className="halo-btn-ghost"
-            >
-              Read CONTRIBUTING
-            </a>
-          </div>
-          <div className="mt-9 flex flex-wrap gap-1.5">
-            {["Apache-2.0", "Fork & PR", "DCO sign-off", "Conventional Commits", "BDFL → committer"].map(
-              (chip) => (
-                <span
-                  key={chip}
-                  className="rounded-md border border-border bg-surface-alt px-2.5 py-1 font-mono text-[10.5px] uppercase tracking-[0.1em] text-text-muted"
-                >
-                  {chip}
-                </span>
-              ),
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* ── § 02 · How to contribute ────────────────────────────── */}
-      <HaloReveal as="section" delay={0} className="border-b border-border px-6 py-24 sm:px-12">
-        <HaloSectionHead
-          eyebrow="§ 02 · The flow"
-          title="From fork to merged, step by step."
-          titleAccent="merged"
-          blurb="The whole path is the standard fork-and-PR flow with two hard requirements: a DCO sign-off on every commit and a green pre-PR build + unit-test gate."
-        />
-        <div className="mx-auto mt-12 max-w-[1000px] flex flex-col gap-4">
-          {STEPS.map((s) => (
-            <article
-              key={s.n}
-              className="halo-card halo-card-hover grid grid-cols-1 gap-5 p-6 sm:grid-cols-[auto_1fr] sm:p-7"
-            >
-              <div className="flex shrink-0 items-start gap-3 sm:flex-col sm:items-start">
-                <span className="font-mono text-[28px] font-medium leading-none tracking-[-0.02em] text-accent">
-                  {s.n}
-                </span>
-                <span className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-text-dim sm:mt-3">
-                  {s.label}
-                </span>
-              </div>
-              <div className="min-w-0">
-                <h3 className="font-sans text-[19px] font-medium tracking-[-0.02em] text-text">
-                  {s.title}
-                </h3>
-                <p className="mt-2 font-sans text-[14px] leading-[1.6] text-text-muted">
-                  {s.desc}
-                </p>
-                {s.code && (
-                  <pre className="mt-4 overflow-x-auto rounded-lg border border-border bg-bg px-4 py-3">
-                    <code className="font-mono text-[12.5px] leading-[1.7] text-text">
-                      {s.code}
-                    </code>
-                  </pre>
-                )}
-                {s.note && (
-                  <p className="mt-3 font-mono text-[11.5px] leading-[1.5] text-text-dim">
-                    {s.note}
-                  </p>
-                )}
-              </div>
-            </article>
-          ))}
-        </div>
-
-        {/* CI checks callout */}
-        <div className="mx-auto mt-8 max-w-[1000px]">
-          <div className="halo-card p-7">
-            <div className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-accent">
-              What CI checks on every PR
+      {/* ── HERO · light · purple ───────────────────────────────────────── */}
+      <Section variant="light">
+        <div className="grid gap-16 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+          <div>
+            <SectionHead
+              size="hero"
+              accent="purple"
+              on="light"
+              eyebrow="Open source · Apache-2.0"
+              eyebrowIcon={<Sparkles className="h-3.5 w-3.5" />}
+              title={<>Build the</>}
+              accentWord="open compliance platform."
+              sub={
+                <>
+                  Blackfyre is Apache-2.0 and built in the open via the standard
+                  fork-and-PR flow — {AUDITOR_COUNT} auditors, {FRAMEWORK_COUNT}{" "}
+                  frameworks, {TOTAL_CONTROLS} controls. Add a cloud auditor, map a new
+                  framework as data, fix a bug, or sharpen the docs. Here&apos;s exactly
+                  how a change gets from your fork to merged.
+                </>
+              }
+            />
+            <div className="mt-8 flex flex-wrap gap-3">
+              <LimeButton href={ISSUES_URL} external icon={<GitHubIcon />}>
+                Good first issues
+              </LimeButton>
+              <GhostButton href={CONTRIBUTING_URL} external>
+                Read CONTRIBUTING
+              </GhostButton>
             </div>
-            <div className="mt-4 grid grid-cols-1 gap-x-8 gap-y-2.5 sm:grid-cols-2">
-              {CI_CHECKS.map((c) => (
-                <div
-                  key={c.cmd}
-                  className="flex items-baseline justify-between gap-4 border-b border-border py-2 last:border-b-0 sm:last:border-b"
-                >
-                  <code className="shrink-0 font-mono text-[12px] text-text">{c.cmd}</code>
-                  <span className="text-right font-sans text-[12.5px] leading-[1.4] text-text-muted">
-                    {c.what}
-                  </span>
-                </div>
-              ))}
+
+            <StatRow
+              className="mt-10"
+              kicker="Ground rules"
+              stats={[
+                { value: "Apache-2.0", label: "License" },
+                { value: String(FRAMEWORK_COUNT), label: "Frameworks as data" },
+                { value: String(TOTAL_CONTROLS), label: "Controls", color: "text-purple-600" },
+                { value: "DCO", label: "Sign-off required" },
+              ]}
+            />
+
+            <div className="mt-8">
+              <LogoRow
+                label="Contribute via"
+                items={["Fork & PR", "DCO sign-off", "Conventional Commits", "GitHub Issues", "CI on every PR"]}
+              />
             </div>
-            <p className="mt-4 font-sans text-[12.5px] leading-[1.5] text-text-dim">
-              A PR must be green before it can be merged. Before you push anything,
-              open an issue first for changes beyond a small fix — it avoids duplicate
-              work on things that don&apos;t fit the roadmap.
-            </p>
+          </div>
+
+          <div className="hidden lg:block">
+            <GitFlowCard />
           </div>
         </div>
-      </HaloReveal>
+      </Section>
 
-      {/* ── § 03 · Ways to help ─────────────────────────────────── */}
-      <HaloReveal as="section" delay={0} className="border-b border-border px-6 py-24 sm:px-12">
-        <HaloSectionHead
-          eyebrow="§ 03 · Ways to help"
-          title="Pick something that fits your energy."
-          titleAccent="fits"
-          blurb="Straight from the roadmap. New frameworks and docs are the most well-scoped first contributions; scanners and triage are the deep end."
-        />
-        <div className="mx-auto mt-12 grid max-w-[1160px] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {WAYS.map((w) => (
-            <article key={w.title} className="halo-card halo-card-hover flex flex-col p-6">
-              <div className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-accent">
-                {w.label}
-              </div>
-              <h3 className="mt-3 font-sans text-[17px] font-medium tracking-[-0.02em] text-text">
-                {w.title}
-              </h3>
-              <p className="mt-2.5 flex-1 font-sans text-[13.5px] leading-[1.55] text-text-muted">
-                {w.desc}
+      {/* ── HOW TO CONTRIBUTE · warm · amber ────────────────────────────── */}
+      <Section variant="warm">
+        <div className="grid gap-16 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
+          <div className="lg:sticky lg:top-12">
+            <SectionHead
+              accent="amber"
+              on="light"
+              eyebrow="The flow"
+              eyebrowIcon={<GitBranch className="h-3.5 w-3.5" />}
+              title="From fork to"
+              accentWord="merged."
+              accentStyle="solid"
+              sub="The whole path is the standard fork-and-PR flow, with two hard requirements: a DCO sign-off on every commit and a green pre-PR build + unit-test gate."
+            />
+            <div className="mt-10">
+              <StepTimeline steps={STEPS} accent="amber" />
+            </div>
+          </div>
+
+          <div className="space-y-6 lg:mt-4">
+            <div className="rounded-2xl border border-zinc-200/80 bg-white p-7">
+              <p className="font-mono text-[11px] font-semibold uppercase tracking-wider text-amber-700">
+                What CI checks on every PR
               </p>
-              <div className="mt-4 flex flex-wrap gap-1.5">
-                {w.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="rounded-md border border-border bg-surface-alt px-2 py-0.5 font-mono text-[10.5px] text-text-muted"
-                  >
-                    {tag}
-                  </span>
+              <div className="mt-4 divide-y divide-zinc-100">
+                {CI_CHECKS.map((c) => (
+                  <div key={c.cmd} className="flex items-baseline justify-between gap-4 py-2.5">
+                    <code className="flex-shrink-0 font-mono text-[12px] text-zinc-900">{c.cmd}</code>
+                    <span className="text-right text-[12.5px] leading-snug text-zinc-500">{c.what}</span>
+                  </div>
                 ))}
               </div>
-              <a
-                href={w.href}
-                target="_blank"
-                rel="noreferrer"
-                className="halo-arrow-parent mt-5 inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-[0.06em] text-accent"
-              >
-                {w.linkLabel}{" "}
-                <span className="halo-arrow" aria-hidden="true">
-                  &rarr;
-                </span>
-              </a>
-            </article>
-          ))}
-        </div>
-      </HaloReveal>
-
-      {/* ── § 04 · Governance ───────────────────────────────────── */}
-      <HaloReveal as="section" delay={0} className="border-b border-border px-6 py-24 sm:px-12">
-        <HaloSectionHead
-          eyebrow="§ 04 · Governance"
-          title="A BDFL model, with a real path to committer."
-          titleAccent="committer"
-          blurb="This is the honest state of a young project, not the end state — and the door from contributor to committer is open."
-        />
-        <div className="mx-auto mt-12 grid max-w-[1080px] grid-cols-1 gap-4 sm:grid-cols-[1.05fr_0.95fr]">
-          <div className="halo-card p-7">
-            <div className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-accent">
-              How decisions are made
+              <p className="mt-4 text-[12.5px] leading-relaxed text-zinc-500">
+                A PR must be green before it can merge. Open an issue first for anything
+                beyond a small fix — it avoids duplicate work on changes that don&apos;t
+                fit the roadmap.
+              </p>
             </div>
-            <h3 className="mt-3 font-sans text-[19px] font-medium tracking-[-0.02em] text-text">
+
+            <div className="rounded-2xl border border-zinc-200/80 bg-white p-7">
+              <p className="font-mono text-[11px] font-semibold uppercase tracking-wider text-amber-700">
+                The DCO sign-off, every commit
+              </p>
+              <pre className="mt-4 overflow-x-auto rounded-lg border border-zinc-200 bg-[#09090e] px-4 py-3">
+                <code className="font-mono text-[12.5px] leading-relaxed text-zinc-100">
+                  git commit -s -m &quot;feat: add scan result pagination&quot;
+                </code>
+              </pre>
+              <p className="mt-3 font-mono text-[11.5px] leading-relaxed text-zinc-500">
+                Forgot to sign off? git commit --amend -s &amp;&amp; git push --force-with-lease
+              </p>
+            </div>
+          </div>
+        </div>
+      </Section>
+
+      {/* ── WAYS TO HELP · dark · blue ──────────────────────────────────── */}
+      <Section variant="dark">
+        <div className="grid gap-16 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+          <div className="lg:sticky lg:top-12">
+            <SectionHead
+              accent="blue"
+              on="dark"
+              eyebrow="Ways to help"
+              eyebrowIcon={<Workflow className="h-3.5 w-3.5" />}
+              title="Pick something that"
+              accentWord="fits your energy."
+              sub="Straight from the roadmap. New frameworks and docs are the most well-scoped first contributions; scanners and triage are the deep end."
+            />
+            <ul className="mt-8 space-y-4">
+              {[
+                { t: "Frameworks land as data", d: "Control catalogs and mappings in packages/shared — no engine changes." },
+                { t: "Docs PRs are first-class", d: "Keeping the ~15-minute local setup honest on a fresh clone counts." },
+                { t: "Triage is a real path", d: "Sustained review and labelling is the road from contributor to committer." },
+              ].map((r) => (
+                <li key={r.t} className="flex gap-3">
+                  <CheckCircle2 className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-400" />
+                  <div>
+                    <p className="text-sm font-semibold text-white">{r.t}</p>
+                    <p className="mt-0.5 text-xs leading-relaxed text-zinc-400">{r.d}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <div className="mt-8">
+              <GhostButton href={ISSUES_URL} external on="dark">
+                Browse good first issues
+              </GhostButton>
+            </div>
+          </div>
+
+          <div className="grid gap-6 sm:grid-cols-2">
+            {WAYS.map((w) => (
+              <CaseStudyCardDark
+                key={w.title}
+                badge={w.badge}
+                icon={w.icon}
+                title={w.title}
+                desc={w.desc}
+                accent={w.accent}
+                illustration={w.ill}
+                linkLabel={w.linkLabel}
+                linkHref={w.linkHref}
+              />
+            ))}
+          </div>
+        </div>
+      </Section>
+
+      {/* ── GOVERNANCE & STANDARDS · light · emerald ────────────────────── */}
+      <Section variant="light">
+        <SectionHead
+          accent="emerald"
+          on="light"
+          eyebrow="Governance & standards"
+          eyebrowIcon={<ShieldCheck className="h-3.5 w-3.5" />}
+          title="A BDFL model, with a real path to"
+          accentWord="committer."
+          accentStyle="solid"
+          sub="The honest state of a young project, not its end state — and the door from contributor to committer is open. Blackfyre adopts the Contributor Covenant v2.1 across every project space."
+        />
+
+        <div className="mt-12 grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
+          <div className="rounded-2xl border border-zinc-200/80 bg-white p-7">
+            <p className="font-mono text-[11px] font-semibold uppercase tracking-wider text-emerald-600">
+              How decisions are made
+            </p>
+            <h3 className="mt-3 text-xl font-bold tracking-tight text-zinc-900">
               Benevolent-dictator model
             </h3>
-            <p className="mt-3 font-sans text-[14px] leading-[1.6] text-text-muted">
-              Blackfyre currently uses a BDFL model: the project founder is the
-              maintainer and has final say on the roadmap and merges. Everyone submits
-              PRs under the DCO, and all merged code is Apache-2.0.
+            <p className="mt-3 text-sm leading-relaxed text-zinc-600">
+              Blackfyre currently uses a BDFL model: the project founder is the maintainer
+              and has final say on the roadmap and merges. Everyone submits PRs under the
+              DCO, and all merged code is Apache-2.0.
             </p>
             <a
               href={GOVERNANCE_URL}
               target="_blank"
               rel="noreferrer"
-              className="halo-arrow-parent mt-5 inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-[0.06em] text-accent"
+              className="mt-5 inline-flex items-center gap-1 text-xs font-semibold text-emerald-600"
             >
-              Read GOVERNANCE.md{" "}
-              <span className="halo-arrow" aria-hidden="true">
-                &rarr;
-              </span>
+              Read GOVERNANCE.md
+              <ArrowUpRight className="h-3.5 w-3.5" />
             </a>
           </div>
 
-          <div className="halo-card p-7">
-            <div className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-text-dim">
+          <div className="rounded-2xl border border-zinc-200/80 bg-white p-7">
+            <p className="font-mono text-[11px] font-semibold uppercase tracking-wider text-zinc-400">
               Contributor → committer
-            </div>
-            <ul className="mt-4 flex flex-col gap-3">
+            </p>
+            <ul className="mt-4 space-y-3">
               {[
                 "Submit PRs under the DCO — the standard fork-and-PR flow.",
                 "Build a track record of sustained, quality contributions.",
                 "Get invited as a committer with merge rights over the areas you work on.",
               ].map((item) => (
                 <li key={item} className="flex gap-2.5">
-                  <Check />
-                  <span className="font-sans text-[14px] leading-[1.5] text-text-muted">
-                    {item}
-                  </span>
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-500" />
+                  <span className="text-sm leading-snug text-zinc-600">{item}</span>
                 </li>
               ))}
             </ul>
-            <p className="mt-5 font-sans text-[12.5px] leading-[1.5] text-text-dim">
-              Triage and review count. Sustained help maintaining the project is the
-              fastest way there.
+            <p className="mt-5 text-xs leading-relaxed text-zinc-400">
+              Triage and review count. Sustained help maintaining the project is the fastest
+              way there.
             </p>
           </div>
         </div>
-      </HaloReveal>
 
-      {/* ── § 05 · Community standards ──────────────────────────── */}
-      <HaloReveal as="section" delay={0} className="border-b border-border px-6 py-24 sm:px-12">
-        <HaloSectionHead
-          eyebrow="§ 05 · Community"
-          title="One standard, every space."
-          titleAccent="every"
-          blurb="Blackfyre adopts the Contributor Covenant v2.1. It applies to all project spaces — issues, PRs, discussions, and beyond."
-        />
-        <div className="mx-auto mt-12 max-w-[1080px]">
-          <div className="halo-card p-7">
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-[1fr_auto] sm:items-center">
-              <div>
-                <div className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-accent">
-                  Code of Conduct
-                </div>
-                <h3 className="mt-3 font-sans text-[19px] font-medium tracking-[-0.02em] text-text">
-                  Contributor Covenant v2.1
-                </h3>
-                <p className="mt-3 max-w-[620px] font-sans text-[14px] leading-[1.6] text-text-muted">
-                  We expect a welcoming, harassment-free experience for everyone. The
-                  Code of Conduct covers all project spaces and includes the
-                  enforcement contact and escalation ladder. Read it before you engage
-                  — it applies to your first issue as much as your hundredth PR.
-                </p>
-                <a
-                  href={COC_URL}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="halo-arrow-parent mt-5 inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-[0.06em] text-accent"
+        {/* Code of Conduct */}
+        <div className="mt-6 rounded-2xl border border-zinc-200/80 bg-white p-7">
+          <div className="grid gap-6 sm:grid-cols-[1fr_auto] sm:items-center">
+            <div>
+              <p className="font-mono text-[11px] font-semibold uppercase tracking-wider text-emerald-600">
+                Code of Conduct
+              </p>
+              <h3 className="mt-3 text-xl font-bold tracking-tight text-zinc-900">
+                Contributor Covenant v2.1
+              </h3>
+              <p className="mt-3 max-w-[620px] text-sm leading-relaxed text-zinc-600">
+                We expect a welcoming, harassment-free experience for everyone. The Code of
+                Conduct covers all project spaces and includes the enforcement contact and
+                escalation ladder — it applies to your first issue as much as your hundredth PR.
+              </p>
+              <a
+                href={COC_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-5 inline-flex items-center gap-1 text-xs font-semibold text-emerald-600"
+              >
+                Read the Code of Conduct
+                <ArrowUpRight className="h-3.5 w-3.5" />
+              </a>
+            </div>
+            <div className="flex flex-wrap gap-1.5 sm:max-w-[200px] sm:justify-end">
+              {["Welcoming", "Harassment-free", "All spaces", "v2.1"].map((chip) => (
+                <span
+                  key={chip}
+                  className="rounded-md border border-zinc-200 bg-zinc-50 px-2.5 py-1 font-mono text-[10.5px] uppercase tracking-[0.08em] text-zinc-500"
                 >
-                  Read the Code of Conduct{" "}
-                  <span className="halo-arrow" aria-hidden="true">
-                    &rarr;
-                  </span>
-                </a>
-              </div>
-              <div className="flex flex-wrap gap-1.5 sm:max-w-[180px] sm:justify-end">
-                {["Welcoming", "Harassment-free", "All spaces", "v2.1"].map((chip) => (
-                  <span
-                    key={chip}
-                    className="rounded-md border border-border bg-surface-alt px-2.5 py-1 font-mono text-[10.5px] uppercase tracking-[0.1em] text-text-muted"
-                  >
-                    {chip}
-                  </span>
-                ))}
-              </div>
+                  {chip}
+                </span>
+              ))}
             </div>
           </div>
         </div>
-      </HaloReveal>
 
-      {/* ── § 06 · Resources ────────────────────────────────────── */}
-      <HaloReveal as="section" delay={0} className="border-b border-border px-6 py-24 sm:px-12">
-        <HaloSectionHead
-          eyebrow="§ 06 · Resources"
-          title="Everything, in the repo."
-          titleAccent="repo"
-          blurb="The canonical docs behind this page. Each links straight to the source of truth on GitHub."
-        />
-        <div className="mx-auto mt-12 grid max-w-[1160px] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {RESOURCES.map((r) => (
-            <a
-              key={r.title}
-              href={r.url}
-              target="_blank"
-              rel="noreferrer"
-              className="halo-card halo-card-hover halo-arrow-parent flex flex-col p-6"
-            >
-              <div className="flex items-start justify-between gap-3">
-                <h3 className="font-sans text-[16px] font-medium tracking-[-0.02em] text-text">
-                  {r.title}
-                </h3>
-                <span className="halo-arrow shrink-0 font-mono text-accent" aria-hidden="true">
-                  &rarr;
-                </span>
-              </div>
-              {r.blurb && (
-                <p className="mt-2.5 flex-1 font-sans text-[13px] leading-[1.55] text-text-muted">
-                  {r.blurb}
-                </p>
-              )}
-            </a>
-          ))}
+        {/* Resources */}
+        <div className="mt-12">
+          <p className="font-mono text-[11px] font-semibold uppercase tracking-wider text-zinc-400">
+            Everything, in the repo · the canonical docs behind this page
+          </p>
+          <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {RESOURCES.map((r) => (
+              <Resource key={r.title} title={r.title} url={r.url} blurb={r.blurb} />
+            ))}
+          </div>
         </div>
-      </HaloReveal>
+      </Section>
 
-      <HaloCTA
-        title="Start with a good first issue."
-        titleAccent="good first issue"
-        sub="Grab a well-scoped issue, sign off your commits, and open a PR. Apache-2.0 — self-host it free, and shape where it goes."
-        eyebrow="§ Start"
-        primaryLabel="Star on GitHub"
-        primaryHref={SITE.repoUrl}
-        secondaryLabel="Good first issues"
-        secondaryHref={GOOD_FIRST_ISSUES_URL}
-      />
+      {/* ── GET STARTED · dark · lime ───────────────────────────────────── */}
+      <Section variant="dark" orbs={false}>
+        <div className="mx-auto flex max-w-[720px] flex-col items-center text-center">
+          <SectionHead
+            accent="lime"
+            on="dark"
+            align="center"
+            eyebrow="Start"
+            eyebrowIcon={<Star className="h-3.5 w-3.5" />}
+            title="Start with a"
+            accentWord="good first issue."
+            sub="Grab a well-scoped issue, sign off your commits, and open a PR. Apache-2.0 — self-host it free, and shape where it goes."
+          />
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            <LimeButton href={SITE.repoUrl} external icon={<GitHubIcon />}>
+              Star on GitHub
+            </LimeButton>
+            <GhostButton href={ISSUES_URL} external on="dark">
+              Good first issues
+            </GhostButton>
+          </div>
+        </div>
+      </Section>
 
       <HaloFooter />
     </>

@@ -77,7 +77,7 @@ const themeInit = `
     var saved = localStorage.getItem('bfy-theme');
     var d = document.documentElement;
     d.setAttribute('data-theme', saved === 'light' ? 'light' : 'dark');
-    d.setAttribute('data-accent', 'tangerine');
+    d.setAttribute('data-accent', 'chartreuse');
     d.classList.add('no-transitions');
     requestAnimationFrame(function() {
       requestAnimationFrame(function() { d.classList.remove('no-transitions'); });

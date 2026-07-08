@@ -1,11 +1,24 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import {
+  Sparkles,
+  Search,
+  Layers,
+  Workflow,
+  CheckCircle2,
+  FileCheck2,
+  ShieldCheck,
+} from "lucide-react";
+
 import HaloNav from "@/components/halo/HaloNav";
 import HaloFooter from "@/components/halo/HaloFooter";
-import HaloCTA from "@/components/halo/HaloCTA";
-import HaloReveal from "@/components/halo/HaloReveal";
-import HaloSectionHead from "@/components/halo/HaloSectionHead";
+
+import Section from "@/components/vibrant/Section";
+import SectionHead from "@/components/vibrant/SectionHead";
+import StatRow from "@/components/vibrant/StatRow";
+import { LimeButton, GhostButton, GitHubIcon } from "@/components/vibrant/buttons";
+
 import {
   AUDITORS,
   AUDITOR_CLOUDS,
@@ -35,6 +48,31 @@ const CLOUD_LABEL: Record<AuditorCloud, string> = {
   multi: "Multi-cloud",
   other: "On-prem / Other",
 };
+
+// A distinct dot colour per cloud bucket — literal classes so Tailwind keeps them.
+const CLOUD_DOT: Record<AuditorCloud, string> = {
+  aws: "bg-amber-500",
+  azure: "bg-blue-500",
+  gcp: "bg-emerald-500",
+  container: "bg-purple-500",
+  iac: "bg-pink-500",
+  multi: "bg-lime-500",
+  other: "bg-zinc-400",
+};
+
+// Live per-cloud counts (static — AUDITORS is a constant).
+const CLOUD_COUNTS = AUDITOR_CLOUDS.map((c) => ({
+  cloud: c,
+  n: AUDITORS.filter((a) => a.cloud === c).length,
+}));
+
+function tabClass(active: boolean) {
+  return `rounded-md border px-3 py-1.5 font-mono text-[10.5px] uppercase tracking-[0.08em] transition-all ${
+    active
+      ? "border-zinc-900 bg-zinc-900 text-white"
+      : "border-zinc-200 bg-white text-zinc-500 hover:border-zinc-400 hover:text-zinc-800"
+  }`;
+}
 
 export default function AuditorCatalog() {
   const [query, setQuery] = useState("");
@@ -66,286 +104,293 @@ export default function AuditorCatalog() {
     <>
       <HaloNav />
 
-      {/* ── Hero ────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden border-b border-border px-6 pb-20 pt-28 sm:px-12 sm:pt-32">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(ellipse 1000px 460px at 78% 12%, rgba(var(--accent-rgb, 198 242 78), 0.06), transparent 60%)",
-          }}
-        />
-        <div className="relative mx-auto max-w-[1280px]">
-          <p className="halo-eyebrow">§ 01 · Auditor Index</p>
-          <h1 className="mt-6 max-w-[820px] font-display font-medium leading-[0.98] tracking-tightest text-text text-[clamp(44px,6.4vw,78px)]">
-            {AUDITOR_COUNT} auditors.{" "}
-            <span className="text-accent italic font-normal">Every layer.</span>
-          </h1>
-          <p className="mt-7 max-w-[620px] font-sans text-lg leading-[1.55] text-text-muted">
-            Real SDK-backed checks across AWS, Azure, GCP and on-prem — Active
-            Directory, SNMP network devices, your IdP, EDR/MDM, Kubernetes,
-            container registries, VCS and SaaS. Plus Prowler and the Checkov /
-            Semgrep / Bandit IaC-and-SAST scanners. Every finding maps to{" "}
-            {FRAMEWORK_COUNT} frameworks and {TOTAL_CONTROLS} controls.
-          </p>
+      {/* ── HERO · light · blue ─────────────────────────────────────────── */}
+      <Section variant="light">
+        <div className="grid gap-16 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+          <div>
+            <SectionHead
+              size="hero"
+              accent="blue"
+              on="light"
+              eyebrow="Auditor index"
+              eyebrowIcon={<Sparkles className="h-3.5 w-3.5" />}
+              title={<>{AUDITOR_COUNT} auditors.</>}
+              accentWord="Every layer."
+              sub={
+                <>
+                  Real SDK-backed checks across AWS, Azure, GCP and on-prem —
+                  Active Directory, SNMP network devices, your IdP, EDR/MDM,
+                  Kubernetes, container registries, VCS and SaaS — plus Prowler
+                  and the Checkov / Semgrep / Bandit IaC-and-SAST scanners. Every
+                  finding maps to{" "}
+                  <strong className="font-semibold text-zinc-900">
+                    {TOTAL_CONTROLS} controls
+                  </strong>{" "}
+                  across {FRAMEWORK_COUNT} frameworks.
+                </>
+              }
+            />
 
-          {/* Stat strip */}
-          <div className="mt-9 flex flex-wrap gap-x-8 gap-y-3 font-mono text-[11px] uppercase tracking-[0.14em] text-text-dim">
-            <span>
-              <span className="text-accent">{AUDITOR_COUNT}</span> auditors
-            </span>
-            <span className="halo-hairline hidden sm:inline" aria-hidden="true" />
-            <span>
-              <span className="text-accent">{FRAMEWORK_COUNT}</span> frameworks
-            </span>
-            <span className="halo-hairline hidden sm:inline" aria-hidden="true" />
-            <span>
-              <span className="text-accent">{TOTAL_CONTROLS}</span> controls
-            </span>
-            <span className="halo-hairline hidden sm:inline" aria-hidden="true" />
-            <span>
-              <span className="text-accent">3</span> clouds + on-prem
-            </span>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <LimeButton href={SITE.repoUrl} external icon={<GitHubIcon />}>
+                View source
+              </LimeButton>
+              <GhostButton href="#catalog">Browse the catalog</GhostButton>
+            </div>
+
+            <StatRow
+              className="mt-10"
+              kicker="Coverage in the box"
+              stats={[
+                { value: String(AUDITOR_COUNT), label: "Auditors", color: "text-blue-600" },
+                { value: String(FRAMEWORK_COUNT), label: "Frameworks" },
+                { value: String(TOTAL_CONTROLS), label: "Controls" },
+                { value: "3", label: "Clouds + on-prem" },
+              ]}
+            />
           </div>
 
-          <div className="mt-9 flex flex-wrap items-center gap-3">
-            <a
-              href={SITE.repoUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="halo-btn-accent"
-            >
-              View source{" "}
-              <span className="halo-arrow" aria-hidden="true">
-                &rarr;
-              </span>
-            </a>
-            <a
-              href="#catalog"
-              className="halo-btn-ghost inline-flex items-center gap-2"
-            >
-              Browse the catalog{" "}
-              <span className="text-accent" aria-hidden="true">
-                &darr;
-              </span>
-            </a>
+          {/* Right — mono coverage panel (hidden below lg) */}
+          <div className="hidden lg:block">
+            <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-7 shadow-sm">
+              <p className="font-mono text-[11px] font-semibold uppercase tracking-wider text-zinc-400">
+                Auditors by cloud
+              </p>
+              <ul className="mt-5 space-y-3">
+                {CLOUD_COUNTS.map(({ cloud: c, n }) => (
+                  <li key={c} className="flex items-center justify-between font-mono text-xs">
+                    <span className="flex items-center gap-2.5 text-zinc-600">
+                      <span className={`h-2 w-2 rounded-full ${CLOUD_DOT[c]}`} aria-hidden />
+                      {CLOUD_LABEL[c]}
+                    </span>
+                    <span className="tabular-nums font-semibold text-zinc-900">{n}</span>
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-6 flex items-center justify-between border-t border-zinc-200 pt-5 font-mono text-xs">
+                <span className="text-zinc-500">Total</span>
+                <span className="text-lg font-extrabold text-blue-600">{AUDITOR_COUNT}</span>
+              </div>
+            </div>
           </div>
         </div>
-      </section>
+      </Section>
 
-      {/* ── Searchable catalog ──────────────────────────────────── */}
-      <section id="catalog" className="px-6 py-24 sm:px-12">
-        <div className="mx-auto max-w-[1280px]">
-          <div className="flex flex-col gap-6 border-b border-border pb-8">
-            <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-              <div>
-                <p className="halo-eyebrow">§ 02 · Catalog</p>
-                <h2 className="mt-4 font-display text-3xl font-medium tracking-tight text-text">
-                  Search every auditor.
-                </h2>
-                <p className="mt-2 max-w-[520px] text-sm text-text-muted">
-                  Filter by cloud, narrow by resource category, or search a
-                  keyword like &ldquo;encryption&rdquo;, &ldquo;RLS&rdquo; or
-                  &ldquo;Kubernetes&rdquo;. Every card&rsquo;s tags are
-                  clickable.
-                </p>
-              </div>
+      {/* ── CATALOG · warm · amber ──────────────────────────────────────── */}
+      <Section variant="warm" id="catalog">
+        <SectionHead
+          accent="amber"
+          on="light"
+          eyebrow="Catalog"
+          eyebrowIcon={<Layers className="h-3.5 w-3.5" />}
+          title="Search every"
+          accentWord="auditor."
+          accentStyle="solid"
+          sub={
+            <>
+              Filter by cloud, narrow by resource category, or search a keyword
+              like &ldquo;encryption&rdquo;, &ldquo;RLS&rdquo; or
+              &ldquo;Kubernetes&rdquo;. Every card&rsquo;s tags are clickable.
+            </>
+          }
+        />
 
-              {/* Keyword search */}
-              <div className="relative flex max-w-xs items-center rounded-lg border border-border bg-surface px-3 py-1.5 font-mono text-xs transition-colors focus-within:border-accent">
-                <span className="mr-2 text-text-muted" aria-hidden="true">
-                  🔎
-                </span>
-                <input
-                  type="text"
-                  aria-label="Search auditors"
-                  placeholder="Search auditors..."
-                  className="w-full border-none bg-transparent text-text outline-none placeholder:text-text-dim"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                />
-              </div>
-            </div>
-
-            {/* Cloud filter tabs */}
-            <div>
-              <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.14em] text-text-dim">
-                Cloud
-              </p>
-              <div className="flex flex-wrap gap-1.5">
-                {CLOUD_TABS.map((c) => (
-                  <button
-                    key={c}
-                    onClick={() => setCloud(c)}
-                    className={`rounded-md border px-3 py-1.5 font-mono text-[10.5px] uppercase tracking-[0.08em] transition-all ${
-                      cloud === c
-                        ? "border-border-strong bg-surface-alt text-accent"
-                        : "border-border bg-surface text-text-dim hover:text-text-muted"
-                    }`}
-                  >
-                    {c === "all" ? "All" : CLOUD_LABEL[c]}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Category filter tabs */}
-            <div>
-              <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.14em] text-text-dim">
-                Category
-              </p>
-              <div className="flex flex-wrap gap-1.5">
-                {CATEGORY_TABS.map((cat) => (
-                  <button
-                    key={cat}
-                    onClick={() => setCategory(cat)}
-                    className={`rounded-md border px-3 py-1.5 font-mono text-[10.5px] uppercase tracking-[0.08em] transition-all ${
-                      category === cat
-                        ? "border-border-strong bg-surface-alt text-accent"
-                        : "border-border bg-surface text-text-dim hover:text-text-muted"
-                    }`}
-                  >
-                    {cat}
-                  </button>
-                ))}
-              </div>
-            </div>
+        {/* Controls */}
+        <div className="mt-10 flex flex-col gap-6 border-b border-zinc-200 pb-8">
+          {/* Keyword search */}
+          <div className="relative flex max-w-sm items-center rounded-lg border border-zinc-300 bg-white px-3 py-2 font-mono text-xs transition-colors focus-within:border-zinc-900">
+            <Search className="mr-2 h-3.5 w-3.5 text-zinc-400" aria-hidden />
+            <input
+              type="text"
+              aria-label="Search auditors"
+              placeholder="Search auditors..."
+              className="w-full border-none bg-transparent text-zinc-900 outline-none placeholder:text-zinc-400"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
           </div>
 
-          {/* Count readout */}
-          <div className="mt-8 flex items-center justify-between">
-            <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-text-dim">
-              Showing{" "}
-              <span className="text-text">{filtered.length}</span> of{" "}
-              {AUDITOR_COUNT}
+          {/* Cloud filter tabs */}
+          <div>
+            <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.14em] text-zinc-400">
+              Cloud
             </p>
-            {filtersActive && (
-              <button
-                onClick={clearFilters}
-                className="font-mono text-[11px] uppercase tracking-[0.12em] text-accent transition-colors hover:text-text"
-              >
-                Clear filters ✕
-              </button>
-            )}
-          </div>
-
-          {/* Grid / empty state */}
-          {filtered.length === 0 ? (
-            <div className="mx-auto mt-10 max-w-[600px] rounded-xl border-2 border-dashed border-border p-12 text-center">
-              <span className="mb-4 block font-mono text-3xl text-warn">⚠</span>
-              <h3 className="font-display text-lg font-medium text-text">
-                No matching auditors
-              </h3>
-              <p className="mt-2 text-sm text-text-muted">
-                Nothing matches these filters
-                {query.trim() !== "" ? (
-                  <>
-                    {" "}
-                    for &ldquo;
-                    <span className="text-text">{query.trim()}</span>&rdquo;
-                  </>
-                ) : null}
-                . Try a broader cloud or category.
-              </p>
-              <button
-                onClick={clearFilters}
-                className="mt-6 rounded-md border border-accent/20 bg-accent/5 px-4 py-2 font-mono text-xs uppercase tracking-wider text-accent transition-all hover:bg-accent/15"
-              >
-                Reset
-              </button>
-            </div>
-          ) : (
-            <div className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-              {filtered.map((a) => (
-                <article
-                  key={a.name}
-                  className="halo-card group flex flex-col p-6 shadow-md transition-all duration-300 hover:-translate-y-1 hover:border-border-strong hover:shadow-xl"
-                >
-                  <div className="mb-4 flex flex-wrap items-center gap-1.5">
-                    <button
-                      onClick={() => setCloud(a.cloud)}
-                      className={`rounded-md border px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.08em] transition-colors ${
-                        cloud === a.cloud
-                          ? "border-accent bg-accent/10 text-accent"
-                          : "border-border bg-surface-alt text-text-muted hover:border-accent hover:text-accent"
-                      }`}
-                    >
-                      {CLOUD_LABEL[a.cloud]}
-                    </button>
-                    <button
-                      onClick={() => setCategory(a.category)}
-                      className={`rounded-md border px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.08em] transition-colors ${
-                        category === a.category
-                          ? "border-accent bg-accent/10 text-accent"
-                          : "border-border bg-surface-alt text-text-muted hover:border-accent hover:text-accent"
-                      }`}
-                    >
-                      {a.category}
-                    </button>
-                  </div>
-
-                  <h3 className="font-sans text-lg font-medium tracking-tight text-text transition-colors group-hover:text-accent">
-                    {a.name}
-                  </h3>
-                  {a.description && (
-                    <p className="mt-3 font-sans text-[13.5px] leading-[1.55] text-text-muted">
-                      {a.description}
-                    </p>
-                  )}
-                </article>
+            <div className="flex flex-wrap gap-1.5">
+              {CLOUD_TABS.map((c) => (
+                <button key={c} onClick={() => setCloud(c)} className={tabClass(cloud === c)}>
+                  {c === "all" ? "All" : CLOUD_LABEL[c]}
+                </button>
               ))}
             </div>
+          </div>
+
+          {/* Category filter tabs */}
+          <div>
+            <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.14em] text-zinc-400">
+              Category
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {CATEGORY_TABS.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setCategory(cat)}
+                  className={tabClass(category === cat)}
+                >
+                  {cat === "all" ? "All" : cat}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Count readout */}
+        <div className="mt-8 flex items-center justify-between">
+          <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-500">
+            Showing <span className="font-semibold text-zinc-900">{filtered.length}</span> of{" "}
+            {AUDITOR_COUNT}
+          </p>
+          {filtersActive && (
+            <button
+              onClick={clearFilters}
+              className="font-mono text-[11px] uppercase tracking-[0.12em] text-amber-700 transition-colors hover:text-zinc-900"
+            >
+              Clear filters ✕
+            </button>
           )}
         </div>
-      </section>
 
-      {/* ── Scanner types note ──────────────────────────────────── */}
-      <HaloReveal as="section" delay={0} className="border-t border-border px-6 py-24 sm:px-12">
-        <HaloSectionHead
-          eyebrow="§ 03 · Under the hood"
-          title="Two execution paths, one findings pipeline."
-          titleAccent="one findings pipeline"
-          blurb="Lightweight SDK auditors run in-process inside the scan worker. Heavy OSS tools — Prowler and the Checkov / Semgrep / Bandit IaC and SAST scanners — run as container-image Lambdas. Both normalize through a single ingest path (ADR-0003)."
-        />
+        {/* Grid / empty state */}
+        {filtered.length === 0 ? (
+          <div className="mx-auto mt-10 max-w-[600px] rounded-2xl border-2 border-dashed border-zinc-300 bg-white p-12 text-center">
+            <span className="mb-4 block font-mono text-3xl text-amber-600" aria-hidden>
+              ⚠
+            </span>
+            <h3 className="font-display text-lg font-semibold text-zinc-900">
+              No matching auditors
+            </h3>
+            <p className="mt-2 text-sm text-zinc-600">
+              Nothing matches these filters
+              {query.trim() !== "" ? (
+                <>
+                  {" "}
+                  for &ldquo;<span className="text-zinc-900">{query.trim()}</span>&rdquo;
+                </>
+              ) : null}
+              . Try a broader cloud or category.
+            </p>
+            <button
+              onClick={clearFilters}
+              className="mt-6 rounded-md border border-zinc-300 bg-white px-4 py-2 font-mono text-xs uppercase tracking-wider text-zinc-700 transition-all hover:border-zinc-900 hover:text-zinc-900"
+            >
+              Reset
+            </button>
+          </div>
+        ) : (
+          <div className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {filtered.map((a) => (
+              <article
+                key={a.name}
+                className="group flex flex-col rounded-2xl border border-zinc-200 bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:border-zinc-300 hover:shadow-lg"
+              >
+                <div className="mb-4 flex flex-wrap items-center gap-1.5">
+                  <button
+                    onClick={() => setCloud(a.cloud)}
+                    className={`inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.08em] transition-colors ${
+                      cloud === a.cloud
+                        ? "border-zinc-900 bg-zinc-900 text-white"
+                        : "border-zinc-200 bg-zinc-50 text-zinc-600 hover:border-zinc-400 hover:text-zinc-900"
+                    }`}
+                  >
+                    <span className={`h-1.5 w-1.5 rounded-full ${CLOUD_DOT[a.cloud]}`} aria-hidden />
+                    {CLOUD_LABEL[a.cloud]}
+                  </button>
+                  <button
+                    onClick={() => setCategory(a.category)}
+                    className={`rounded-md border px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.08em] transition-colors ${
+                      category === a.category
+                        ? "border-amber-600 bg-amber-50 text-amber-800"
+                        : "border-zinc-200 bg-zinc-50 text-zinc-600 hover:border-amber-500 hover:text-amber-700"
+                    }`}
+                  >
+                    {a.category}
+                  </button>
+                </div>
 
-        <div className="mx-auto mt-12 max-w-[1000px]">
-          <div className="halo-card p-7 sm:p-9">
-            <p className="halo-eyebrow">§ Scanner families</p>
+                <h3 className="font-sans text-lg font-semibold tracking-tight text-zinc-900 transition-colors group-hover:text-blue-600">
+                  {a.name}
+                </h3>
+                {a.description && (
+                  <p className="mt-3 font-sans text-[13.5px] leading-[1.55] text-zinc-600">
+                    {a.description}
+                  </p>
+                )}
+              </article>
+            ))}
+          </div>
+        )}
+      </Section>
+
+      {/* ── UNDER THE HOOD · dark · purple ──────────────────────────────── */}
+      <Section variant="dark">
+        <div className="grid gap-16 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+          <div className="lg:sticky lg:top-12">
+            <SectionHead
+              accent="purple"
+              on="dark"
+              eyebrow="Under the hood"
+              eyebrowIcon={<Workflow className="h-3.5 w-3.5" />}
+              title="Two execution paths,"
+              accentWord="one findings pipeline."
+              sub="Lightweight SDK auditors run in-process inside the scan worker. Heavy OSS tools — Prowler and the Checkov / Semgrep / Bandit IaC and SAST scanners — run as container-image Lambdas. Both normalize through a single ingest path (ADR-0003)."
+            />
+            <div className="mt-8 flex items-start gap-3 rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
+              <ShieldCheck className="mt-0.5 h-5 w-5 flex-shrink-0 text-purple-400" aria-hidden />
+              <p className="text-xs leading-relaxed text-zinc-400">
+                Scanning uses a read-only, least-privilege cross-account IAM role —
+                no write keys. Scanners collect the minimum posture data needed and
+                never touch PII, customer records or business content.
+              </p>
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-7 sm:p-9">
+            <p className="font-mono text-[11px] font-semibold uppercase tracking-wider text-purple-400">
+              {SCANNER_TYPES.length} scanner families
+            </p>
             <ul className="mt-6 grid grid-cols-1 gap-x-8 gap-y-3.5 sm:grid-cols-2">
               {SCANNER_TYPES.map((s) => (
-                <li
-                  key={s}
-                  className="flex items-start font-sans text-[13.5px] leading-[1.5] text-text-muted"
-                >
-                  <span
-                    className="mr-2.5 select-none font-mono text-accent"
-                    aria-hidden="true"
-                  >
-                    ✓
-                  </span>
+                <li key={s} className="flex items-start font-mono text-[12.5px] leading-[1.5] text-zinc-300">
+                  <CheckCircle2 className="mr-2.5 mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-purple-400" aria-hidden />
                   <span>{s}</span>
                 </li>
               ))}
             </ul>
-            <p className="mt-8 border-t border-border pt-6 font-sans text-[13px] leading-[1.55] text-text-dim">
-              Scanning uses a read-only, least-privilege cross-account IAM role —
-              no write keys. Scanners collect the minimum posture data needed and
-              never touch PII, customer records or business content.
-            </p>
           </div>
         </div>
-      </HaloReveal>
+      </Section>
 
-      <HaloCTA
-        title="Read the source. Run it yourself."
-        titleAccent="Run it yourself"
-        sub="Every auditor above is real code in the open-source repo. Clone the full stack locally — no cloud account or API keys required."
-        primaryLabel="View source"
-        primaryHref={SITE.repoUrl}
-        secondaryLabel="See it hosted"
-        secondaryHref={SITE.hostedUrl}
-      />
+      {/* ── GET STARTED · dark · lime ───────────────────────────────────── */}
+      <Section variant="dark" orbs={false}>
+        <div className="flex flex-col items-start gap-10 lg:flex-row lg:items-center lg:justify-between">
+          <SectionHead
+            accent="lime"
+            on="dark"
+            eyebrow="Get started"
+            eyebrowIcon={<FileCheck2 className="h-3.5 w-3.5" />}
+            title="Read the source."
+            accentWord="Run it yourself."
+            sub="Every auditor above is real code in the open-source repo. Clone the full stack locally — no cloud account or API keys required."
+          />
+          <div className="flex flex-shrink-0 flex-wrap gap-3">
+            <LimeButton href={SITE.repoUrl} external icon={<GitHubIcon />}>
+              Star on GitHub
+            </LimeButton>
+            <GhostButton href={SITE.hostedUrl} external on="dark">
+              See it hosted
+            </GhostButton>
+          </div>
+        </div>
+      </Section>
 
       <HaloFooter />
     </>

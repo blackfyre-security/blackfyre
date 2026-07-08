@@ -24,6 +24,8 @@ const config: Config = {
         "accent-2": "var(--accent-2)",
         warn: "var(--warn)",
         crit: "var(--crit)",
+        // vibrant redesign: intermediate zinc used by dashboard chart bars
+        "zinc-850": "#1f1f23",
       },
       fontFamily: {
         sans: [
