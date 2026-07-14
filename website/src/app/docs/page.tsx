@@ -16,7 +16,7 @@ import Section from "@/components/vibrant/Section";
 import SectionHead from "@/components/vibrant/SectionHead";
 import StatRow from "@/components/vibrant/StatRow";
 import { CaseStudyCardDark } from "@/components/vibrant/Cards";
-import { DeviceCluster } from "@/components/vibrant/Mockups";
+import HeroApiConsole from "@/components/vibrant/heroes/HeroApiConsole";
 import { LimeButton, GhostButton, GitHubIcon } from "@/components/vibrant/buttons";
 import { ACCENTS, type Accent } from "@/components/vibrant/accents";
 
@@ -157,7 +157,7 @@ export default function DocsPage() {
           </div>
 
           <div className="hidden lg:block">
-            <DeviceCluster />
+            <HeroApiConsole />
           </div>
         </div>
       </Section>

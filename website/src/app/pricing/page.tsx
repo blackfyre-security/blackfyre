@@ -239,7 +239,7 @@ export default function PricingPage() {
 
       {/* ── HERO · light · blue ─────────────────────────────────────────── */}
       <Section variant="light">
-        <div className="grid gap-16 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+        <div className="grid gap-16 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
           <div>
             <SectionHead
               size="hero"
@@ -313,7 +313,7 @@ export default function PricingPage() {
           </TierCard>
 
           <TierCard tier={hosted}>
-            <GhostButton href={SITE.hostedUrl} external>
+            <GhostButton href={SITE.demoUrl} external>
               Get early access
             </GhostButton>
             <GhostButton href="/contact">Talk to us</GhostButton>

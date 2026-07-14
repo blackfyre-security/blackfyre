@@ -77,7 +77,7 @@ interface LightCardProps {
 /** Light horizontal card — gradient thumbnail + amber kicker + stat footer. */
 export function FeatureCardLight({ kicker, title, desc, thumb, stats, linkLabel, linkHref }: LightCardProps) {
   return (
-    <article className="group flex flex-col gap-6 rounded-2xl border border-zinc-200/80 bg-white p-6 transition-all duration-300 hover:shadow-lg sm:flex-row">
+    <article className="group flex flex-col gap-6 rounded-2xl border border-zinc-200 bg-white p-6 shadow-[0_1px_2px_rgba(9,9,14,0.04),0_12px_28px_-18px_rgba(9,9,14,0.18)] ring-1 ring-zinc-950/[0.03] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_18px_40px_-18px_rgba(9,9,14,0.25)] sm:flex-row">
       <div className="flex h-[130px] w-full items-center justify-center overflow-hidden rounded-xl border border-zinc-200/60 bg-gradient-to-tr from-zinc-100 to-zinc-50 p-3 sm:w-[160px] sm:flex-shrink-0">
         {thumb}
       </div>
