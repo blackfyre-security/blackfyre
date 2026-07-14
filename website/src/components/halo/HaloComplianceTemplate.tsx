@@ -536,7 +536,7 @@ export default function HaloComplianceTemplate({ framework }: HaloComplianceTemp
               <GhostButton href="/docs" on="dark">
                 Read the docs
               </GhostButton>
-              <GhostButton href={SITE.hostedUrl} external on="dark">
+              <GhostButton href={SITE.demoUrl} external on="dark">
                 Try hosted (early access)
               </GhostButton>
             </div>

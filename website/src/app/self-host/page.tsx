@@ -21,7 +21,7 @@ import StatRow from "@/components/vibrant/StatRow";
 import IconTile from "@/components/vibrant/IconTile";
 import LogoRow from "@/components/vibrant/LogoRow";
 import { FeatureCardLight } from "@/components/vibrant/Cards";
-import { DeviceCluster } from "@/components/vibrant/Mockups";
+import HeroComposeTerminal from "@/components/vibrant/heroes/HeroComposeTerminal";
 import { LimeButton, GhostButton, GitHubIcon } from "@/components/vibrant/buttons";
 
 import CopyBlock from "./CopyBlock";
@@ -99,7 +99,7 @@ export default function SelfHostPage() {
 
       {/* ── HERO · light · blue ─────────────────────────────────────────── */}
       <Section variant="light">
-        <div className="grid gap-16 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+        <div className="grid gap-16 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
           <div>
             <SectionHead
               size="hero"
@@ -147,7 +147,7 @@ export default function SelfHostPage() {
           </div>
 
           <div className="hidden lg:block">
-            <DeviceCluster />
+            <HeroComposeTerminal />
           </div>
         </div>
 

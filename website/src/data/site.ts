@@ -5,6 +5,9 @@ export const SITE = {
   repoUrl: "https://github.com/blackfyre-security/blackfyre",
   repoSlug: "blackfyre-security/blackfyre",
   hostedUrl: "https://blackfyre.tech",
+  // Live hosted demo the "Hosted option" CTAs point at (kept separate from
+  // hostedUrl, which is the canonical marketing domain used for SEO metadata).
+  demoUrl: "https://demo.blackfyre.tech",
   license: "Apache-2.0",
   tagline: "Open-source multi-cloud compliance & security platform",
 } as const;

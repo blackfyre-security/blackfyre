@@ -385,7 +385,7 @@ export default function AuditorCatalog() {
             <LimeButton href={SITE.repoUrl} external icon={<GitHubIcon />}>
               Star on GitHub
             </LimeButton>
-            <GhostButton href={SITE.hostedUrl} external on="dark">
+            <GhostButton href={SITE.demoUrl} external on="dark">
               See it hosted
             </GhostButton>
           </div>
