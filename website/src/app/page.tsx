@@ -22,7 +22,7 @@ import LogoRow from "@/components/vibrant/LogoRow";
 import CTABanner from "@/components/vibrant/CTABanner";
 import StepTimeline from "@/components/vibrant/StepTimeline";
 import { CaseStudyCardDark, FeatureCardLight } from "@/components/vibrant/Cards";
-import { DeviceCluster } from "@/components/vibrant/Mockups";
+import HeroPostureMap from "@/components/vibrant/heroes/HeroPostureMap";
 import { Parallax } from "@/components/vibrant/motion";
 import { LimeButton, GhostButton, GitHubIcon } from "@/components/vibrant/buttons";
 
@@ -98,7 +98,7 @@ export default function Home() {
 
       {/* ── HERO · light · blue ─────────────────────────────────────────── */}
       <Section variant="light">
-        <div className="grid gap-16 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+        <div className="grid gap-16 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
           <div>
             <SectionHead
               size="hero"
@@ -155,7 +155,7 @@ export default function Home() {
           </div>
 
           <Parallax className="hidden lg:block" shift={-6}>
-            <DeviceCluster />
+            <HeroPostureMap />
           </Parallax>
         </div>
 

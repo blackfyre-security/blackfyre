@@ -238,7 +238,7 @@ export default function ContributePage() {
 
       {/* ── HERO · light · purple ───────────────────────────────────────── */}
       <Section variant="light">
-        <div className="grid gap-16 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+        <div className="grid gap-16 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
           <div>
             <SectionHead
               size="hero"

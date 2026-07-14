@@ -22,7 +22,7 @@ import IconTile from "@/components/vibrant/IconTile";
 import LogoRow from "@/components/vibrant/LogoRow";
 import StepTimeline from "@/components/vibrant/StepTimeline";
 import { CaseStudyCardDark } from "@/components/vibrant/Cards";
-import { DeviceCluster } from "@/components/vibrant/Mockups";
+import HeroThreatScan from "@/components/vibrant/heroes/HeroThreatScan";
 import { LimeButton, GhostButton, GitHubIcon } from "@/components/vibrant/buttons";
 
 import { SITE, DOCS } from "@/data/site";
@@ -268,7 +268,7 @@ export default function SecurityPage() {
           </div>
 
           <div className="hidden lg:block">
-            <DeviceCluster />
+            <HeroThreatScan />
           </div>
         </div>
 

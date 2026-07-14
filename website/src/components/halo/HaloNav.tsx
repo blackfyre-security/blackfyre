@@ -16,8 +16,8 @@ interface HaloNavLink {
 // section anchor (#) — no agency/services pages, no sales CTA.
 const NAV_LINKS: HaloNavLink[] = [
   { href: "/platform", label: "Platform" },
-  { href: "/agents", label: "Auditors" },
   { href: "/platform#frameworks", label: "Frameworks" },
+  { href: "/agents", label: "Auditors" },
   { href: "/docs", label: "Docs" },
   { href: "/self-host", label: "Self-host" },
   { href: "/pricing", label: "Pricing" },
@@ -121,11 +121,18 @@ export default function HaloNav() {
     <>
       <header
         className={cn(
-          "sticky top-0 z-40 border-b border-border bg-bg/90 backdrop-blur-md transition-all duration-300 ease-out",
-          scrolled && "bg-bg/95 backdrop-blur-xl backdrop-saturate-150",
+          "sticky top-0 z-40 transition-all duration-300 ease-out",
+          scrolled
+            ? "border-b border-border bg-[color-mix(in_srgb,var(--bg)_82%,transparent)] backdrop-blur-xl backdrop-saturate-150 shadow-[0_10px_30px_-18px_rgba(0,0,0,0.8)]"
+            : "border-b border-transparent bg-transparent",
         )}
       >
-        <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-6 px-6 py-4 md:px-12">
+        <div
+          className={cn(
+            "mx-auto flex max-w-[1280px] items-center justify-between gap-6 px-6 transition-all duration-300 ease-out md:px-12",
+            scrolled ? "py-3" : "py-5",
+          )}
+        >
           <div className="flex items-center gap-8">
             <BrandMark />
             <nav
@@ -169,7 +176,7 @@ export default function HaloNav() {
               GitHub
             </a>
             <a
-              href={SITE.hostedUrl}
+              href={SITE.demoUrl}
               className="halo-btn-accent !py-2.5 !text-[13px]"
             >
               Hosted option
@@ -266,7 +273,7 @@ export default function HaloNav() {
                   Star on GitHub
                 </a>
                 <a
-                  href={SITE.hostedUrl}
+                  href={SITE.demoUrl}
                   onClick={() => setMenuOpen(false)}
                   className="halo-btn-accent text-center"
                 >

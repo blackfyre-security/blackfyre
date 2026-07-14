@@ -28,7 +28,7 @@ import StatRow from "@/components/vibrant/StatRow";
 import IconTile from "@/components/vibrant/IconTile";
 import LogoRow from "@/components/vibrant/LogoRow";
 import { CaseStudyCardDark } from "@/components/vibrant/Cards";
-import { DeviceCluster } from "@/components/vibrant/Mockups";
+import HeroControlMatrix from "@/components/vibrant/heroes/HeroControlMatrix";
 import { LimeButton, GhostButton, GitHubIcon } from "@/components/vibrant/buttons";
 import { type Accent } from "@/components/vibrant/accents";
 
@@ -291,7 +291,7 @@ export default function PlatformPage() {
           </div>
 
           <div className="hidden lg:block">
-            <DeviceCluster />
+            <HeroControlMatrix />
           </div>
         </div>
 
