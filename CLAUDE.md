@@ -111,3 +111,8 @@ npm run lint --workspace=packages/portal
 - CI blocking gates: typecheck, unit tests, portal+admin lint, DCO. `npm audit` is
   warn-only. Don't "fix" CI by weakening these.
 - Generated/do-not-edit: workspace `dist/`, `.sst/`, `sst-env.d.ts`.
+- Integration tests `DELETE FROM` the shared tables — they wipe the demo seed.
+  Reseed with `(echo "SET app.env='development';"; cat src/migrations/003_seed_data.sql) | psql`
+  (the seeds are guarded on that session var and no-op silently without it).
+  018 (platform admin) has an unknown dev password — align it locally from the
+  003 users if you need to drive the admin app.
