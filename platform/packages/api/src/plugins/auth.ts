@@ -81,6 +81,28 @@ const authPlugin: FastifyPluginAsync = async (app) => {
   });
 
   app.decorate("authenticate", async function (request: FastifyRequest) {
+    // BUGFIX: the HttpOnly-cookie migration set bf_access_token at login but
+    // nothing ever consumed it — browser clients (portal/admin static exports)
+    // can't read an HttpOnly cookie to build an Authorization header, so every
+    // cookie-authenticated request 401'd. When no Authorization header is
+    // present, lift the token out of the cookie into the SAME Bearer
+    // verification path (HS256 pinning and every downstream check unchanged).
+    // CSRF for cookie-authenticated mutations is enforced by plugins/csrf.
+    if (!request.headers.authorization) {
+      const cookieToken = (request.headers.cookie ?? "")
+        .split(";")
+        .map((c) => c.trim().split("="))
+        .find(([k]) => k === "bf_access_token")?.[1];
+      if (cookieToken) {
+        // Guarded decode: a malformed value (e.g. "%") throws URIError, which
+        // would surface as a 500 — treat it as "no token" so it 401s instead.
+        try {
+          request.headers.authorization = `Bearer ${decodeURIComponent(cookieToken)}`;
+        } catch {
+          /* malformed cookie → fall through to the normal 401 path */
+        }
+      }
+    }
     const authHeader = request.headers.authorization;
     const apiKeyHeader = request.headers["x-api-key"] as string | undefined;
 

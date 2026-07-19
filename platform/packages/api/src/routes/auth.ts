@@ -235,7 +235,24 @@ export const authRoutes: FastifyPluginAsync = async (app) => {
 
   // POST /api/auth/refresh — with token rotation and reuse detection
   app.post("/api/auth/refresh", async (request, reply) => {
-    const body = refreshSchema.parse(request.body);
+    // BUGFIX (cookie-auth completion): browser clients can't read the HttpOnly
+    // bf_refresh_token cookie to place it in the body, so fall back to the
+    // cookie when the body doesn't carry a token. Verification, rotation and
+    // the stored-hash check below are identical for both transports.
+    const cookieRefresh = (request.headers.cookie ?? "")
+      .split(";")
+      .map((c) => c.trim().split("="))
+      .find(([k]) => k === "bf_refresh_token")?.[1];
+    let decodedCookieRefresh = "";
+    try {
+      decodedCookieRefresh = cookieRefresh ? decodeURIComponent(cookieRefresh) : "";
+    } catch {
+      /* malformed cookie → treated as absent; schema/verify path returns 401 */
+    }
+    const rawBody = (request.body ?? {}) as { refreshToken?: string };
+    const body = refreshSchema.parse(
+      rawBody.refreshToken ? rawBody : { refreshToken: decodedCookieRefresh },
+    );
 
     let decoded: { sub: string; tenantId: string; role: UserRole; type: string };
     try {
