@@ -30,7 +30,7 @@ jobs:
       matrix:
         service: [api, admin, portal]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Configure AWS creds
         uses: aws-actions/configure-aws-credentials@v4

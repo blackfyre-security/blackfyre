@@ -1,0 +1,42 @@
+# Marks issues/PRs stale after 45 days of inactivity, closes 14 days later.
+# Exemptions keep roadmap anchors, contributor on-ramps, and security work open.
+name: Stale
+
+on:
+  schedule:
+    - cron: "17 2 * * *" # daily, 02:17 UTC
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/stale@v9
+        with:
+          days-before-stale: 45
+          days-before-close: 14
+          exempt-issue-labels: "pinned,roadmap,good first issue,security"
+          exempt-pr-labels: "pinned,roadmap,security"
+          stale-issue-label: "stale"
+          stale-pr-label: "stale"
+          stale-issue-message: >-
+            This issue has been quiet for 45 days. It will close in 14 days
+            unless there's new activity — a comment or a label update keeps it
+            open. If it still matters to you, say so (or open a PR — see
+            CONTRIBUTING.md).
+          stale-pr-message: >-
+            This PR has been quiet for 45 days. It will close in 14 days unless
+            it's updated. If you're stuck, comment — a maintainer can help you
+            get it over the line.
+          close-issue-message: >-
+            Closed for inactivity. Not gone forever — comment and a maintainer
+            will reopen it if it's still relevant.
+          close-pr-message: >-
+            Closed for inactivity. Reopen anytime by pushing new commits and
+            commenting.
+          operations-per-run: 100

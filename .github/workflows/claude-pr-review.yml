@@ -1,0 +1,66 @@
+# First-pass Claude review on every PR from a branch in this repo.
+#
+# Fork PRs are intentionally excluded: `pull_request` runs on fork PRs receive no
+# secrets, so the review cannot run there. For fork PRs, a maintainer comments
+# "@claude review" instead (handled by claude.yml, which runs in base context).
+# Do NOT convert this to pull_request_target to "fix" that — running an agent
+# with secrets against untrusted fork code is a supply-chain hole.
+#
+# Requires: ANTHROPIC_API_KEY repo secret (see claude.yml header).
+name: Claude PR Review
+
+on:
+  pull_request:
+    types: [opened, ready_for_review, synchronize]
+
+concurrency:
+  group: claude-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.draft == false &&
+      github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      pull-requests: write   # post the review comment
+      issues: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+
+      - name: Claude first-pass review
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            Review PR #${{ github.event.pull_request.number }} in ${{ github.repository }}.
+            Read CLAUDE.md first — it defines this repo's conventions and security
+            invariants. Use `gh pr diff` / `gh pr view` for the change set.
+
+            Blackfyre is a security/compliance product: hold a high bar. Review for,
+            in priority order:
+            1. Correctness — real bugs, broken edge cases, unhandled errors.
+            2. Security — injection, authn/authz gaps, secret handling, and
+               especially RLS/tenant-isolation regressions: any use of app.db or
+               app.superDb where request.db is required, tenant tables created
+               without FORCE ROW LEVEL SECURITY + tenant_isolation policy,
+               request.db.transaction() usage (unsupported on reserved
+               connections), credentials logged or returned in responses.
+            3. Tests — changed behavior without a test; bug fixes need a test
+               that fails before the fix. Unit tests must run offline.
+            4. Conventions — CLAUDE.md/CONTRIBUTING.md: conventional commits,
+               migration files append-only, no hand-edits to generated files.
+
+            Be constructive and concise. Point at exact files/lines. Do not
+            nitpick style that a linter doesn't enforce (there is no Prettier
+            here). If the PR is solid, say so briefly — do not invent findings.
+            Post your review as a single PR comment using `gh pr comment`.
+          claude_args: |
+            --allowedTools "Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr comment:*),Read,Grep,Glob"

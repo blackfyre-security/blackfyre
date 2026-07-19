@@ -1,0 +1,82 @@
+# Deterministic triage on new issues — no LLM, no spend, runs in seconds.
+#   - Labels by type (bug/enhancement/question/documentation) and area
+#     (provider:aws|azure|gcp, framework) from title/body keywords.
+#   - Bug reports missing reproduction info get a polite comment + needs-repro.
+#   - Likely-easy issues get triage:gfi-candidate for MAINTAINER confirmation —
+#     the bot never applies "good first issue" itself.
+# Label set: docs/COMMUNITY_PLAYBOOK.md (gh label create commands).
+name: Issue triage
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const title = (issue.title || '').toLowerCase();
+            const body = (issue.body || '').toLowerCase();
+            const text = title + '\n' + body;
+            const existing = issue.labels.map(l => (typeof l === 'string' ? l : l.name));
+            const add = new Set();
+
+            // --- type ---
+            const isBug = existing.includes('bug') || /\b(bug|error|crash|broken|fails?|exception|regression)\b/.test(title);
+            if (isBug) add.add('bug');
+            else if (/\b(docs?|documentation|readme|typo|guide)\b/.test(title)) add.add('documentation');
+            else if (/^(how|what|why|where|can i|is it possible)\b|\?$/.test(title.trim())) add.add('question');
+            else if (existing.includes('enhancement') || /\b(feature|add|support|implement|proposal)\b/.test(title)) add.add('enhancement');
+
+            // --- area: cloud provider ---
+            if (/\baws\b|amazon web services|cloudtrail|guardduty|\biam\b.*aws|\bs3\b|\bec2\b/.test(text)) add.add('provider:aws');
+            if (/\bazure\b|defender|keyvault|\baks\b/.test(text)) add.add('provider:azure');
+            if (/\bgcp\b|google cloud|\bgke\b|bigquery/.test(text)) add.add('provider:gcp');
+
+            // --- area: compliance framework ---
+            if (/soc ?2|iso ?27001|iso ?42001|hipaa|gdpr|pci[- ]?dss|dpdpa|pdppl|nist|framework|control mapping|control catalog/.test(text)) add.add('framework');
+
+            // --- bug reports: reproduction info present? ---
+            if (add.has('bug')) {
+              const hasRepro = /steps to reproduce|reproduc|expected behav|actual behav|stack ?trace|error log/.test(body) && body.length > 200;
+              if (!hasRepro) {
+                add.add('needs-repro');
+                await github.rest.issues.createComment({
+                  ...context.repo, issue_number: issue.number,
+                  body: [
+                    `Thanks for the report, @${issue.user.login}! To help us fix this quickly, could you add:`,
+                    '',
+                    '- **Steps to reproduce** (commands you ran, from a fresh clone if possible)',
+                    '- **Expected vs. actual behavior**',
+                    '- **Environment** — OS, Node version (`node -v`), and whether the docker-compose stack was running',
+                    '- **Logs** — API/console output around the failure (please redact tokens/credentials)',
+                    '',
+                    'Once that info is in, a maintainer will triage it. Thanks!'
+                  ].join('\n')
+                });
+              }
+            }
+
+            // --- good-first-issue candidate (maintainer confirms manually) ---
+            const gfiSignal = /typo|broken link|rename|dev experience|convenience script|docs|error message|small|simple/.test(text)
+              || (add.has('documentation'));
+            if (gfiSignal && !add.has('question')) add.add('triage:gfi-candidate');
+
+            if (add.size) {
+              // addLabels creates missing labels with default colors; the curated
+              // palette comes from docs/COMMUNITY_PLAYBOOK.md.
+              await github.rest.issues.addLabels({
+                ...context.repo, issue_number: issue.number, labels: [...add]
+              });
+              core.info(`Labeled #${issue.number}: ${[...add].join(', ')}`);
+            } else {
+              core.info(`No labels inferred for #${issue.number} — leaving for manual triage.`);
+            }
