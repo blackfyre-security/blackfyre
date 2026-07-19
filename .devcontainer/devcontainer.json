@@ -1,0 +1,25 @@
+{
+  "name": "Blackfyre",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:20",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "forwardPorts": [4000, 4001, 3001, 3003],
+  "portsAttributes": {
+    "4000": { "label": "API" },
+    "4001": { "label": "Demo API (no DB)" },
+    "3001": { "label": "Portal" },
+    "3003": { "label": "Admin" }
+  },
+  "postCreateCommand": "cd platform && npm install && npm run build && cp -n packages/api/.env.example packages/api/.env || true",
+  "postAttachCommand": "echo '🔥 Blackfyre codespace ready. Fastest demo (no DB): cd platform && npm run demo --workspace=packages/api  →  :4001. Full stack: cd platform && npm run db:up && npm run db:migrate && npm run dev  →  :4000 (see docs/developer/local-development.md)'",
+  "hostRequirements": {
+    "cpus": 4,
+    "memory": "8gb"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": ["dbaeumer.vscode-eslint"]
+    }
+  }
+}

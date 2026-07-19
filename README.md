@@ -12,6 +12,7 @@ with AI-assisted analysis, tamper-evident evidence, and real remediation trackin
 [![Release](https://img.shields.io/github/v/release/blackfyre-security/blackfyre?include_prereleases&label=release)](https://github.com/blackfyre-security/blackfyre/releases)
 [![Discussions](https://img.shields.io/github/discussions/blackfyre-security/blackfyre)](https://github.com/blackfyre-security/blackfyre/discussions)
 [![Good first issues](https://img.shields.io/github/issues/blackfyre-security/blackfyre/good%20first%20issue?label=good%20first%20issues)](https://github.com/blackfyre-security/blackfyre/labels/good%20first%20issue)
+[![Open in GitHub Codespaces](https://img.shields.io/badge/Codespaces-try%20it%20in%20one%20click-181717?logo=github)](https://codespaces.new/blackfyre-security/blackfyre)
 
 [Quickstart](#quickstart) · [Coverage](#compliance--cloud-coverage) · [Docs](#documentation) · [Contributing](#contributing) · [Security](SECURITY.md) · [Hosted option](https://blackfyre.tech)
 
@@ -49,6 +50,11 @@ findings through remediation — with evidence you can hand to an auditor.
   auditor-scoped access
 
 ## Quickstart
+
+**Zero-install:** [open the repo in GitHub Codespaces](https://codespaces.new/blackfyre-security/blackfyre)
+— dependencies install automatically; then `npm run demo --workspace=packages/api`
+(from `platform/`) serves a fully mocked API on :4001 with no database, or follow
+the printed hint for the full stack.
 
 Full local stack (no cloud account needed) — details in
 [docs/developer/local-development.md](docs/developer/local-development.md):
