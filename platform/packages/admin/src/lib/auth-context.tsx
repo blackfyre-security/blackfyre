@@ -43,7 +43,7 @@ function getUserFromCookie(): User | null {
 }
 
 function setUserCookie(user: User) {
-  document.cookie = `${USER_COOKIE}=${encodeURIComponent(JSON.stringify(user))}; path=/; max-age=900; SameSite=Strict`;
+  document.cookie = `${USER_COOKIE}=${encodeURIComponent(JSON.stringify(user))}; path=/; max-age=2592000; SameSite=Strict`;
 }
 
 function clearUserCookie() {
