@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Questions & ideas — GitHub Discussions
+    url: https://github.com/blackfyre-security/blackfyre/discussions
+    about: Usage help, architecture questions, showing off your setup, open-ended ideas.
+  - name: 🔒 Security vulnerability (private)
+    url: https://github.com/blackfyre-security/blackfyre/security/advisories/new
+    about: Never open a public issue for a vulnerability — report it privately here or via security@blackfyre.tech.

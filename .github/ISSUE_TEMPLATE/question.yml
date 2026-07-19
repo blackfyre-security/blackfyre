@@ -1,0 +1,21 @@
+name: Question
+description: Ask about using or developing Blackfyre (consider Discussions first)
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For open-ended or usage questions, [GitHub Discussions](../../discussions)
+        usually gets a better answer — issues work best for questions tied to a
+        specific piece of code or behavior.
+  - type: textarea
+    id: question
+    attributes:
+      label: Your question
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: What have you tried / read already?
+      description: Docs you've checked (README, docs/developer/), commands you've run.

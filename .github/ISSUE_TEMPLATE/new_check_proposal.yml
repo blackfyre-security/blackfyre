@@ -1,0 +1,80 @@
+name: New check / control mapping proposal
+description: Propose a new cloud security check or a compliance framework mapping — the highest-leverage contribution
+labels: ["enhancement", "framework"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This is Blackfyre's most valuable contribution path — you don't need to be a
+        TypeScript expert. Compliance knowledge (what should be checked, which controls
+        it maps to) is half the work. See the
+        ["Adding a check or framework mapping" guide](../../blob/main/CONTRIBUTING.md#adding-a-cloud-check-or-framework-mapping)
+        for where things live in the code.
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What are you proposing?
+      options:
+        - A new cloud security check (auditor logic)
+        - A new framework / control catalog (data)
+        - New control mappings for an existing check
+        - A correction to an existing mapping
+    validations:
+      required: true
+  - type: dropdown
+    id: provider
+    attributes:
+      label: Cloud provider
+      multiple: true
+      options:
+        - AWS
+        - Azure
+        - GCP
+        - On-prem / other
+        - N/A (framework data only)
+    validations:
+      required: true
+  - type: input
+    id: service
+    attributes:
+      label: Service / resource type
+      placeholder: "e.g. AWS ElastiCache, Azure Cosmos DB, GCP Cloud Functions"
+  - type: textarea
+    id: check
+    attributes:
+      label: What should be checked, and why does it matter?
+      description: The misconfiguration or risk, and its security impact.
+      placeholder: "ElastiCache replication groups without encryption-in-transit expose ..."
+    validations:
+      required: true
+  - type: textarea
+    id: mappings
+    attributes:
+      label: Framework control mappings
+      description: Which controls does this evidence? Framework + control IDs, with a one-line rationale each.
+      placeholder: |
+        - SOC 2 CC6.1 — logical access controls over encryption
+        - ISO 27001 A.8.24 — use of cryptography
+        - PCI-DSS 4.2.1 — encryption of cardholder data in transit
+    validations:
+      required: true
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Suggested severity when the check fails
+      options:
+        - critical
+        - high
+        - medium
+        - low
+        - informational
+  - type: dropdown
+    id: contribution
+    attributes:
+      label: Would you like to implement it?
+      options:
+        - "Yes — point me at the right files"
+        - "Yes, with guidance"
+        - "No — offering the domain knowledge"
+    validations:
+      required: true

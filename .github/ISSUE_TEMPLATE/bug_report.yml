@@ -1,31 +1,88 @@
 name: Bug report
-description: Something is broken in the platform, portal, admin, or demo
+description: Something isn't working
 labels: ["bug"]
 body:
-  - type: input
-    id: env
+  - type: markdown
     attributes:
-      label: Environment
-      placeholder: "e.g. demo.blackfyre.tech / app-staging.blackfyre.tech / local dev"
-    validations:
-      required: true
+      value: |
+        Thanks for the report! Please redact anything sensitive (tokens, account IDs,
+        real findings data) before submitting. Security vulnerabilities go through
+        [private reporting](../../security/policy) — never a public issue.
   - type: textarea
-    id: describe
+    id: what-happened
     attributes:
       label: What happened
-      placeholder: "Steps to reproduce, what you expected, what you saw."
+      description: What did you do, what did you expect, what happened instead?
+      placeholder: |
+        Expected: ...
+        Actual: ...
     validations:
       required: true
   - type: textarea
-    id: console
+    id: repro
     attributes:
-      label: Browser console / server logs (if relevant)
-      render: shell
+      label: Steps to reproduce
+      description: From a fresh clone if possible — exact commands help enormously.
+      placeholder: |
+        1. docker compose up -d postgres redis localstack
+        2. npm run db:migrate && npm run dev
+        3. ...
+    validations:
+      required: true
+  - type: dropdown
+    id: provider
+    attributes:
+      label: Cloud provider (if scanner-related)
+      multiple: true
+      options:
+        - AWS
+        - Azure
+        - GCP
+        - On-prem / other
+        - Not scanner-related
+  - type: dropdown
+    id: framework
+    attributes:
+      label: Compliance framework (if mapping/scoring-related)
+      multiple: true
+      options:
+        - SOC 2
+        - ISO 27001
+        - HIPAA
+        - GDPR
+        - PCI-DSS
+        - DPDPA
+        - ISO 42001
+        - PDPPL
+        - NIST 800-53
+        - Not framework-related
+  - type: input
+    id: control-ids
+    attributes:
+      label: Affected control IDs
+      description: If specific controls score or map incorrectly (e.g. CC6.1, A.8.12).
+      placeholder: "CC6.1, A.8.12"
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      placeholder: |
+        OS: macOS 15 / Ubuntu 24.04
+        Node: v20.x (node -v)
+        Setup: local docker-compose / self-hosted AWS / demo.blackfyre.tech
+    validations:
+      required: true
   - type: input
     id: browser
     attributes:
       label: Browser & version (if UI bug)
       placeholder: "e.g. Chrome 130, Firefox 128"
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / console output
+      description: API or browser console output around the failure. Redact credentials.
+      render: shell
   - type: textarea
     id: screenshots
     attributes:

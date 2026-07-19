@@ -9,8 +9,16 @@ open to external contributions via the standard fork-and-PR flow.
 - For anything beyond a small fix, open an issue first to discuss the approach
   before investing time in a PR. This avoids duplicate work and wasted effort
   on changes that don't fit the roadmap.
-- Look for issues labeled [`good first issue`](https://github.com/<ORG>/blackfyre/labels/good%20first%20issue)
-  if you're new to the codebase and want a well-scoped starting point.
+- Look for issues labeled [`good first issue`](https://github.com/blackfyre-security/blackfyre/labels/good%20first%20issue)
+  if you're new to the codebase and want a well-scoped starting point. Comment on
+  the issue to claim it — a maintainer will confirm nobody else is on it.
+- For open-ended questions or ideas, use
+  [GitHub Discussions](https://github.com/blackfyre-security/blackfyre/discussions);
+  issues are for concrete bugs and scoped work.
+- You don't have to write code to contribute meaningfully: compliance domain
+  knowledge (control interpretations, framework mappings) is half of what this
+  project runs on — see
+  [Adding a cloud check or framework mapping](#adding-a-cloud-check-or-framework-mapping).
 
 ## Fork-and-PR flow
 
@@ -26,9 +34,40 @@ Do not push directly to this repository — all changes land via PR.
 
 ## Local development setup
 
-Full setup instructions (prerequisites, environment variables, running
-services locally) live in
+Full setup instructions (prerequisites, environment variables, seeded logins,
+troubleshooting) live in
 [`docs/developer/local-development.md`](docs/developer/local-development.md).
+The short version — you need Node 20, npm, and Docker:
+
+```bash
+git clone https://github.com/<your-fork>/blackfyre.git && cd blackfyre/platform
+docker compose up -d postgres redis localstack   # Postgres 16, Redis, SQS/S3 emulation
+npm install && npm run build
+cp packages/api/.env.example packages/api/.env   # then edit per the local-dev guide
+npm run db:migrate && npm run dev                # API on :4000
+```
+
+Portal (`:3001`) and admin (`:3003`) run with
+`NEXT_PUBLIC_API_URL=http://localhost:4000 npm run dev --workspace=packages/portal`
+(or `packages/admin`).
+
+## Running and writing tests
+
+```bash
+cd platform
+npm run test:unit --workspace=packages/api   # unit suite — offline, CI-blocking
+npm run test --workspace=packages/api        # full suite — needs the compose services up
+cd packages/api && npx vitest run tests/unit/some-file.test.ts --config vitest.unit.config.ts   # one file
+```
+
+- Tests are Vitest, in `platform/packages/api/tests/{unit,integration,smoke}/`.
+- **Unit tests must run offline** (no Postgres/Redis) — that's what gates PRs.
+- A bug fix should come with a test that fails before the fix and passes after.
+- If your change touches tenant-scoped data, run the tenant-isolation suite
+  against the compose stack — it's the most important test in the repo:
+  `npx vitest run tests/integration/tenant-isolation.test.ts` (from `packages/api`).
+- Playwright browser tests (`npm run test:browser --workspace=packages/admin`)
+  run against a deployed environment — maintainers run these; you don't need to.
 
 At minimum, before opening a PR:
 
@@ -40,6 +79,40 @@ npm run test:unit --workspace=packages/api
 
 Both commands must pass. CI runs the equivalent checks on every PR and will
 block merge if either fails.
+
+## Adding a cloud check or framework mapping
+
+The highest-leverage contribution to Blackfyre: more checks and better control
+mappings directly improve every user's compliance coverage. Start with the
+[new check proposal](https://github.com/blackfyre-security/blackfyre/issues/new?template=new_check_proposal.yml)
+issue template so a maintainer can confirm scope before you build.
+
+**Where things live** (all under `platform/packages/api/src/`):
+
+- `agents/aws/`, `agents/azure/`, `agents/gcp/` — one auditor per cloud service
+  (e.g. `agents/aws/s3.ts`). Each extends `base-agent.ts` and is registered in
+  `agents/registry.ts`; the swarm orchestrator runs them uniformly
+  ([ADR-0003](docs/adr/0003-scanner-orchestration.md)).
+- `compliance/control-registry.ts` — registers the 9 frameworks; catalogs live
+  in `compliance/frameworks/` (plus some inline in the registry). The
+  `Framework` enum is in `packages/shared/src/types/control-mapping.ts`.
+- Findings carry framework mappings — each check declares which control IDs it
+  evidences, and scoring rolls up from there (`compliance/scoring.ts`).
+
+**Adding a check to an existing auditor** is the gentlest on-ramp: find the
+service file under `agents/<cloud>/`, follow the pattern of a neighboring check
+(SDK call → evaluate → emit finding with control mappings + remediation text),
+and add a unit test next to the existing ones for that auditor.
+
+**Adding a framework** is data, not code: a control catalog (ID, title,
+description, weight) in `compliance/frameworks/`, registered in
+`control-registry.ts`, plus a `Framework` enum entry. Mappings from existing
+checks to the new framework's controls can then land incrementally — great
+follow-up PRs for compliance-minded contributors.
+
+Real cloud credentials are never required for tests — auditors are unit-tested
+with mocked SDK responses, and `sandbox/fake-org/` provides a deliberately
+misconfigured mock AWS for integration runs.
 
 ## Developer Certificate of Origin (DCO)
 
