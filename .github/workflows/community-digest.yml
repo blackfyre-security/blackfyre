@@ -6,6 +6,11 @@
 # Output lands as a workflow ARTIFACT (community-digest-<run>). A maintainer
 # downloads, edits, and posts by hand. Skips quietly if ANTHROPIC_API_KEY
 # isn't configured. Manual runs: Actions → Community digest → Run workflow.
+#
+# NOTE: issue/PR titles and author names in raw-activity.md are UNTRUSTED
+# input (anyone can open an issue) — a hostile title can try to steer the
+# draft. That's contained (read-only perms, no Bash for the drafting step,
+# artifact-only output), but always read the draft before posting anything.
 name: Community digest
 
 on:
@@ -17,7 +22,6 @@ permissions:
   contents: read
   issues: read
   pull-requests: read
-  id-token: write
 
 jobs:
   digest:
@@ -64,7 +68,7 @@ jobs:
 
       - name: Draft digest with Claude
         if: steps.gather.outputs.have_key == 'true'
-        uses: anthropics/claude-code-action@v1
+        uses: anthropics/claude-code-action@3553f84341b92da26052e28acf1aa898f9511f32 # v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: |

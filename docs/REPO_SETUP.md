@@ -122,7 +122,7 @@ gh secret set RAZORPAY_KEY_SECRET      --repo blackfyre-security/blackfyre
 gh secret set RAZORPAY_WEBHOOK_SECRET  --repo blackfyre-security/blackfyre
 ```
 
-Get the SST secret values from `.planning/safety-snapshot-20260510/staging-secrets.txt` (local-only, gitignored).
+Get the SST secret values from your local secrets store (never committed to this repo).
 
 ## 8. Set GitHub Actions variables (non-secret config)
 
