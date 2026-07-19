@@ -99,8 +99,8 @@ per framework with weighted controls.
 | Cloud | SDK auditors | Covers |
 |---|---|---|
 | AWS | 13 | IAM, S3, EC2/VPC, RDS, KMS, CloudTrail, GuardDuty, Config, Lambda, ECS/EKS, SQS/SNS, Secrets Manager, WAF |
-| Azure | 12 | IAM, Storage, Compute, SQL, Key Vault, AKS, Defender, Monitor, Network, Policy, App Service |
-| GCP | 11 | IAM, Storage, Compute, Cloud SQL, GKE, KMS, BigQuery, Network, Org Policy, Security Command Center |
+| Azure | 11 | IAM, Storage, Compute, SQL, Key Vault, AKS, Defender, Monitor, Network, Policy, App Service |
+| GCP | 10 | IAM, Storage, Compute, Cloud SQL, GKE, KMS, BigQuery, Network, Org Policy, Security Command Center |
 | On-prem / other | 10+ | Active Directory, network/SNMP, endpoints, Kubernetes, SaaS, code repos, container registries, OT/SCADA |
 
 Plus Prowler and IaC scanning (Checkov/Semgrep/Bandit) as containerized scanners.

@@ -90,12 +90,12 @@ issue template so a maintainer can confirm scope before you build.
 **Where things live** (all under `platform/packages/api/src/`):
 
 - `agents/aws/`, `agents/azure/`, `agents/gcp/` — one auditor per cloud service
-  (e.g. `agents/aws/s3.ts`). Each extends `base-agent.ts` and is registered in
+  (e.g. `agents/aws/s3-auditor.ts`). Each extends `base-agent.ts` and is registered in
   `agents/registry.ts`; the swarm orchestrator runs them uniformly
   ([ADR-0003](docs/adr/0003-scanner-orchestration.md)).
 - `compliance/control-registry.ts` — registers the 9 frameworks; catalogs live
   in `compliance/frameworks/` (plus some inline in the registry). The
-  `Framework` enum is in `packages/shared/src/types/control-mapping.ts`.
+  `Framework` const map is in `packages/shared/src/types/control-mapping.ts`.
 - Findings carry framework mappings — each check declares which control IDs it
   evidences, and scoring rolls up from there (`compliance/scoring.ts`).
 
@@ -106,7 +106,7 @@ and add a unit test next to the existing ones for that auditor.
 
 **Adding a framework** is data, not code: a control catalog (ID, title,
 description, weight) in `compliance/frameworks/`, registered in
-`control-registry.ts`, plus a `Framework` enum entry. Mappings from existing
+`control-registry.ts`, plus a `Framework` map entry. Mappings from existing
 checks to the new framework's controls can then land incrementally — great
 follow-up PRs for compliance-minded contributors.
 
