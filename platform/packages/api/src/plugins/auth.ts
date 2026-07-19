@@ -94,7 +94,13 @@ const authPlugin: FastifyPluginAsync = async (app) => {
         .map((c) => c.trim().split("="))
         .find(([k]) => k === "bf_access_token")?.[1];
       if (cookieToken) {
-        request.headers.authorization = `Bearer ${decodeURIComponent(cookieToken)}`;
+        // Guarded decode: a malformed value (e.g. "%") throws URIError, which
+        // would surface as a 500 — treat it as "no token" so it 401s instead.
+        try {
+          request.headers.authorization = `Bearer ${decodeURIComponent(cookieToken)}`;
+        } catch {
+          /* malformed cookie → fall through to the normal 401 path */
+        }
       }
     }
     const authHeader = request.headers.authorization;

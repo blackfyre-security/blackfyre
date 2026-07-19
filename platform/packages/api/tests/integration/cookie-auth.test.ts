@@ -39,6 +39,16 @@ describe("Cookie-based authentication", () => {
     expect(res.statusCode).toBe(401);
   });
 
+  it("returns 401 (not 500) for a malformed percent-encoded cookie", async () => {
+    const app = getApp();
+    const res = await app.inject({
+      method: "GET",
+      url: "/api/scans",
+      headers: { cookie: "bf_access_token=%" },
+    });
+    expect(res.statusCode).toBe(401);
+  });
+
   it("prefers the Authorization header when both transports are present", async () => {
     const app = getApp();
     const t = await createTestTenantAndUser({ email: `cookie-hdr-${Date.now()}@test.com` });

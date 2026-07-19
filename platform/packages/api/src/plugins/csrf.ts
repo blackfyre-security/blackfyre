@@ -14,6 +14,10 @@ const CSRF_HEADER = "x-csrf-token";
 // routes (create-order, verify) keep CSRF protection. The Stripe webhook is already covered by the
 // /api/webhooks/ prefix.
 const CSRF_EXEMPT_PREFIXES = [
+  // NOTE: /api/auth/refresh mutates state (rotates the stored refresh token)
+  // driven by the bf_refresh_token cookie. Its cross-site protection is the
+  // cookie's SameSite=Lax attribute (not attached on cross-site POST), NOT the
+  // double-submit token — keep SameSite >= Lax on the auth cookies.
   "/api/auth/",
   "/api/webhooks/",
   "/api/health",

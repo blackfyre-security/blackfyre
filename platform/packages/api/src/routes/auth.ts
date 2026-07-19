@@ -243,11 +243,15 @@ export const authRoutes: FastifyPluginAsync = async (app) => {
       .split(";")
       .map((c) => c.trim().split("="))
       .find(([k]) => k === "bf_refresh_token")?.[1];
+    let decodedCookieRefresh = "";
+    try {
+      decodedCookieRefresh = cookieRefresh ? decodeURIComponent(cookieRefresh) : "";
+    } catch {
+      /* malformed cookie → treated as absent; schema/verify path returns 401 */
+    }
     const rawBody = (request.body ?? {}) as { refreshToken?: string };
     const body = refreshSchema.parse(
-      rawBody.refreshToken
-        ? rawBody
-        : { refreshToken: cookieRefresh ? decodeURIComponent(cookieRefresh) : "" },
+      rawBody.refreshToken ? rawBody : { refreshToken: decodedCookieRefresh },
     );
 
     let decoded: { sub: string; tenantId: string; role: UserRole; type: string };
