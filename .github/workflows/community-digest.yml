@@ -1,0 +1,104 @@
+# Weekly community digest — DRAFTS ONLY, never auto-posts anywhere.
+#
+# Every Monday, gathers the week's repo activity, then Claude drafts:
+#   1. a community update (suitable for a GitHub Discussion post), and
+#   2. ready-to-edit announcement drafts for X / LinkedIn / Reddit.
+# Output lands as a workflow ARTIFACT (community-digest-<run>). A maintainer
+# downloads, edits, and posts by hand. Skips quietly if ANTHROPIC_API_KEY
+# isn't configured. Manual runs: Actions → Community digest → Run workflow.
+#
+# NOTE: issue/PR titles and author names in raw-activity.md are UNTRUSTED
+# input (anyone can open an issue) — a hostile title can try to steer the
+# draft. That's contained (read-only perms, no Bash for the drafting step,
+# artifact-only output), but always read the draft before posting anything.
+name: Community digest
+
+on:
+  schedule:
+    - cron: "30 3 * * 1" # Mondays 03:30 UTC (09:00 IST)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Gather the week's activity
+        id: gather
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          SINCE="$(date -u -d '7 days ago' +%Y-%m-%d)"
+          mkdir -p digest
+          {
+            echo "# Raw activity since ${SINCE} for ${GITHUB_REPOSITORY}"
+            echo; echo "## Merged PRs"
+            gh pr list -R "$GITHUB_REPOSITORY" --state merged --search "merged:>=${SINCE}" \
+              --json number,title,author --template \
+              '{{range .}}- #{{.number}} {{.title}} (@{{.author.login}}){{"\n"}}{{end}}'
+            echo; echo "## New issues"
+            gh issue list -R "$GITHUB_REPOSITORY" --state all --search "created:>=${SINCE}" \
+              --json number,title,author,state --template \
+              '{{range .}}- #{{.number}} [{{.state}}] {{.title}} (@{{.author.login}}){{"\n"}}{{end}}'
+            echo; echo "## Closed issues"
+            gh issue list -R "$GITHUB_REPOSITORY" --state closed --search "closed:>=${SINCE}" \
+              --json number,title --template \
+              '{{range .}}- #{{.number}} {{.title}}{{"\n"}}{{end}}'
+            echo; echo "## Commits on main"
+            git log --since="${SINCE}" --no-merges --pretty='- %s — %an' origin/main | head -50
+            echo; echo "## Contributors this week"
+            git log --since="${SINCE}" --pretty='%an' origin/main | sort -u
+          } > digest/raw-activity.md
+          cat digest/raw-activity.md
+          if [ -z "${{ secrets.ANTHROPIC_API_KEY && 'set' }}" ]; then
+            echo "have_key=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::ANTHROPIC_API_KEY not configured — uploading raw activity only."
+          else
+            echo "have_key=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Draft digest with Claude
+        if: steps.gather.outputs.have_key == 'true'
+        uses: anthropics/claude-code-action@3553f84341b92da26052e28acf1aa898f9511f32 # v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            Read digest/raw-activity.md — a week of activity for Blackfyre, an
+            open-source multi-cloud compliance platform (see README.md and
+            ROADMAP.md for tone and positioning).
+
+            Write digest/community-digest.md containing:
+            1. **Community update** (GitHub Discussion post, ~200 words):
+               what shipped, notable issues/discussions, roadmap movement,
+               new contributors thanked BY NAME. Warm, concrete, zero hype.
+               If it was a quiet week, say so honestly and highlight one
+               good-first-issue to pick up.
+            2. **Announcement drafts** the maintainer will edit and post
+               MANUALLY — clearly marked as drafts:
+               - X/Twitter: <280 chars, one concrete highlight, repo link.
+               - LinkedIn: ~120 words, aimed at compliance/DevSecOps folks,
+                 angle: open-source alternative to commercial CSPM tools.
+               - Reddit (r/devops or r/selfhosted): title + 2-3 sentence body,
+                 community-norm-appropriate (no marketing speak, invite
+                 feedback, only worth posting when something substantial
+                 shipped — say "skip this week" if not).
+            Base every claim on raw-activity.md — do not invent activity,
+            metrics, or contributor names.
+          claude_args: |
+            --allowedTools "Read,Write,Grep,Glob"
+
+      - name: Upload digest artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: community-digest-${{ github.run_number }}
+          path: digest/
+          retention-days: 30

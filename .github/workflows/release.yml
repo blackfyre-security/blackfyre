@@ -1,0 +1,72 @@
+# Creates a GitHub Release when a version tag (v*) is pushed.
+#   git tag -a v0.1.0 -m "v0.1.0" && git push origin v0.1.0
+# Release notes = commits since the previous tag grouped by conventional-commit
+# type, plus GitHub's compare link. First tag falls back to full history.
+#
+# npm publish: intentionally absent — every workspace package is "private": true,
+# nothing is published to a registry. If a package (e.g. @blackfyre/cli) ever
+# goes public, add after the build step:
+#   # - run: npm publish --workspace=packages/cli --access public
+#   #   env: { NODE_AUTH_TOKEN: <npm token secret> }
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write # create the release
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0 # full history for notes generation
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: platform/package-lock.json
+
+      # Prove the tagged commit builds and passes the blocking unit gate before
+      # a release is published from it.
+      - run: npm ci --no-audit --no-fund
+        working-directory: platform
+      - run: npm run build
+        working-directory: platform
+      - run: npm run test:unit --workspace=packages/api
+        working-directory: platform
+
+      - name: Generate release notes from conventional commits
+        id: notes
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          PREV="$(git describe --tags --abbrev=0 "${TAG}^" 2>/dev/null || true)"
+          RANGE="${PREV:+${PREV}..}${TAG}"
+          {
+            echo "## What's changed"
+            echo
+            for sec in "feat:✨ Features" "fix:🐛 Fixes" "docs:📚 Docs" "ci:⚙️ CI" "refactor:♻️ Refactoring" "test:🧪 Tests" "chore:🧹 Chores"; do
+              type="${sec%%:*}"; title="${sec#*:}"
+              lines="$(git log --no-merges --pretty='- %s (%h) — %an' "$RANGE" | grep -E "^- ${type}(\(.+\))?!?:" || true)"
+              if [ -n "$lines" ]; then echo "### ${title}"; echo "$lines"; echo; fi
+            done
+            other="$(git log --no-merges --pretty='- %s (%h) — %an' "$RANGE" | grep -Ev '^- (feat|fix|docs|ci|refactor|test|chore)(\(.+\))?!?:' || true)"
+            if [ -n "$other" ]; then echo "### Other"; echo "$other"; echo; fi
+            if [ -n "$PREV" ]; then
+              echo "**Full changelog**: https://github.com/${GITHUB_REPOSITORY}/compare/${PREV}...${TAG}"
+            fi
+          } > release-notes.md
+          cat release-notes.md
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" \
+            --title "Blackfyre ${GITHUB_REF_NAME}" \
+            --notes-file release-notes.md \
+            --verify-tag

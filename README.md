@@ -4,13 +4,16 @@
 
 **Open-source multi-cloud compliance & security platform**
 
-Scan AWS, Azure, and GCP against 683 controls across 9 compliance frameworks —
+Scan AWS, Azure, and GCP against 678 controls across 9 compliance frameworks —
 with AI-assisted analysis, tamper-evident evidence, and real remediation tracking.
 
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
-[![CI](https://github.com/<ORG>/blackfyre/actions/workflows/ci.yml/badge.svg)](https://github.com/<ORG>/blackfyre/actions/workflows/ci.yml)
+[![CI](https://github.com/blackfyre-security/blackfyre/actions/workflows/ci.yml/badge.svg)](https://github.com/blackfyre-security/blackfyre/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/blackfyre-security/blackfyre?include_prereleases&label=release)](https://github.com/blackfyre-security/blackfyre/releases)
+[![Discussions](https://img.shields.io/github/discussions/blackfyre-security/blackfyre)](https://github.com/blackfyre-security/blackfyre/discussions)
+[![Good first issues](https://img.shields.io/github/issues/blackfyre-security/blackfyre/good%20first%20issue?label=good%20first%20issues)](https://github.com/blackfyre-security/blackfyre/labels/good%20first%20issue)
 
-[Quickstart](#quickstart) · [Docs](#documentation) · [Contributing](CONTRIBUTING.md) · [Security](SECURITY.md) · [Hosted option](https://blackfyre.tech)
+[Quickstart](#quickstart) · [Coverage](#compliance--cloud-coverage) · [Docs](#documentation) · [Contributing](#contributing) · [Security](SECURITY.md) · [Hosted option](https://blackfyre.tech)
 
 </div>
 
@@ -29,8 +32,9 @@ findings through remediation — with evidence you can hand to an auditor.
 - **Multi-cloud scanning** — 40+ SDK-based auditors (IAM, storage, compute,
   networking, encryption, logging) plus Prowler and IaC scanning
   (Checkov/Semgrep/Bandit) as containerized scanners
-- **9 compliance frameworks, 683 controls** — SOC 2, ISO 27001, HIPAA, GDPR,
-  PCI-DSS, DPDPA, ISO 42001, PDPPL, NIST, with weighted control scoring
+- **9 compliance frameworks, 678 controls** — SOC 2, ISO 27001, HIPAA, GDPR,
+  PCI-DSS, DPDPA, ISO 42001, PDPPL, NIST 800-53, with weighted control scoring
+  ([coverage table](#compliance--cloud-coverage))
 - **AI-assisted analysis** — gap analysis, MITRE ATT&CK mapping, remediation
   suggestions, and a security copilot (Claude via Anthropic API or AWS Bedrock);
   every AI feature degrades gracefully to heuristics when no key is configured
@@ -50,7 +54,7 @@ Full local stack (no cloud account needed) — details in
 [docs/developer/local-development.md](docs/developer/local-development.md):
 
 ```bash
-git clone https://github.com/<ORG>/blackfyre.git && cd blackfyre/platform
+git clone https://github.com/blackfyre-security/blackfyre.git && cd blackfyre/platform
 docker compose up -d postgres redis localstack
 npm install && npm run build
 cp packages/api/.env.example packages/api/.env   # then edit per the local-dev guide
@@ -66,6 +70,43 @@ NEXT_PUBLIC_API_URL=http://localhost:4000 npm run dev --workspace=packages/admin
 
 Log in at http://localhost:3001 with the seeded dev user `admin@acme.com` /
 `password123`.
+
+<!-- SCREENSHOTS: capture and embed here —
+  1. Portal compliance dashboard (per-framework posture scores) — the money shot
+  2. A scan in progress with live SSE progress
+  3. A finding detail with framework mappings + remediation guidance
+  4. Evidence vault chain view (tamper-evident hashes)
+  Ideally one short GIF of scan → findings → score. Store under docs/assets/. -->
+
+## Compliance & cloud coverage
+
+Every check maps findings onto the controls it evidences; posture is scored
+per framework with weighted controls.
+
+| Framework | Version | Controls |
+|---|---|---:|
+| SOC 2 | 2017 TSC | 15 |
+| ISO/IEC 27001 | 2022 | 93 |
+| HIPAA Security Rule | 2013 | 113 |
+| GDPR | 2016 | 99 |
+| PCI-DSS | 4.0 | 14 |
+| India DPDPA | 2023 | 8 |
+| ISO/IEC 42001 (AI) | 2023 | 22 |
+| Qatar PDPPL | 2016 | 16 |
+| NIST 800-53 | Rev 5 | 298 |
+| **Total** | | **678** |
+
+| Cloud | SDK auditors | Covers |
+|---|---|---|
+| AWS | 13 | IAM, S3, EC2/VPC, RDS, KMS, CloudTrail, GuardDuty, Config, Lambda, ECS/EKS, SQS/SNS, Secrets Manager, WAF |
+| Azure | 11 | IAM, Storage, Compute, SQL, Key Vault, AKS, Defender, Monitor, Network, Policy, App Service |
+| GCP | 10 | IAM, Storage, Compute, Cloud SQL, GKE, KMS, BigQuery, Network, Org Policy, Security Command Center |
+| On-prem / other | 10+ | Active Directory, network/SNMP, endpoints, Kubernetes, SaaS, code repos, container registries, OT/SCADA |
+
+Plus Prowler and IaC scanning (Checkov/Semgrep/Bandit) as containerized scanners.
+Want a framework or check we don't have?
+[Propose it](https://github.com/blackfyre-security/blackfyre/issues/new?template=new_check_proposal.yml) —
+frameworks land as data, not code.
 
 ## Architecture
 
@@ -117,6 +158,24 @@ see [docs/self-hosting.md](docs/self-hosting.md).
 Fastify 4 + Drizzle ORM + Zod on Node 20 · Next.js 14 static exports · PostgreSQL 16
 with RLS · Redis · SQS · S3 · Anthropic Claude / AWS Bedrock · SST (AWS) ·
 GitHub Actions
+
+## Contributing
+
+Blackfyre needs two kinds of contributors, and only one of them writes code:
+
+- **Compliance & security knowledge** — control interpretations, framework
+  mappings, new check proposals. Frameworks land as data, not code; if you know
+  what an auditor actually asks for, you can improve every user's coverage
+  without touching TypeScript.
+- **Code** — cloud auditors, platform features, DX. TypeScript monorepo with a
+  [15-minute local setup](docs/developer/local-development.md), no cloud
+  account required.
+
+Start with a [`good first issue`](https://github.com/blackfyre-security/blackfyre/labels/good%20first%20issue),
+read [CONTRIBUTING.md](CONTRIBUTING.md) (including the
+[new check guide](CONTRIBUTING.md#adding-a-cloud-check-or-framework-mapping)),
+or just ask in [Discussions](https://github.com/blackfyre-security/blackfyre/discussions).
+The [roadmap](ROADMAP.md) shows where the project is headed.
 
 ## License & trademark
 

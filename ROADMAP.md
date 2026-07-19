@@ -11,8 +11,14 @@ GitHub issues where they exist; propose changes by opening an issue.
   release must pass a fresh-clone walkthrough
 - Fix the integration-test/docker-compose environment mismatch so `npm test` works
   against the compose services without manual `DATABASE_URL` overrides
+  ([#1](https://github.com/blackfyre-security/blackfyre/issues/1))
 - Bring the full integration suite to a green, CI-enforced baseline (today only the
   unit suite gates PRs — see [docs/developer/testing.md](docs/developer/testing.md))
+  ([#2](https://github.com/blackfyre-security/blackfyre/issues/2))
+- Contributor convenience: `npm run dev:all`
+  ([#3](https://github.com/blackfyre-security/blackfyre/issues/3)), a compose profile
+  that also runs the API ([#5](https://github.com/blackfyre-security/blackfyre/issues/5)),
+  portal/admin a11y checks ([#6](https://github.com/blackfyre-security/blackfyre/issues/6))
 
 **First community releases**
 - Tagged, changelogged releases with upgrade notes (migrations are already
@@ -22,10 +28,14 @@ GitHub issues where they exist; propose changes by opening an issue.
 
 **Scanner coverage**
 - Deepen AWS/Azure/GCP auditor coverage (more services per cloud, more checks per
-  service) and keep the control catalog in `packages/shared/src/constants/frameworks`
-  current
+  service) and keep the control catalogs in
+  `platform/packages/api/src/compliance/frameworks/` (registered in
+  `compliance/control-registry.ts`) current — see the
+  [contributor guide](CONTRIBUTING.md#adding-a-cloud-check-or-framework-mapping)
+- Expand MITRE ATT&CK technique coverage
+  ([#4](https://github.com/blackfyre-security/blackfyre/issues/4))
 - Local story for the Prowler/IaC container scanners (today they're wired for
-  Lambda only)
+  Lambda only) ([#8](https://github.com/blackfyre-security/blackfyre/issues/8))
 
 ## Mid term
 
@@ -33,11 +43,13 @@ GitHub issues where they exist; propose changes by opening an issue.
 - A documented interface so third-party scanners can register findings without
   forking `packages/api/src/agents/` — the swarm orchestrator already treats agents
   uniformly; the work is stabilizing that contract and loading external ones safely
+  ([#9](https://github.com/blackfyre-security/blackfyre/issues/9))
 
 **More compliance frameworks**
 - Beyond the shipped nine (SOC 2, ISO 27001, HIPAA, GDPR, PCI-DSS, DPDPA, ISO 42001,
   PDPPL, NIST): community-requested frameworks land as data (control catalogs +
   mappings) rather than code, which makes them a great first contribution
+  ([#10](https://github.com/blackfyre-security/blackfyre/issues/10))
 
 **Deployment breadth**
 - A supported non-AWS production path (plain containers + Postgres + Redis + any

@@ -12,7 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Multi-cloud compliance scanning (AWS, Azure, GCP)
 - Evidence vault with SHA-256 integrity verification
 - Real-time scan monitoring via SSE
-- 8 compliance frameworks (SOC 2, ISO 27001, HIPAA, GDPR, PCI-DSS, DPDPA, ISO 42001, PDPPL)
+- 9 compliance frameworks, 678 controls (SOC 2, ISO 27001, HIPAA, GDPR, PCI-DSS, DPDPA, ISO 42001, PDPPL, NIST 800-53)
 
 ### Fixed
 - Critical security audit findings resolved

@@ -6,7 +6,8 @@ body:
     id: problem
     attributes:
       label: Problem this solves
-      placeholder: "What's the user/customer pain or business need?"
+      description: Describe the pain, not just the feature — who hits this and when?
+      placeholder: "As a compliance lead scanning multiple AWS accounts, I can't ..."
     validations:
       required: true
   - type: textarea
@@ -21,13 +22,12 @@ body:
     attributes:
       label: Alternatives considered
   - type: dropdown
-    id: priority
+    id: contribution
     attributes:
-      label: Priority
+      label: Would you be willing to work on this?
       options:
-        - "nice-to-have"
-        - "next-quarter"
-        - "blocking-a-customer"
-        - "blocking-our-pitch"
+        - "Yes, I'd like to implement it (a maintainer will help scope it)"
+        - "Yes, with guidance"
+        - "No, just suggesting"
     validations:
       required: true
