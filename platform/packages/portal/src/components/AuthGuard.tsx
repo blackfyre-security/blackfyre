@@ -18,11 +18,16 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const [checked, setChecked] = useState(false);
 
   useEffect(() => {
+    // The real auth cookies (bf_access_token/bf_refresh_token) are HttpOnly and
+    // invisible to JS, so the guard keys on bf_portal_user — the non-HttpOnly
+    // session cookie auth-context sets on successful login. The legacy
+    // localStorage/bf_portal_token checks are kept for older sessions.
     const hasToken =
       typeof window !== "undefined" &&
       (localStorage.getItem("accessToken") ||
         localStorage.getItem("bf_portal_token") ||
-        document.cookie.split("; ").some((c) => c.startsWith("bf_portal_token=")));
+        document.cookie.split("; ").some((c) => c.startsWith("bf_portal_token=")) ||
+        document.cookie.split("; ").some((c) => c.startsWith("bf_portal_user=")));
 
     if (!hasToken) {
       router.replace(`/login?next=${encodeURIComponent(pathname)}`);
