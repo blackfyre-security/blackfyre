@@ -166,14 +166,12 @@ interface NavItem {
 
 interface NavGroup {
   title: string;
-  hue: string;
   items: NavItem[];
 }
 
 const navGroups: NavGroup[] = [
   {
     title: "Overview",
-    hue: "var(--violet)",
     items: [
       { label: "Dashboard",   href: "/",           icon: <GridIcon /> },
       { label: "Compliance",   href: "/compliance", icon: <ShieldCheckIcon /> },
@@ -182,7 +180,6 @@ const navGroups: NavGroup[] = [
   },
   {
     title: "Security",
-    hue: "var(--cyan)",
     items: [
       { label: "Scans",       href: "/scans",      icon: <ActivityIcon /> },
       { label: "Findings",    href: "/findings",   icon: <AlertTriangleIcon /> },
@@ -192,7 +189,6 @@ const navGroups: NavGroup[] = [
   },
   {
     title: "Action",
-    hue: "var(--orange)",
     items: [
       { label: "Remediation", href: "/remediation", icon: <WrenchIcon /> },
       { label: "Autopilot",   href: "/autopilot",   icon: <RocketIcon />, requiredTier: "defend" },
@@ -201,7 +197,6 @@ const navGroups: NavGroup[] = [
   },
   {
     title: "Evidence",
-    hue: "var(--green)",
     items: [
       { label: "Evidence Vault", href: "/evidence", icon: <VaultIcon /> },
       { label: "Reports",       href: "/reports",   icon: <FileTextIcon /> },
@@ -209,7 +204,6 @@ const navGroups: NavGroup[] = [
   },
   {
     title: "Intelligence",
-    hue: "var(--purple)",
     items: [
       { label: "AI Copilot",     href: "/copilot",       icon: <BrainIcon />, requiredTier: "protect" },
       { label: "Calendar",       href: "/calendar",      icon: <FileTextIcon />, requiredTier: "protect" },
@@ -219,7 +213,6 @@ const navGroups: NavGroup[] = [
   },
   {
     title: "Manage",
-    hue: "var(--blue)",
     items: [
       { label: "Integrations", href: "/integrations", icon: <SlidersIcon /> },
       { label: "Team",         href: "/team",          icon: <UsersIcon /> },
@@ -294,8 +287,7 @@ export default function Sidebar({ open, onClose, tier = "comply" }: { open?: boo
         {navGroups.map((group) => (
           <div key={group.title} className="mb-2">
             {expanded && (
-              <div className="px-3 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-widest text-[var(--text-muted)] select-none flex items-center gap-1.5">
-                <span aria-hidden="true" className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: group.hue }} />
+              <div className="px-3 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-widest text-[var(--text-muted)] select-none">
                 {group.title}
               </div>
             )}
@@ -313,12 +305,7 @@ export default function Sidebar({ open, onClose, tier = "comply" }: { open?: boo
                       style={!expanded ? { justifyContent: "center", padding: "8px" } : undefined}
                       onClick={locked ? (e) => e.preventDefault() : undefined}
                     >
-                      <span
-                        className="shrink-0 flex items-center justify-center w-7 h-7 rounded-lg"
-                        style={{ background: `color-mix(in srgb, ${group.hue} 16%, transparent)`, color: group.hue }}
-                      >
-                        {item.icon}
-                      </span>
+                      <span className="shrink-0">{item.icon}</span>
                       {expanded && <span className="flex-1">{item.label}</span>}
                       {locked && expanded && (
                         <span className="text-[9px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded bg-amber-900/30 text-amber-400 border border-amber-700/30 ml-auto">

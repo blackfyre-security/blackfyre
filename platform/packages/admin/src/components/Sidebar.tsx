@@ -15,7 +15,6 @@ interface NavItem {
 
 interface NavGroup {
   heading: string;
-  hue: string;
   items: NavItem[];
 }
 
@@ -132,7 +131,6 @@ function LogoutIcon() {
 const navGroups: NavGroup[] = [
   {
     heading: "Operations",
-    hue: "var(--violet)",
     items: [
       { label: "Overview",      href: "/",              icon: <DashboardIcon />    },
       { label: "Clients",       href: "/clients",       icon: <ClientsIcon />,      badge: "6"            },
@@ -147,7 +145,6 @@ const navGroups: NavGroup[] = [
   },
   {
     heading: "Org",
-    hue: "var(--blue)",
     items: [
       { label: "Billing",  href: "/billing",  icon: <BillingIcon />  },
       { label: "Users",    href: "/users",    icon: <UsersIcon />    },
@@ -237,7 +234,7 @@ export default function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
               borderRadius: 3,
               background: "var(--accent)",
               transform: "rotate(45deg)",
-              boxShadow: "0 0 12px rgba(139,124,255,0.35)",
+              boxShadow: "0 0 12px rgba(91,131,247,0.35)",
             }}
           />
         )}
@@ -249,7 +246,7 @@ export default function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
           <div key={group.heading} className={gi > 0 ? "mt-5" : ""}>
             {expanded && (
               <div
-                className="px-3 mb-1.5 text-[10px] font-semibold flex items-center gap-1.5"
+                className="px-3 mb-1.5 text-[10px] font-semibold"
                 style={{
                   fontFamily: "var(--font-mono), 'JetBrains Mono', monospace",
                   color: "var(--text-muted)",
@@ -257,7 +254,6 @@ export default function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
                   textTransform: "uppercase",
                 }}
               >
-                <span aria-hidden="true" className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: group.hue }} />
                 {group.heading}
               </div>
             )}
@@ -294,10 +290,7 @@ export default function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
                           style={{ background: "var(--accent)" }}
                         />
                       )}
-                      <span
-                        className="shrink-0 flex items-center justify-center w-6 h-6 rounded-md"
-                        style={{ background: `color-mix(in srgb, ${group.hue} 16%, transparent)`, color: group.hue }}
-                      >
+                      <span className="shrink-0 flex items-center justify-center w-[18px]">
                         {item.icon}
                       </span>
                       <span
