@@ -15,6 +15,7 @@ interface NavItem {
 
 interface NavGroup {
   heading: string;
+  hue: string;
   items: NavItem[];
 }
 
@@ -131,6 +132,7 @@ function LogoutIcon() {
 const navGroups: NavGroup[] = [
   {
     heading: "Operations",
+    hue: "var(--violet)",
     items: [
       { label: "Overview",      href: "/",              icon: <DashboardIcon />    },
       { label: "Clients",       href: "/clients",       icon: <ClientsIcon />,      badge: "6"            },
@@ -145,6 +147,7 @@ const navGroups: NavGroup[] = [
   },
   {
     heading: "Org",
+    hue: "var(--blue)",
     items: [
       { label: "Billing",  href: "/billing",  icon: <BillingIcon />  },
       { label: "Users",    href: "/users",    icon: <UsersIcon />    },
@@ -192,9 +195,9 @@ export default function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
               <img
                 src="/logo-blackfyre.png"
                 alt="Blackfyre"
-                height={56}
-                width={168}
-                className="h-14 w-auto select-none"
+                height={40}
+                width={172}
+                className="h-10 w-auto select-none"
                 draggable={false}
               />
             </Link>
@@ -234,7 +237,7 @@ export default function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
               borderRadius: 3,
               background: "var(--accent)",
               transform: "rotate(45deg)",
-              boxShadow: "0 0 12px rgba(0,255,136,0.35)",
+              boxShadow: "0 0 12px rgba(139,124,255,0.35)",
             }}
           />
         )}
@@ -246,7 +249,7 @@ export default function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
           <div key={group.heading} className={gi > 0 ? "mt-5" : ""}>
             {expanded && (
               <div
-                className="px-3 mb-1.5 text-[10px] font-semibold"
+                className="px-3 mb-1.5 text-[10px] font-semibold flex items-center gap-1.5"
                 style={{
                   fontFamily: "var(--font-mono), 'JetBrains Mono', monospace",
                   color: "var(--text-muted)",
@@ -254,6 +257,7 @@ export default function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
                   textTransform: "uppercase",
                 }}
               >
+                <span aria-hidden="true" className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: group.hue }} />
                 {group.heading}
               </div>
             )}
@@ -290,7 +294,10 @@ export default function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
                           style={{ background: "var(--accent)" }}
                         />
                       )}
-                      <span className="shrink-0 flex items-center justify-center w-[18px]">
+                      <span
+                        className="shrink-0 flex items-center justify-center w-6 h-6 rounded-md"
+                        style={{ background: `color-mix(in srgb, ${group.hue} 16%, transparent)`, color: group.hue }}
+                      >
                         {item.icon}
                       </span>
                       <span
@@ -352,8 +359,8 @@ export default function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
             <div
               className="w-8 h-8 rounded-md flex items-center justify-center text-[12px] font-bold shrink-0 mono"
               style={{
-                background: "linear-gradient(135deg, var(--accent), #33FFA0)",
-                color: "#0A0A0B",
+                background: "var(--accent-gradient)",
+                color: "var(--accent-fg)",
               }}
             >
               {(user?.name?.charAt(0) || user?.email?.charAt(0) || "A").toUpperCase()}

@@ -43,10 +43,18 @@ module.exports = {
         low:      { DEFAULT: 'var(--low)',      bg: 'var(--low-bg)',      text: 'var(--low-text)' },
         info:     { DEFAULT: 'var(--info-color)', bg: 'var(--info-bg)',   text: 'var(--info-text)' },
         success:  { DEFAULT: 'var(--success)',  bg: 'var(--success-bg)',  text: 'var(--success-text)' },
+
+        // ── Group hues (nav sections & icon chips, shared) ────
+        'hue-violet': 'var(--violet)',
+        'hue-cyan':   'var(--cyan)',
+        'hue-orange': 'var(--orange)',
+        'hue-green':  'var(--green)',
+        'hue-purple': 'var(--purple)',
+        'hue-blue':   'var(--blue)',
       },
 
       fontFamily: {
-        sans: ['-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+        sans: ['var(--font-sans)', '"Plus Jakarta Sans"', 'system-ui', '-apple-system', 'sans-serif'],
         mono: ['JetBrains Mono', 'Fira Code', 'Consolas', 'monospace'],
       },
 
@@ -65,9 +73,9 @@ module.exports = {
       },
 
       borderRadius: {
-        card:  '14px',
-        btn:   '9px',
-        input: '9px',
+        card:  '12px',
+        btn:   '10px',
+        input: '10px',
         tag:   '6px',
         pill:  '9999px',
       },

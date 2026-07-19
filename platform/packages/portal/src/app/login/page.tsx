@@ -79,7 +79,7 @@ export default function LoginPage() {
             src="/logo-blackfyre.png"
             alt="Blackfyre"
             height={80}
-            width={240}
+            width={345}
             className="h-20 w-auto select-none mb-3"
             draggable={false}
           />
