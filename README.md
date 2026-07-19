@@ -77,12 +77,21 @@ NEXT_PUBLIC_API_URL=http://localhost:4000 npm run dev --workspace=packages/admin
 Log in at http://localhost:3001 with the seeded dev user `admin@acme.com` /
 `password123`.
 
-<!-- SCREENSHOTS: capture and embed here —
-  1. Portal compliance dashboard (per-framework posture scores) — the money shot
-  2. A scan in progress with live SSE progress
-  3. A finding detail with framework mappings + remediation guidance
-  4. Evidence vault chain view (tamper-evident hashes)
-  Ideally one short GIF of scan → findings → score. Store under docs/assets/. -->
+## A look inside
+
+The portal dashboard — posture score, framework coverage, and open findings at
+a glance:
+
+![Portal dashboard: compliance posture score, framework coverage cards for all 9 frameworks, and open findings summary](docs/assets/portal-dashboard.png)
+
+Per-framework compliance rings and the drill-down control matrix:
+
+![Compliance page: per-framework score rings and the SOC 2 control matrix with pass/fail status per control](docs/assets/compliance-matrix.png)
+
+<!-- TODO: add a short GIF of scan → findings → score (capture per
+  docs/COMMUNITY_PLAYBOOK.md), plus a finding-detail and evidence-chain shot
+  from a scan-populated workspace. Current shots are from the seeded dev
+  stack (docker compose + 003_seed_data). -->
 
 ## Compliance & cloud coverage
 
