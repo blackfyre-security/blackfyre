@@ -29,12 +29,22 @@ jobs:
       contents: read
       pull-requests: write   # post the review comment
       issues: read
+    env:
+      # secrets aren't readable in job-level `if`, so gate each step instead —
+      # without this, every PR gets a red X until the secret is configured.
+      HAS_ANTHROPIC_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' }}
     steps:
+      - name: Skip notice (no ANTHROPIC_API_KEY)
+        if: env.HAS_ANTHROPIC_KEY != 'true'
+        run: echo "::notice title=Claude PR review skipped::ANTHROPIC_API_KEY secret is not configured — see .github/workflows/claude.yml header for setup."
+
       - uses: actions/checkout@v5
+        if: env.HAS_ANTHROPIC_KEY == 'true'
         with:
           fetch-depth: 1
 
       - name: Claude first-pass review
+        if: env.HAS_ANTHROPIC_KEY == 'true'
         uses: anthropics/claude-code-action@3553f84341b92da26052e28acf1aa898f9511f32 # v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
