@@ -29,5 +29,8 @@
   },
   "optionalDependencies": {
     "@rollup/rollup-linux-x64-gnu": "^4.60.4"
+  },
+  "overrides": {
+    "fast-jwt": "6.2.4"
   }
 }
