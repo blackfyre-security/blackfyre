@@ -21,19 +21,16 @@ This is the suite CONTRIBUTING.md asks you to run before opening a PR, and what
 
 ```bash
 # from platform/, with `docker compose up -d postgres redis` already running:
-DATABASE_URL="postgres://blackfyre:blackfyre_dev@localhost:5432/blackfyre" \
-REDIS_URL="redis://:blackfyre_redis_dev@localhost:6379" \
 npm test
 ```
 
 - Config: `packages/api/vitest.config.ts`; `tests/helpers/setup.ts` connects to
   Postgres/Redis before the run
-- **Gotcha (real):** the setup default is
-  `postgres://blackfyre:localdev@localhost:5432/blackfyre_audit`, which does **not**
-  match `platform/docker-compose.yml` (user `blackfyre`, password `blackfyre_dev`,
-  db `blackfyre`). Without the explicit `DATABASE_URL` above, every file fails with
-  `password authentication failed for user "blackfyre"`. It honors `$DATABASE_URL`,
-  so the override is all you need.
+- The setup defaults match `platform/docker-compose.yml`
+  (`postgres://blackfyre:blackfyre_dev@localhost:5432/blackfyre` and
+  `redis://:blackfyre_redis_dev@localhost:6379`), so no overrides are needed
+  against the compose services. Both honor `$DATABASE_URL` / `$REDIS_URL` if you
+  point tests at a different instance.
 - Run migrations first (`npm run db:migrate`) — integration tests expect the schema.
 
 Both configs inject a test-only `ENCRYPTION_MASTER_KEY` (the encryption service fails

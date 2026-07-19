@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { getApp, createTestTenantAndUser } from "./helpers/setup.js";
 import postgres from "postgres";
 
-const TEST_DB_URL = process.env.DATABASE_URL || "postgres://blackfyre:localdev@localhost:5432/blackfyre_audit";
+const TEST_DB_URL = process.env.DATABASE_URL || "postgres://blackfyre:blackfyre_dev@localhost:5432/blackfyre";
 
 /** Helper: insert an integration directly into the DB for a given tenant */
 async function createTestIntegration(tenantId: string) {
