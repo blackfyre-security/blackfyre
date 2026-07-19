@@ -5,11 +5,14 @@ import { buildApp } from "../../src/app.js";
 import { hashPassword } from "../../src/utils/password.js";
 import type { Config } from "../../src/config.js";
 
-const TEST_DB_URL = process.env.DATABASE_URL || "postgres://blackfyre:localdev@localhost:5432/blackfyre_audit";
+// Defaults match platform/docker-compose.yml so `docker compose up -d postgres redis`
+// followed by `npm test` works with no manual overrides. Both honor the env vars.
+const TEST_DB_URL = process.env.DATABASE_URL || "postgres://blackfyre:blackfyre_dev@localhost:5432/blackfyre";
+const TEST_REDIS_URL = process.env.REDIS_URL || "redis://:blackfyre_redis_dev@localhost:6379";
 
 const testConfig: Config = {
   DATABASE_URL: TEST_DB_URL,
-  REDIS_URL: "redis://localhost:6379",
+  REDIS_URL: TEST_REDIS_URL,
   JWT_SECRET: "test-secret-that-is-at-least-32-characters-long-for-testing",
   JWT_EXPIRES_IN: "15m",
   JWT_REFRESH_EXPIRES_IN: "7d",
