@@ -46,7 +46,7 @@ module.exports = {
       },
 
       fontFamily: {
-        sans: ['Plus Jakarta Sans', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        sans: ['-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
         mono: ['JetBrains Mono', 'Fira Code', 'Consolas', 'monospace'],
       },
 
@@ -65,10 +65,10 @@ module.exports = {
       },
 
       borderRadius: {
-        card:  '6px',
-        btn:   '4px',
-        input: '4px',
-        tag:   '3px',
+        card:  '14px',
+        btn:   '9px',
+        input: '9px',
+        tag:   '6px',
         pill:  '9999px',
       },
 
