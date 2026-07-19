@@ -95,7 +95,18 @@ where `app.env != 'development'` — the compose Postgres sets that via
 
 ## 5. Run the services
 
-Three terminals (all from `blackfyre/platform`):
+**Fast path — one terminal** (from `blackfyre/platform`):
+
+```bash
+npm run dev:all
+```
+
+This starts all three services concurrently — API (Fastify, port 4000), client
+portal (Next.js, port 3001), and admin dashboard (Next.js, port 3003) — with
+prefixed, color-coded logs. Ctrl+C shuts all three down together.
+
+Prefer separate terminals (e.g. to restart one service without the others)?
+The individual commands are:
 
 ```bash
 # Terminal 1 — API (Fastify, port 4000)
