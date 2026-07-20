@@ -22,7 +22,7 @@
 
 x-api-build: &api-build
   context: .
-  dockerfile: Dockerfile.api
+  dockerfile: packages/api/Dockerfile
 
 x-api-env: &api-env
   # docker-compose is for LOCAL development. Production deploys go via
@@ -171,7 +171,7 @@ services:
   admin:
     build:
       context: .
-      dockerfile: Dockerfile.admin
+      dockerfile: packages/admin/Dockerfile
       args:
         # Browser-side calls go via nginx, which proxies api.blackfyre.local
         # to the api container. Both have to resolve from the host.
@@ -185,7 +185,7 @@ services:
   portal:
     build:
       context: .
-      dockerfile: Dockerfile.portal
+      dockerfile: packages/portal/Dockerfile
       args:
         NEXT_PUBLIC_API_URL: http://api.blackfyre.local
         NEXT_PUBLIC_DEMO_MODE: "false"

@@ -23,6 +23,19 @@ async function migrate() {
     )
   `;
 
+  // Seed/demo migrations are marked `-- @dev-only` and must never touch a real
+  // deployment. They carry their own in-file `app.env` guard that RAISEs, which
+  // aborts the whole run — fine for us, fatal for a self-hoster whose database
+  // has no app.env set (the run would stop at 003 and leave the schema
+  // half-migrated). Detect the environment once and skip those files instead.
+  const [{ env }] = await sql<{ env: string | null }[]>`
+    SELECT current_setting('app.env', true) AS env
+  `;
+  const isDevEnv = env === "development";
+  if (!isDevEnv) {
+    console.log(`  app.env=${env ?? "(unset)"} — dev-only seed migrations will be skipped`);
+  }
+
   const migrationsDir = join(__dirname, "../migrations");
   const files = readdirSync(migrationsDir)
     .filter((f) => f.endsWith(".sql"))
@@ -37,8 +50,17 @@ async function migrate() {
       continue;
     }
 
-    console.log(`  applying: ${file}`);
     const content = readFileSync(join(migrationsDir, file), "utf-8");
+
+    // Dev-only seed data: skip outside a development database, and do NOT record
+    // it as applied, so the same file still seeds if this database is later
+    // brought up as a dev environment.
+    if (!isDevEnv && /^\s*--\s*@dev-only\b/m.test(content)) {
+      console.log(`  skip: ${file} (@dev-only, app.env is not 'development')`);
+      continue;
+    }
+
+    console.log(`  applying: ${file}`);
     // SQL files manage their own BEGIN/COMMIT; use unsafe with max:1 connection
     await sql.unsafe(content);
     await sql`INSERT INTO _migrations (name) VALUES (${file})`;

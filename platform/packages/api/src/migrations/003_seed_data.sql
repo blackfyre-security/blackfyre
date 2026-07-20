@@ -1,3 +1,7 @@
+-- @dev-only
+-- Skipped entirely by the migration runner unless app.env = 'development'.
+-- The DO block below is defence-in-depth for anyone applying this file by hand.
+--
 -- Production guard: abort if running in production
 DO $$
 BEGIN
