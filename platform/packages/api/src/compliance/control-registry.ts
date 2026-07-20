@@ -17,29 +17,34 @@ function project<T extends { controlId: string; controlName: string; description
   }));
 }
 
+// SOC 2 — Trust Services Criteria (2017, rev. 2022), AICPA.
+// Criterion REFERENCES (CC6.1 etc.) are factual identifiers. The AICPA's own
+// criterion text is copyrighted and is NOT reproduced here: every `description`
+// below is original wording stating what Blackfyre assesses for that criterion.
+// Consult the official TSC for the authoritative text.
 const soc2Controls: ControlDefinition[] = [
   // Access Control (CC6) — critical
-  { controlId: "CC6.1", controlName: "Logical and Physical Access Controls", description: "Entity implements logical access security software, infrastructure, and architectures", weight: 3, category: "Access Control" },
-  { controlId: "CC6.2", controlName: "User Authentication", description: "Prior to issuing system credentials, registered authorized users are identified", weight: 3, category: "Access Control" },
-  { controlId: "CC6.3", controlName: "Credential Management", description: "Processes for creating, changing, and deleting credentials", weight: 3, category: "Access Control" },
-  { controlId: "CC6.6", controlName: "Network Security Boundaries", description: "Security measures to protect against threats outside system boundaries", weight: 3, category: "Access Control" },
-  { controlId: "CC6.7", controlName: "Data Transmission Protection", description: "Encryption of data in transit", weight: 3, category: "Access Control" },
-  { controlId: "CC6.8", controlName: "Malicious Software Prevention", description: "Controls to prevent or detect malicious software", weight: 2, category: "Access Control" },
+  { controlId: "CC6.1", controlName: "Logical and Physical Access Controls", description: "Access to systems and data is gated by enforced technical controls rather than convention.", weight: 3, category: "Access Control" },
+  { controlId: "CC6.2", controlName: "User Authentication", description: "New accounts are approved and tied to a verified identity before any credential is issued.", weight: 3, category: "Access Control" },
+  { controlId: "CC6.3", controlName: "Credential Management", description: "Credential issue, rotation and revocation follow a defined, auditable lifecycle.", weight: 3, category: "Access Control" },
+  { controlId: "CC6.6", controlName: "Network Security Boundaries", description: "External network exposure is restricted and defended at the perimeter.", weight: 3, category: "Access Control" },
+  { controlId: "CC6.7", controlName: "Data Transmission Protection", description: "Data moving between systems or networks is encrypted in transit.", weight: 3, category: "Access Control" },
+  { controlId: "CC6.8", controlName: "Malicious Software Prevention", description: "Hosts and workloads are defended against unauthorised or malicious code.", weight: 2, category: "Access Control" },
   // Change Management (CC8) — important
-  { controlId: "CC8.1", controlName: "Change Authorization", description: "Changes to infrastructure and software are authorized", weight: 2, category: "Change Management" },
+  { controlId: "CC8.1", controlName: "Change Authorization", description: "Infrastructure and software changes are reviewed and approved before release.", weight: 2, category: "Change Management" },
   // Risk Assessment (CC3) — important
-  { controlId: "CC3.1", controlName: "Risk Assessment Process", description: "Entity specifies objectives to identify and assess risks", weight: 2, category: "Risk Assessment" },
-  { controlId: "CC3.2", controlName: "Risk Identification", description: "Entity identifies risks to objectives", weight: 2, category: "Risk Assessment" },
+  { controlId: "CC3.1", controlName: "Risk Assessment Process", description: "Business objectives are stated precisely enough that risks against them can be assessed.", weight: 2, category: "Risk Assessment" },
+  { controlId: "CC3.2", controlName: "Risk Identification", description: "Risks threatening those objectives are identified and recorded.", weight: 2, category: "Risk Assessment" },
   // Monitoring (CC7) — critical
-  { controlId: "CC7.1", controlName: "Monitoring and Detection", description: "To meet its objectives, entity uses detection and monitoring procedures", weight: 3, category: "Monitoring" },
-  { controlId: "CC7.2", controlName: "Incident Response", description: "Entity monitors system components and anomalies for incidents", weight: 3, category: "Monitoring" },
+  { controlId: "CC7.1", controlName: "Monitoring and Detection", description: "Detection and monitoring coverage exists across the systems in scope.", weight: 3, category: "Monitoring" },
+  { controlId: "CC7.2", controlName: "Incident Response", description: "Anomalies are investigated and escalated through a defined incident path.", weight: 3, category: "Monitoring" },
   // Availability (A1) — important
-  { controlId: "A1.1", controlName: "System Availability", description: "Maintains, monitors, evaluates current processing capacity", weight: 2, category: "Availability" },
-  { controlId: "A1.2", controlName: "Recovery Procedures", description: "Recovery procedures, backups, and related infrastructure", weight: 2, category: "Availability" },
+  { controlId: "A1.1", controlName: "System Availability", description: "Processing capacity is tracked against demand so availability targets hold.", weight: 2, category: "Availability" },
+  { controlId: "A1.2", controlName: "Recovery Procedures", description: "Backups and restore procedures exist and are exercised, not merely documented.", weight: 2, category: "Availability" },
   // Communications (CC2) — standard
-  { controlId: "CC2.1", controlName: "Internal Communications", description: "Entity has established information and communication processes", weight: 1, category: "Communications" },
+  { controlId: "CC2.1", controlName: "Internal Communications", description: "Security responsibilities are communicated to the people who hold them.", weight: 1, category: "Communications" },
   // Control Environment (CC1) — standard
-  { controlId: "CC1.1", controlName: "COSO Principle 1", description: "Entity demonstrates commitment to integrity and ethical values", weight: 1, category: "Control Environment" },
+  { controlId: "CC1.1", controlName: "COSO Principle 1", description: "Leadership sets and reinforces expectations for integrity and ethical conduct.", weight: 1, category: "Control Environment" },
 ];
 
 const iso27001Controls: ControlDefinition[] = [
@@ -101,27 +106,32 @@ const gdprControls: ControlDefinition[] = [
   { controlId: "Art.46", controlName: "Appropriate Safeguards for Transfers", description: "Appropriate safeguards for international data transfers", weight: 1, category: "International Transfers" },
 ];
 
+// PCI DSS v4.0 — PCI Security Standards Council.
+// Requirement NUMBERS are factual identifiers. The Council's requirement text is
+// copyrighted and is NOT reproduced here: every `description` below is original
+// wording stating what Blackfyre assesses. Consult the official standard for the
+// authoritative text.
 const pcidssControls: ControlDefinition[] = [
   // Network Security — critical
-  { controlId: "1.1", controlName: "Network Security Controls", description: "Install and maintain network security controls", weight: 3, category: "Network Security" },
-  { controlId: "1.2", controlName: "Network Security Configuration", description: "Network security controls configured and maintained", weight: 3, category: "Network Security" },
+  { controlId: "1.1", controlName: "Network Security Controls", description: "Perimeter and segmentation controls are deployed and kept current.", weight: 3, category: "Network Security" },
+  { controlId: "1.2", controlName: "Network Security Configuration", description: "Those controls carry a reviewed ruleset rather than drifting defaults.", weight: 3, category: "Network Security" },
   // Account Data Protection — critical
-  { controlId: "3.1", controlName: "Account Data Storage Minimization", description: "Storage of account data is kept to a minimum", weight: 3, category: "Account Data" },
-  { controlId: "3.5", controlName: "Primary Account Number Protection", description: "PAN is secured wherever it is stored", weight: 3, category: "Account Data" },
-  { controlId: "4.1", controlName: "Transmission Encryption", description: "Strong cryptography protects cardholder data during transmission over open networks", weight: 3, category: "Encryption" },
+  { controlId: "3.1", controlName: "Account Data Storage Minimization", description: "Retained cardholder data is limited to what the business genuinely needs.", weight: 3, category: "Account Data" },
+  { controlId: "3.5", controlName: "Primary Account Number Protection", description: "Card numbers are rendered unreadable in every store that holds them.", weight: 3, category: "Account Data" },
+  { controlId: "4.1", controlName: "Transmission Encryption", description: "Card data crossing untrusted networks is protected by current cryptography.", weight: 3, category: "Encryption" },
   // Access Control — critical
-  { controlId: "7.1", controlName: "Access Restriction to System Components", description: "Access limited to those individuals whose job requires it", weight: 3, category: "Access Control" },
-  { controlId: "8.3.1", controlName: "Multi-Factor Authentication", description: "MFA for all non-console administrative access", weight: 3, category: "Access Control" },
-  { controlId: "8.2.1", controlName: "Unique Identification", description: "All users assigned a unique ID", weight: 2, category: "Access Control" },
+  { controlId: "7.1", controlName: "Access Restriction to System Components", description: "Access is granted on demonstrated business need, not by default.", weight: 3, category: "Access Control" },
+  { controlId: "8.3.1", controlName: "Multi-Factor Authentication", description: "Administrative and remote access requires a second authentication factor.", weight: 3, category: "Access Control" },
+  { controlId: "8.2.1", controlName: "Unique Identification", description: "Every actor has a distinct account, with no shared or generic logins.", weight: 2, category: "Access Control" },
   // Monitoring & Logging — important
-  { controlId: "10.1", controlName: "Audit Trail Implementation", description: "Audit trails linking access to system components to individual user", weight: 2, category: "Monitoring" },
-  { controlId: "10.2", controlName: "Audit Log Content", description: "Automated audit trails for all system components to reconstruct events", weight: 2, category: "Monitoring" },
+  { controlId: "10.1", controlName: "Audit Trail Implementation", description: "Activity on in-scope systems is attributable to an individual account.", weight: 2, category: "Monitoring" },
+  { controlId: "10.2", controlName: "Audit Log Content", description: "Logs capture enough detail to reconstruct what happened after the fact.", weight: 2, category: "Monitoring" },
   // Vulnerability Management — important
-  { controlId: "6.1", controlName: "Security Vulnerability Identification", description: "Process to identify security vulnerabilities", weight: 2, category: "Vulnerability Management" },
-  { controlId: "6.2", controlName: "Secure Software Development", description: "Bespoke and custom software developed securely", weight: 2, category: "Vulnerability Management" },
+  { controlId: "6.1", controlName: "Security Vulnerability Identification", description: "Newly disclosed vulnerabilities are tracked and ranked on a routine cadence.", weight: 2, category: "Vulnerability Management" },
+  { controlId: "6.2", controlName: "Secure Software Development", description: "In-house software is built under a defined secure-development practice.", weight: 2, category: "Vulnerability Management" },
   // Testing — standard
-  { controlId: "11.3", controlName: "Penetration Testing", description: "External and internal penetration testing regularly performed", weight: 1, category: "Testing" },
-  { controlId: "11.1", controlName: "Wireless Access Point Detection", description: "Processes to test for wireless access points", weight: 1, category: "Testing" },
+  { controlId: "11.3", controlName: "Penetration Testing", description: "Offensive testing is performed on a schedule and findings are remediated.", weight: 1, category: "Testing" },
+  { controlId: "11.1", controlName: "Wireless Access Point Detection", description: "The environment is swept for unauthorised wireless access points.", weight: 1, category: "Testing" },
 ];
 
 const dpdpaControls: ControlDefinition[] = [

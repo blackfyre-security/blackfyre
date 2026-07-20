@@ -3,3 +3,7 @@ Copyright 2026 Giridhar Kannabiran
 
 This product includes software developed as part of the Blackfyre project
 (https://blackfyre.tech).
+
+This product also bundles and invokes third-party open-source software. See
+THIRD-PARTY-NOTICES.md for the component list and their licences, and
+TRADEMARK.md for third-party trademark attributions.
