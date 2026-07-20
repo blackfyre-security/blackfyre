@@ -79,6 +79,18 @@ const envSchema = z.object({
   // HTTP, and the zero-leakage plugin has no exempt path prefix.
   PLATFORM_ADMIN_API: z.enum(["true", "false"]).default("false"),
 
+  // Whether this deployment lets someone register without paying.
+  //
+  // Deliberately NOT inferred from "is a payment gateway configured". Inferring it
+  // means a secrets-manager blip that empties RAZORPAY_KEY_ID silently converts a
+  // paid deployment into a free one — a loud broken checkout becomes a silent
+  // giveaway. This is an explicit operator decision, defaulting to "false" so the
+  // failure mode is a visible checkout rather than free accounts.
+  //
+  // Self-hosting sets this to "true" (see packages/api/.env.example): there is
+  // nobody to bill when you are hosting the software yourself.
+  ALLOW_UNPAID_REGISTRATION: z.enum(["true", "false"]).default("false"),
+
   // Razorpay — leave empty to disable payment processing
   RAZORPAY_KEY_ID: z.string().default(""),
   RAZORPAY_KEY_SECRET: z.string().default(""),

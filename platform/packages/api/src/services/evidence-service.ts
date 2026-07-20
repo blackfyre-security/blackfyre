@@ -283,11 +283,18 @@ export class EvidenceService {
    *     explicit reason instead of comparing a meaningless digest.
    *   - With real evidence bytes in S3 we recompute and compare the hex digest.
    */
+  /**
+   * SECURITY: `tenantId` is required. This previously resolved the record with the
+   * un-scoped `getById`, so any authenticated user who learned an evidence UUID
+   * could verify — and, via the sibling download route, retrieve — another
+   * tenant's compliance evidence.
+   */
   async verifyIntegrity(
     evidenceId: string,
+    tenantId: string,
     s3Service: EvidenceS3Service,
   ): Promise<{ valid: boolean; expected: string; actual: string; hashSource: string; reason?: string }> {
-    const record = await this.getById(evidenceId);
+    const record = await this.getByIdForTenant(evidenceId, tenantId);
     const hashSource = (record as { hashSource?: string }).hashSource ?? "metadata-only";
 
     // REAL IMPL (BLACKFYRE 2026-06): refuse to assert integrity over a metadata-only hash.

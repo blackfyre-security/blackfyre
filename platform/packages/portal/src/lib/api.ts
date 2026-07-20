@@ -151,9 +151,9 @@ class ApiClient {
   // deployment has a payment gateway is a runtime question, not a build-time one.
   deploymentConfig() {
     return this.request<{
+      allowUnpaidRegistration: boolean;
       paymentsEnabled: boolean;
       providers: { razorpay: boolean; stripe: boolean };
-      selfHosted: boolean;
     }>("GET", "/api/v1/config");
   }
 

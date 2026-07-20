@@ -88,16 +88,19 @@ export const healthRoutes: FastifyPluginAsync = async (app) => {
   // server env at build time and must ask at runtime which optional subsystems this
   // deployment actually has. Booleans only — never echo key material or its shape.
   //
-  // `paymentsEnabled` is what lets a self-hosted install sign up: with no payment
-  // gateway configured, the portal registers the account directly instead of putting
-  // a checkout in front of someone hosting the software themselves.
+  // `allowUnpaidRegistration` is what lets a self-hosted install sign up: it puts no
+  // checkout in front of someone hosting the software themselves. It is an explicit
+  // operator flag, NOT inferred from whether payment keys happen to be present, so a
+  // secrets blip on a paid deployment cannot silently turn signup free.
   app.get("/api/v1/config", async () => {
     const razorpay = Boolean(app.config.RAZORPAY_KEY_ID);
     const stripe = Boolean(app.config.STRIPE_PUBLISHABLE_KEY);
     return {
+      // The signup flow keys off this, and ONLY this. It is an explicit operator
+      // setting, never inferred from key presence — see config.ts.
+      allowUnpaidRegistration: app.config.ALLOW_UNPAID_REGISTRATION === "true",
       paymentsEnabled: razorpay || stripe,
       providers: { razorpay, stripe },
-      selfHosted: !razorpay && !stripe,
     };
   });
 

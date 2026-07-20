@@ -334,12 +334,12 @@ describe("EvidenceService", () => {
 
   describe("verifyIntegrity", () => {
     it("returns { valid: true } on matching hash", async () => {
-      // verifyIntegrity calls getById first (1 select), then s3Service.verifyEvidence
+      // verifyIntegrity resolves the record tenant-scoped (1 select), then s3Service.verifyEvidence
       const mockS3Service = {
         verifyEvidence: vi.fn().mockResolvedValue(true),
       };
 
-      const result = await service.verifyIntegrity("e1", mockS3Service as any);
+      const result = await service.verifyIntegrity("e1", "t1", mockS3Service as any);
 
       expect(result.valid).toBe(true);
       expect(result.expected).toBe(MOCK_SHA256);
@@ -354,7 +354,7 @@ describe("EvidenceService", () => {
     it("returns { valid: false } and a mismatch on tampered content", async () => {
       const mockS3Service = { verifyEvidence: vi.fn().mockResolvedValue(false) };
 
-      const result = await service.verifyIntegrity("e1", mockS3Service as any);
+      const result = await service.verifyIntegrity("e1", "t1", mockS3Service as any);
 
       expect(result.valid).toBe(false);
       expect(result.actual).toBe("mismatch");
@@ -367,7 +367,7 @@ describe("EvidenceService", () => {
       ]);
       const mockS3Service = { verifyEvidence: vi.fn().mockResolvedValue(true) };
 
-      const result = await service.verifyIntegrity("e1", mockS3Service as any);
+      const result = await service.verifyIntegrity("e1", "t1", mockS3Service as any);
 
       expect(result.valid).toBe(false);
       expect(result.hashSource).toBe("metadata-only");
@@ -376,13 +376,37 @@ describe("EvidenceService", () => {
       expect(mockS3Service.verifyEvidence).not.toHaveBeenCalled();
     });
 
+    // SECURITY REGRESSION (cross-tenant IDOR): verifyIntegrity used to resolve the
+    // record with the UN-scoped getById, so any authenticated user holding an
+    // evidence UUID could verify — and via the sibling download route retrieve —
+    // another tenant's compliance evidence.
+    //
+    // Asserting on the mock DB is NOT sufficient here: the shared select-chain mock
+    // answers getById and getByIdForTenant identically, so a "row not found" test
+    // passes with the bug still present. Assert the resolution PATH instead — that
+    // the tenant-scoped lookup is the one used, and that it receives the caller's
+    // tenant. This fails if verifyIntegrity is switched back to getById.
+    it("resolves the record tenant-scoped, not by id alone", async () => {
+      const scoped = vi.spyOn(service, "getByIdForTenant");
+      const unscoped = vi.spyOn(service, "getById");
+      const mockS3Service = { verifyEvidence: vi.fn().mockResolvedValue(true) };
+
+      await service.verifyIntegrity("e1", "t1", mockS3Service as any);
+
+      expect(scoped).toHaveBeenCalledWith("e1", "t1");
+      expect(unscoped).not.toHaveBeenCalled();
+
+      scoped.mockRestore();
+      unscoped.mockRestore();
+    });
+
     it("returns valid:false with reason when a content record has no S3 object yet", async () => {
       mockDb._getByIdChain.limit.mockResolvedValueOnce([
         { ...mockRow, s3ObjectKey: null },
       ]);
       const mockS3Service = { verifyEvidence: vi.fn() };
 
-      const result = await service.verifyIntegrity("e1", mockS3Service as any);
+      const result = await service.verifyIntegrity("e1", "t1", mockS3Service as any);
 
       expect(result.valid).toBe(false);
       expect(result.actual).toBe("no-s3-key");

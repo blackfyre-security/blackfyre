@@ -87,7 +87,7 @@ export default function SignupPage() {
     api
       .deploymentConfig()
       .then((cfg) => {
-        if (!cancelled) setPaymentsEnabled(cfg.paymentsEnabled);
+        if (!cancelled) setPaymentsEnabled(!cfg.allowUnpaidRegistration);
       })
       .catch(() => {
         if (!cancelled) setPaymentsEnabled(true);
