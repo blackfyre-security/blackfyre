@@ -44,7 +44,12 @@ function getUserFromCookie(): User | null {
 
 function setUserCookie(user: User) {
   const secure = typeof window !== "undefined" && window.location.protocol === "https:" ? "; Secure" : "";
-  document.cookie = `${USER_COOKIE}=${encodeURIComponent(JSON.stringify(user))}; path=/; max-age=900; SameSite=Strict${secure}`;
+  // Lifetime matches the refresh token (30d), NOT the 15-min access token:
+  // this cookie is only the client-side "session exists" signal for AuthGuard —
+  // the server authenticates every request via the HttpOnly cookies regardless.
+  // At 900s it silently killed the UI session every 15 minutes even though the
+  // refresh flow kept the real session alive.
+  document.cookie = `${USER_COOKIE}=${encodeURIComponent(JSON.stringify(user))}; path=/; max-age=2592000; SameSite=Strict${secure}`;
 }
 
 function clearUserCookie() {
