@@ -42,6 +42,12 @@ jobs:
       - name: Typecheck api (blocking)
         run: npx tsc --noEmit -p packages/api/tsconfig.json
         working-directory: platform
+      # BLOCKING GATE: the portal was previously only ever `next build`-ed, which does
+      # not fail the job on type errors in every call site. A portal↔API contract drift
+      # (rendering fields the API never returns) therefore shipped undetected.
+      - name: Typecheck portal (blocking)
+        run: npx tsc --noEmit -p packages/portal/tsconfig.json
+        working-directory: platform
       # BLOCKING GATE: API unit suite must run and pass on every PR/push.
       - name: Test api — unit (blocking)
         run: npm run test:unit --workspace=packages/api

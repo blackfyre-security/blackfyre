@@ -15,6 +15,7 @@ import { remediationRoutes } from "./routes/remediations.js";
 import { alertRoutes } from "./routes/alerts.js";
 import { driftRoutes } from "./routes/drift.js";
 import { learningRoutes } from "./routes/learning.js";
+import { auditLogRoutes } from "./routes/audit-logs.js";
 import { adminRoutes } from "./routes/admin.js";
 import { adminReportRoutes } from "./routes/admin-reports.js";
 import { aiRoutes } from "./routes/ai-analysis.js";
@@ -306,6 +307,7 @@ export async function buildApp(config: Config): Promise<FastifyInstance> {
   // Routes
   await app.register(healthRoutes);
   await app.register(authRoutes);
+  await app.register(auditLogRoutes);
   await app.register(integrationRoutes);
   await app.register(scanRoutes);
   await app.register(findingRoutes);

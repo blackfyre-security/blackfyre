@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE.hostedUrl),
   title: "Blackfyre — Open-source multi-cloud compliance & security platform",
   description:
-    "Open-source, self-hostable multi-cloud compliance & security platform — 55 auditors, 9 frameworks, 678 controls across AWS, Azure, GCP and on-prem. Apache-2.0.",
+    "Open-source, self-hostable multi-cloud compliance & security platform — 40+ SDK auditors, 9 frameworks, 678 controls across AWS, Azure, GCP and on-prem. Apache-2.0.",
   keywords: [
     "open source security",
     "compliance automation",
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Blackfyre — Open-source multi-cloud compliance & security platform",
     description:
-      "Self-hostable, Apache-2.0 compliance & security scanning: 55 auditors, 9 frameworks, 678 controls, tamper-evident evidence, and database-enforced multi-tenancy.",
+      "Self-hostable, Apache-2.0 compliance & security scanning: 40+ SDK auditors, 9 frameworks, 678 controls, hash-verified evidence, and database-enforced multi-tenancy.",
     url: SITE.hostedUrl,
     siteName: SITE.name,
     type: "website",
@@ -62,7 +62,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Blackfyre — Open-source multi-cloud compliance & security platform",
     description:
-      "Open-source multi-cloud compliance & security. 55 auditors · 9 frameworks · 678 controls · AWS/Azure/GCP + on-prem. Self-host free under Apache-2.0.",
+      "Open-source multi-cloud compliance & security. 40+ SDK auditors · 9 frameworks · 678 controls · AWS/Azure/GCP + on-prem. Self-host free under Apache-2.0.",
   },
   robots: { index: true, follow: true },
 };
@@ -123,7 +123,7 @@ export default function RootLayout({
               url: "https://blackfyre.tech",
               email: "founder@blackfyre.tech",
               description:
-                "Open-source multi-cloud compliance & security platform. Scan AWS, Azure and GCP against 678 controls across 9 frameworks with 55 auditors, AI-assisted analysis and a tamper-evident evidence vault. Apache-2.0 — self-host free.",
+                "Open-source multi-cloud compliance & security platform. Scan AWS, Azure and GCP against 678 controls across 9 frameworks with 40+ SDK auditors, AI-assisted analysis and a hash-verified evidence vault. Apache-2.0 — self-host free.",
               offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
               address: {
                 "@type": "PostalAddress",

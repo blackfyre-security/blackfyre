@@ -28,7 +28,7 @@ import { TOTAL_CONTROLS, FRAMEWORK_COUNT } from "@/data/frameworks";
 export const metadata: Metadata = {
   title: "Pricing — Blackfyre",
   description:
-    "Blackfyre is free to self-host forever under Apache-2.0 — all 55 auditors, 9 frameworks and 678 controls. A managed hosted option is in early access.",
+    "Blackfyre is free to self-host forever under Apache-2.0 — all 40+ SDK auditors, 9 frameworks and 678 controls. A managed hosted option is in early access.",
 };
 
 const LICENSE_URL = `${SITE.repoUrl}/blob/main/LICENSE`;
@@ -114,7 +114,7 @@ const COMPARISON: readonly ComparisonRow[] = [
 const FAQ: readonly { q: string; a: string }[] = [
   {
     q: "Is self-host really full-featured?",
-    a: `Yes. Self-host is the complete product — all ${AUDITOR_COUNT} auditors, all ${FRAMEWORK_COUNT} frameworks and ${TOTAL_CONTROLS} controls, the tamper-evident evidence vault, RLS multi-tenancy and enterprise auth. Apache-2.0 means it's free forever with no feature gates or seat limits.`,
+    a: `Yes. Self-host is the complete product — all ${AUDITOR_COUNT} auditors, all ${FRAMEWORK_COUNT} frameworks and ${TOTAL_CONTROLS} controls, the hash-verified evidence vault, RLS multi-tenancy and enterprise auth. Apache-2.0 means it's free forever with no feature gates or seat limits.`,
   },
   {
     q: "What does the hosted option add?",

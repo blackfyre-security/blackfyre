@@ -113,7 +113,7 @@ function BrandBlock() {
       />
       <p className="halo-label mt-3">Open source &middot; Apache-2.0</p>
       <p className="mt-4 max-w-[300px] text-[13px] leading-relaxed text-text-muted">
-        Open-source multi-cloud compliance &amp; security. 55 auditors, 9
+        Open-source multi-cloud compliance &amp; security. 40+ SDK auditors, 9
         frameworks, 678 controls across AWS, Azure, GCP and on-prem &mdash;
         self-host free forever.
       </p>

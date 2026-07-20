@@ -292,14 +292,21 @@ function TrendCard({ trendDelta }: { trendDelta: number }) {
           {trendDelta.toFixed(1)}
         </div>
       </div>
+      {/*
+        No per-day score history is exposed by the API yet, so there is no series to
+        plot. This previously rendered an animated random walk, which read as the
+        tenant's real trend on a compliance dashboard. Until a history endpoint
+        exists it renders a flat baseline and says so. `trendDelta` above is real.
+      */}
       <div style={{ marginTop: 18, marginLeft: -6, marginRight: -6, marginBottom: -6 }}>
         <HaloSparkline
           color={positive ? "var(--accent)" : "var(--critical-text)"}
           height={90}
           points={60}
-          speed={500}
-          variance={0.4}
         />
+      </div>
+      <div className="halo-label" style={{ marginTop: 10, opacity: 0.7 }}>
+        Score history not yet recorded
       </div>
     </div>
   );

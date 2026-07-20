@@ -39,7 +39,7 @@ import { FRAMEWORKS, TOTAL_CONTROLS, FRAMEWORK_COUNT } from "@/data/frameworks";
 export const metadata: Metadata = {
   title: "Platform — Blackfyre",
   description:
-    "A product tour of Blackfyre: 55 auditors across AWS, Azure, GCP and on-prem mapped to 9 frameworks and 678 controls, with a tamper-evident evidence vault. Open source, Apache-2.0.",
+    "A product tour of Blackfyre: 40+ SDK auditors across AWS, Azure, GCP and on-prem mapped to 9 frameworks and 678 controls, with a hash-verified evidence vault. Open source, Apache-2.0.",
 };
 
 const docUrl = (title: string) =>
@@ -171,7 +171,7 @@ const FEATURES: readonly Feature[] = [
   {
     icon: Cloud,
     title: "Multi-cloud scanning",
-    desc: "55 auditors across AWS, Azure, GCP and on-prem, plus Prowler and the IaC scanners Checkov, Semgrep and Bandit.",
+    desc: "40+ SDK auditors across AWS, Azure, GCP and on-prem, plus Prowler and the IaC scanners Checkov, Semgrep and Bandit.",
     accent: "blue",
   },
   {
@@ -260,7 +260,7 @@ export default function PlatformPage() {
               sub={
                 <>
                   Blackfyre maps your multi-cloud and on-prem posture to{" "}
-                  {FRAMEWORK_COUNT} compliance frameworks, stores tamper-evident
+                  {FRAMEWORK_COUNT} compliance frameworks, stores hash-verified
                   evidence, and ships as source you run yourself.{" "}
                   <strong className="font-semibold text-zinc-900">
                     {AUDITOR_COUNT} auditors, {TOTAL_CONTROLS} controls, one runtime
@@ -310,7 +310,7 @@ export default function PlatformPage() {
           eyebrowIcon={<Workflow className="h-3.5 w-3.5" />}
           title="One request pipeline,"
           accentWord="end to end."
-          sub="Static frontends talk to a Fastify API; the API writes to Postgres and enqueues work; Lambda workers drain the queues, run the scanners, and land tamper-evident evidence in S3."
+          sub="Static frontends talk to a Fastify API; the API writes to Postgres and enqueues work; Lambda workers drain the queues, run the scanners, and land hash-verified evidence in S3."
         />
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {PIPELINE.map((s) => (

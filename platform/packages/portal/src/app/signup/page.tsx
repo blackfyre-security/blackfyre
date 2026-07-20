@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { api } from "@/lib/api";
@@ -75,6 +75,44 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  // Whether this deployment has a payment gateway at all. A self-hosted install
+  // has none, and must not be shown a checkout for software it is already
+  // hosting. null = not yet known; treat as "payments on" until told otherwise so
+  // a failed probe can never silently hand out unpaid accounts on a paid
+  // deployment.
+  const [paymentsEnabled, setPaymentsEnabled] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    api
+      .deploymentConfig()
+      .then((cfg) => {
+        if (!cancelled) setPaymentsEnabled(cfg.paymentsEnabled);
+      })
+      .catch(() => {
+        if (!cancelled) setPaymentsEnabled(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const selfHosted = paymentsEnabled === false;
+
+  // Self-hosted: create the tenant and owner directly, no checkout in between.
+  async function registerWithoutPayment() {
+    setError("");
+    setLoading(true);
+    try {
+      const result = await api.register({ name, email, password, companyName });
+      api.setTokens(result.accessToken, result.refreshToken);
+      router.push("/onboarding");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Account creation failed");
+      setLoading(false);
+    }
+  }
+
   function handleSelectPlan(plan: Plan) {
     setSelectedPlan(plan);
     setError("");
@@ -90,6 +128,10 @@ export default function SignupPage() {
     }
     if (password.length < 8) {
       setError("Password must be at least 8 characters");
+      return;
+    }
+    if (selfHosted) {
+      void registerWithoutPayment();
       return;
     }
     setStep("payment");
@@ -186,7 +228,7 @@ export default function SignupPage() {
 
         {/* Step indicator */}
         <div className="flex items-center justify-center gap-3 mb-8">
-          {(["plan", "details", "payment"] as Step[]).map((s, i) => (
+          {((selfHosted ? ["plan", "details"] : ["plan", "details", "payment"]) as Step[]).map((s, i) => (
             <div key={s} className="flex items-center gap-3">
               <div
                 className="flex items-center justify-center w-7 h-7 rounded-full text-xs font-semibold"

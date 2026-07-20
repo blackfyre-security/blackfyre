@@ -37,6 +37,8 @@ export function parseAdTimestamp(value: string): number {
   }
 }
 
+import { OptionalDependencyMissingError, isOptionalDependencyMissing } from "../optional-dependency.js";
+
 /**
  * Production LDAP search using ldapjs.
  * Returns an empty array when ldapjs is unavailable or the connection fails,
@@ -44,10 +46,17 @@ export function parseAdTimestamp(value: string): number {
  */
 export async function ldapSearch(config: ADConfig, query: LdapQuery): Promise<LdapEntry[]> {
   try {
-    // Dynamic import — ldapjs is an optional peer dependency
+    // Dynamic import — ldapjs is an OPTIONAL dependency, deliberately not in
+    // package.json so cloud-only installs (the overwhelming majority) do not carry
+    // it. But a missing module previously returned [] indistinguishably from "the
+    // directory is clean", so four AD auditors reported success while collecting
+    // nothing. Say so loudly instead; the caller still degrades to config-level
+    // findings rather than failing the scan.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const ldap = await import("ldapjs" as any).catch(() => null) as any;
-    if (!ldap) return [];
+    if (!ldap) {
+      throw new OptionalDependencyMissingError("ldapjs", "Active Directory auditing");
+    }
 
     return await new Promise<LdapEntry[]>((resolve) => {
       const client = ldap.createClient({
@@ -88,7 +97,10 @@ export async function ldapSearch(config: ADConfig, query: LdapQuery): Promise<Ld
         });
       });
     });
-  } catch {
+  } catch (err) {
+    // A missing optional dependency is a real, actionable condition — never let the
+    // catch-all turn it back into a silent empty result.
+    if (isOptionalDependencyMissing(err)) throw err;
     return [];
   }
 }

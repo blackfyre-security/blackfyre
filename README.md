@@ -5,7 +5,7 @@
 **Open-source multi-cloud compliance & security platform**
 
 Scan AWS, Azure, and GCP against 678 controls across 9 compliance frameworks —
-with AI-assisted analysis, tamper-evident evidence, and real remediation tracking.
+with AI-assisted analysis, hash-verified evidence, and real remediation tracking.
 
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![CI](https://github.com/blackfyre-security/blackfyre/actions/workflows/ci.yml/badge.svg)](https://github.com/blackfyre-security/blackfyre/actions/workflows/ci.yml)
@@ -39,8 +39,12 @@ findings through remediation — with evidence you can hand to an auditor.
 - **AI-assisted analysis** — gap analysis, MITRE ATT&CK mapping, remediation
   suggestions, and a security copilot (Claude via Anthropic API or AWS Bedrock);
   every AI feature degrades gracefully to heuristics when no key is configured
-- **Evidence vault** — tamper-evident evidence chain with SHA-256 integrity
-  verification, Object-Lock-backed storage
+- **Evidence vault** — SHA-256 content hashing with an explicit `hashSource` on
+  every record, so a hash that covers real evidence bytes is distinguishable from
+  one that only covers collection metadata. S3 Object Lock (WORM, COMPLIANCE mode)
+  on AWS deployments; local self-hosted storage has no Object Lock. The chained
+  ledger (`services/ledger/`) is implemented but not yet wired into the write path
+  — see [#33](https://github.com/blackfyre-security/blackfyre/issues/33)
 - **Real-time monitoring** — configuration drift detection and live scan progress
   over SSE
 - **Serious multi-tenancy** — Postgres row-level security enforced below the ORM
