@@ -1,6 +1,6 @@
 version: 2
 updates:
-  # Platform (monorepo: api, admin, portal, shared, ui, cli)
+  # Platform (monorepo: api, portal, shared, ui, cli)
   - package-ecosystem: "npm"
     directory: "/platform"
     schedule:

@@ -68,6 +68,17 @@ const envSchema = z.object({
   PROWLER_SCANNER_ARN: z.string().default(""),
   IAC_SCANNER_ARN: z.string().default(""),
 
+  // Platform-admin API — OFF by default.
+  //
+  // These routes are the multi-tenant OPERATOR surface for a hosted Blackfyre
+  // service: cross-tenant reads, tenant provisioning, billing, the marketing
+  // contact inbox. A self-hosted install is a single tenant and never needs
+  // them, so they are not registered unless this is explicitly set to "true".
+  //
+  // Leaving them off also means `users.is_platform_admin` grants nothing over
+  // HTTP, and the zero-leakage plugin has no exempt path prefix.
+  PLATFORM_ADMIN_API: z.enum(["true", "false"]).default("false"),
+
   // Razorpay — leave empty to disable payment processing
   RAZORPAY_KEY_ID: z.string().default(""),
   RAZORPAY_KEY_SECRET: z.string().default(""),

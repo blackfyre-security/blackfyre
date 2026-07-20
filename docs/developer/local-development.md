@@ -114,9 +114,6 @@ npm run dev
 
 # Terminal 2 — client portal (Next.js, port 3001)
 NEXT_PUBLIC_API_URL=http://localhost:4000 npm run dev --workspace=packages/portal
-
-# Terminal 3 — admin dashboard (Next.js, port 3003)
-NEXT_PUBLIC_API_URL=http://localhost:4000 npm run dev --workspace=packages/admin
 ```
 
 Confirm the API is healthy:

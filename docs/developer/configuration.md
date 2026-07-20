@@ -44,6 +44,7 @@ Leave these empty to disable the feature; the API no-ops rather than erroring.
 | `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASS` / `SMTP_FROM` | Outbound email (alerts, invites, password reset) | Any SMTP provider (Gmail app password, SES, Postmark, etc.) |
 | `WEBHOOK_SIGNING_SECRET` | HMAC-signs outbound webhook deliveries | Generate: `openssl rand -hex 32` |
 | `ANTHROPIC_API_KEY` | Claude API key — powers AI gap analysis, AI remediation suggestions, AI worker | https://console.anthropic.com/settings/keys |
+| `PLATFORM_ADMIN_API` | `"true"` registers the cross-tenant operator routes (`/api/admin/*`, `/api/clients/*`) for a hosted multi-tenant service. Defaults to `"false"` — the only supported self-hosted setting. See [ADR-0005](../adr/0005-operator-console-split.md). | — |
 | `RAZORPAY_KEY_ID` / `RAZORPAY_KEY_SECRET` / `RAZORPAY_WEBHOOK_SECRET` | Subscription payments (India / INR) | https://dashboard.razorpay.com/app/keys and .../webhooks |
 | `STRIPE_SECRET_KEY` / `STRIPE_PUBLISHABLE_KEY` / `STRIPE_WEBHOOK_SECRET` | Subscription payments (international / USD) | https://dashboard.stripe.com/apikeys |
 | `STRIPE_PRICE_ID_COMPLY` / `STRIPE_PRICE_ID_PROTECT` / `STRIPE_PRICE_ID_DEFEND` | Pre-created recurring Stripe prices | Optional — blank means the checkout route creates inline pricing instead |

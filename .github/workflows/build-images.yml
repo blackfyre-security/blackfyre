@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        service: [api, admin, portal]
+        service: [api, portal]
     steps:
       - uses: actions/checkout@v5
 

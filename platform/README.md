@@ -7,7 +7,6 @@ Monorepo for the BLACKFYRE SaaS platform. Uses npm workspaces.
 | Package | Description | Port |
 |---------|-------------|------|
 | [`@blackfyre/api`](./packages/api/) | Backend API — Fastify + Drizzle ORM | 4000 |
-| [`@blackfyre/admin`](./packages/admin/) | Admin dashboard — Next.js | 3003 |
 | [`@blackfyre/client`](./packages/portal/) | Client portal — Next.js | 3001 |
 | [`@blackfyre/shared`](./packages/shared/) | Shared types, schemas, Tailwind preset | — |
 | [`@blackfyre/ui`](./packages/ui/) | Shared React component library | — |
@@ -29,7 +28,6 @@ npm run db:migrate
 npm run dev
 
 # Start frontends (separate terminals)
-npm run dev --workspace=packages/admin
 npm run dev --workspace=packages/portal
 ```
 

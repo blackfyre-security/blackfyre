@@ -1,7 +1,6 @@
 # Testing
 
-All automated tests live in `platform/packages/api/tests/` (Vitest), plus an opt-in
-Playwright browser suite in `platform/packages/admin/tests/browser/`. Run everything
+All automated tests live in `platform/packages/api/tests/` (Vitest). Run everything
 from `platform/`.
 
 ## Unit tests (offline — what CI runs on every PR)
@@ -50,17 +49,12 @@ npx vitest run -t "rejects malformed strings" --config vitest.unit.config.ts
 npm run test:watch --workspace=packages/api
 ```
 
-## Browser / e2e (Playwright, opt-in)
+## Browser / e2e
 
-```bash
-npm run test:browser --workspace=packages/admin     # sets BROWSER_SMOKE=1
-```
-
-- Config: `packages/admin/playwright.config.ts`; tests in
-  `packages/admin/tests/browser/`
-- Deliberately opt-in (`BROWSER_SMOKE=1`): these drive a real deployed admin app
-  cross-origin, so they're excluded from casual test runs and from PR CI.
-- First run needs browsers: `npx playwright install chromium`.
+There is currently no browser/e2e suite in this repository. The Playwright smoke
+tests lived in the operator console, which is no longer part of the open-source
+release (see [ADR-0005](adr/0005-operator-console-split.md)). Portal e2e coverage
+is open work — see the issue tracker.
 
 ## Staging smoke
 

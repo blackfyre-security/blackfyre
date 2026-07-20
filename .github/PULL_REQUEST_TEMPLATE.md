@@ -18,7 +18,7 @@
 - [ ] I signed off my commits (DCO — `git commit -s`)
 - [ ] `npm run build` passes (from `platform/`)
 - [ ] `npm run test:unit --workspace=packages/api` passes
-- [ ] Lint passes if I touched portal/admin (`npm run lint --workspace=packages/portal|admin`)
+- [ ] Lint passes if I touched the portal (`npm run lint --workspace=packages/portal`)
 
 ## Does this touch tenant isolation / RLS?
 

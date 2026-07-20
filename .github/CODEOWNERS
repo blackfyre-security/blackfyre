@@ -11,9 +11,8 @@
 /platform/packages/api/src/db/                  @giridharmkb1904-commits
 /platform/packages/api/src/migrations/          @giridharmkb1904-commits
 
-# Frontend (portal + admin + marketing)
+# Frontend (portal + marketing)
 /platform/packages/portal/                      @NarasimaPandiyan
-/platform/packages/admin/                       @NarasimaPandiyan
 /website/                                       @NarasimaPandiyan
 
 # Demo / sandbox (shared)

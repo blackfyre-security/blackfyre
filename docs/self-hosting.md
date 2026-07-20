@@ -14,7 +14,7 @@ Two honest tiers. Pick the one that matches what you're trying to do.
 ## Tier 1: Local / evaluation (Docker Compose)
 
 The [local development guide](developer/local-development.md) is the evaluation
-path — it stands up the full product (API, portal, admin, Postgres, Redis, emulated
+path — it stands up the full product (API, portal, Postgres, Redis, emulated
 SQS/S3, seeded demo data) with no cloud account.
 
 For an all-container variant (closer to production packaging), `platform/docker-compose.yml`
@@ -25,7 +25,7 @@ reverse proxy:
 cd platform
 docker compose up -d --build
 # then add to /etc/hosts:
-#   127.0.0.1 api.blackfyre.local admin.blackfyre.local app.blackfyre.local
+#   127.0.0.1 api.blackfyre.local app.blackfyre.local
 # and open http://app.blackfyre.local
 ```
 
@@ -54,7 +54,7 @@ The infrastructure is code in `platform/infra/` + `platform/sst.config.ts`
   VPC (`infra/migrations.ts`)
 - **Budget alarms** — (`infra/budgets.ts`)
 
-The frontends (portal/admin/website) are static Next.js exports — host them on any
+The frontends (portal/website) are static Next.js exports — host them on any
 static host/CDN (the reference deployment uses Cloudflare Pages via
 `.github/workflows/deploy.yml`) and point them at your API URL via
 `NEXT_PUBLIC_API_URL` at build time.

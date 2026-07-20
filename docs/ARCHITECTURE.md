@@ -37,7 +37,6 @@ All three use the **same Next.js source code** + **same Fastify API code** + **s
                 │                                       (baked into zip)
                 │
                 ├─ app-staging.blackfyre.tech ──────────── blackfyre-portal-staging
-                ├─ admin-staging.blackfyre.tech ────────── blackfyre-admin-staging
                 │                                              │
                 │                                              ▼
                 │                                         BlackfyreApi   ◀──┐
@@ -56,7 +55,6 @@ All three use the **same Next.js source code** + **same Fastify API code** + **s
                 │                                       11 SST secrets     │
                 │                                                          │
                 ├─ app.blackfyre.tech ────────────── blackfyre-portal      │
-                ├─ admin.blackfyre.tech ──────────── blackfyre-admin       │
                 │                                                          │
                 │                                       (same as staging,  │
                 │                                       sized up for prod) │
@@ -69,7 +67,7 @@ All three use the **same Next.js source code** + **same Fastify API code** + **s
 
 ## What deploys where
 
-**Frontend** (portal, admin, marketing site) → **Cloudflare Pages**, static export only.
+**Frontend** (portal, marketing site) → **Cloudflare Pages**, static export only.
 
 **Backend** (API, SSE, workers, scanners, DB) → **AWS Lambda + RDS + SQS + S3** via SST.
 
@@ -113,7 +111,7 @@ No ECS, no EC2, no ALB, no Terraform — all gone as of 2026-05-11.
 
 | Layer | Tech | Notes |
 |---|---|---|
-| Frontend (portal, admin) | Next.js 14 (App Router, `output: "export"`) + Tailwind + React | Static HTML/JS only |
+| Frontend (portal) | Next.js 14 (App Router, `output: "export"`) + Tailwind + React | Static HTML/JS only |
 | Marketing site | Next.js 14 static | Lives in `/website` |
 | API | Fastify 4 + Drizzle ORM + postgres-js | Wrapped by `@fastify/aws-lambda` |
 | Workers | Fastify-less Lambda handlers | SQS-triggered |

@@ -315,45 +315,6 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
-  # ── Cloudflare Pages: Admin (staging + prod) ──
-  deploy-admin:
-    needs: [resolve-stage, deploy-sst]
-    if: needs.resolve-stage.outputs.is_demo == 'false'
-    runs-on: ubuntu-latest
-    environment: ${{ needs.resolve-stage.outputs.stage }}
-    env:
-      STAGE: ${{ needs.resolve-stage.outputs.stage }}
-    steps:
-      - uses: actions/checkout@v5
-        with:
-          # Check out the exact SHA CI validated. For workflow_dispatch,
-          # falls back to the dispatched ref. Prevents the
-          # "merge → CI green → another merge → deploy gets new code" race.
-          ref: ${{ needs.resolve-stage.outputs.ref }}
-      - uses: actions/setup-node@v5
-        with:
-          node-version: "20"
-          cache: "npm"
-          cache-dependency-path: platform/package-lock.json
-      - run: npm ci --no-audit --no-fund
-        working-directory: platform
-      - run: npm run build --workspace=packages/shared
-        working-directory: platform
-      - name: Build admin
-        run: npm run build --workspace=packages/admin
-        working-directory: platform
-        env:
-          NEXT_PUBLIC_API_URL: ${{ needs.resolve-stage.outputs.is_prod == 'true' && vars.PROD_API_URL || vars.STAGING_API_URL }}
-      - name: Deploy
-        run: |
-          PROJECT="blackfyre-admin"
-          [ "$STAGE" = "staging" ] && PROJECT="blackfyre-admin-staging"
-          npx wrangler pages deploy out --project-name "$PROJECT" --branch main --commit-dirty=true
-        working-directory: platform/packages/admin
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-
   # ── Cloudflare Pages: Marketing website (only on prod) ──
   deploy-website:
     # Gate the marketing site on a SUCCESSFUL API deploy — otherwise a prod website

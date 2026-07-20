@@ -52,15 +52,7 @@ jobs:
         env:
           NEXT_PUBLIC_API_URL: ${{ vars.STAGING_API_URL || 'https://api.example.com' }}
           NEXT_PUBLIC_DEMO_MODE: "false"
-      - name: Build admin (static export)
-        run: npm run build --workspace=packages/admin
-        working-directory: platform
-        env:
-          NEXT_PUBLIC_API_URL: ${{ vars.STAGING_API_URL || 'https://api.example.com' }}
       # BLOCKING GATE: lint must pass for the Next.js apps that define a lint script.
-      - name: Lint admin (blocking)
-        run: npm run lint --workspace=packages/admin --if-present
-        working-directory: platform
       - name: Lint portal (blocking)
         run: npm run lint --workspace=packages/portal --if-present
         working-directory: platform

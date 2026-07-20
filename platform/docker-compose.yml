@@ -3,8 +3,8 @@
 # Usage:
 #   docker compose up -d --build
 #   # then edit your hosts file once:
-#   #   127.0.0.1 api.blackfyre.local admin.blackfyre.local app.blackfyre.local
-#   open http://admin.blackfyre.local
+#   #   127.0.0.1 api.blackfyre.local app.blackfyre.local
+#   open http://app.blackfyre.local
 #
 # Services:
 #   postgres       — Postgres 16 (production: RDS)
@@ -16,7 +16,6 @@
 #   worker-monitor — long-poll loop on MonitorJobsQueue
 #   worker-ai      — long-poll loop on AiJobsQueue
 #   worker-evidence— long-poll loop on EvidenceJobsQueue
-#   admin          — Next.js standalone on :3003
 #   portal         — Next.js standalone on :3001
 #   nginx          — reverse proxy on :80 (subdomain routing)
 
@@ -31,7 +30,7 @@ x-api-env: &api-env
   DATABASE_URL: postgres://blackfyre:blackfyre_dev@postgres:5432/blackfyre
   REDIS_URL: redis://:blackfyre_redis_dev@redis:6379
   JWT_SECRET: dev-only-jwt-secret-32-characters-min-replace-in-prod!!
-  CORS_ORIGINS: http://admin.blackfyre.local,http://app.blackfyre.local
+  CORS_ORIGINS: http://app.blackfyre.local
   AWS_REGION: ap-south-1
   AWS_ACCESS_KEY_ID: test
   AWS_SECRET_ACCESS_KEY: test
@@ -168,20 +167,6 @@ services:
         condition: service_healthy
 
   # ---------------- Frontends ----------------
-  admin:
-    build:
-      context: .
-      dockerfile: packages/admin/Dockerfile
-      args:
-        # Browser-side calls go via nginx, which proxies api.blackfyre.local
-        # to the api container. Both have to resolve from the host.
-        NEXT_PUBLIC_API_URL: http://api.blackfyre.local
-    ports:
-      - "3003:3003"
-    depends_on:
-      api:
-        condition: service_healthy
-
   portal:
     build:
       context: .
@@ -205,8 +190,6 @@ services:
     depends_on:
       api:
         condition: service_healthy
-      admin:
-        condition: service_started
       portal:
         condition: service_started
 

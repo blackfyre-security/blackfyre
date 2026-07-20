@@ -47,9 +47,8 @@ cp packages/api/.env.example packages/api/.env   # then edit per the local-dev g
 npm run db:migrate && npm run dev                # API on :4000
 ```
 
-Portal (`:3001`) and admin (`:3003`) run with
-`NEXT_PUBLIC_API_URL=http://localhost:4000 npm run dev --workspace=packages/portal`
-(or `packages/admin`).
+The portal (`:3001`) runs with
+`NEXT_PUBLIC_API_URL=http://localhost:4000 npm run dev --workspace=packages/portal`.
 
 ## Running and writing tests
 
@@ -66,7 +65,6 @@ cd packages/api && npx vitest run tests/unit/some-file.test.ts --config vitest.u
 - If your change touches tenant-scoped data, run the tenant-isolation suite
   against the compose stack — it's the most important test in the repo:
   `npx vitest run tests/integration/tenant-isolation.test.ts` (from `packages/api`).
-- Playwright browser tests (`npm run test:browser --workspace=packages/admin`)
   run against a deployed environment — maintainers run these; you don't need to.
 
 At minimum, before opening a PR:

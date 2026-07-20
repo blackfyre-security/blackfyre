@@ -40,7 +40,7 @@ jobs:
               `Welcome, @${author} — thanks for your first pull request to Blackfyre! 🎉`,
               '',
               'What happens next:',
-              `1. **CI** runs the blocking gates: typecheck, API unit tests, portal/admin lint, and the DCO sign-off check (every commit needs \`git commit -s\` — [how to fix a missing sign-off](${repoUrl}/blob/main/CONTRIBUTING.md#developer-certificate-of-origin-dco)).`,
+              `1. **CI** runs the blocking gates: typecheck, API unit tests, portal lint, and the DCO sign-off check (every commit needs \`git commit -s\` — [how to fix a missing sign-off](${repoUrl}/blob/main/CONTRIBUTING.md#developer-certificate-of-origin-dco)).`,
               '2. **Claude does a first-pass review** — an automated maintainer-configured review that flags correctness/security issues early. It\'s advisory; a human maintainer has the final say.',
               '3. A **maintainer reviews** — usually within a few days. Small, focused PRs merge fastest.',
               '',

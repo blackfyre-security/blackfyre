@@ -9,7 +9,7 @@
     "build:website": "cd website && npm run build",
     "build:platform": "cd platform && npm run build",
     "test": "cd platform && npm test",
-    "lint": "cd platform && npm run lint --workspace=packages/admin && npm run lint --workspace=packages/portal"
+    "lint": "cd platform && npm run lint --workspace=packages/portal"
   },
   "engines": {
     "node": ">=20"

@@ -5,7 +5,13 @@ const SKIP_PATHS = ["/health", "/healthz", "/ready", "/api/health"];
 
 // Path prefixes that legitimately return cross-tenant data (platform-admin only routes).
 // These routes enforce their own is_platform_admin check before responding.
-const SKIP_PREFIXES = ["/api/admin/"];
+// Path prefixes exempt from cross-tenant leak detection. `/api/admin/*` returns
+// cross-tenant data by design and enforces its own is_platform_admin check — but
+// it only exists when PLATFORM_ADMIN_API=true. With the operator API off (the
+// default, and the only supported self-hosted configuration) nothing is exempt,
+// so every response on every route is leak-checked.
+const SKIP_PREFIXES =
+  process.env.PLATFORM_ADMIN_API === "true" ? ["/api/admin/"] : [];
 
 // Fields whose values are treated as tenant identifiers
 const TENANT_ID_FIELDS = new Set(["tenantId", "tenant_id", "organizationId", "organization_id"]);

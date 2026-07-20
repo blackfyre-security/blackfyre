@@ -47,16 +47,9 @@ Talks to the API with `src/lib/api.ts` (reads `NEXT_PUBLIC_API_URL` at build tim
 Pages under `src/app/`: dashboard, scans, findings, evidence, reports, compliance,
 settings, onboarding. Uses `@blackfyre/ui` + `@blackfyre/shared`.
 
-Production invariant: the portal (and admin) must stay `output: "export"` — no
-middleware, no `app/api` routes, no server actions. They deploy to static hosting;
+Production invariant: the portal must stay `output: "export"` — no
+middleware, no `app/api` routes, no server actions. It deploys to static hosting;
 all dynamic behavior belongs in the API.
-
-## packages/admin — `@blackfyre/admin`
-
-The operator dashboard (Next.js 14, static export), port 3003 in dev. Tenant
-management, platform settings, cross-tenant reporting. Same API client pattern and
-constraints as the portal. Also hosts the opt-in Playwright browser smoke tests
-(`tests/browser/`, `npm run test:browser`).
 
 ## packages/shared — `@blackfyre/shared`
 
@@ -73,7 +66,7 @@ Everything depends on shared; shared depends on nothing.
 
 ## packages/ui — `@blackfyre/ui`
 
-Shared React component library used by portal and admin — design-system primitives
+Shared React component library used by the portal — design-system primitives
 (`Button`, `Card`, `DataTable`, `Toast`, …) and domain components (`FindingCard`,
 `ScoreRing`, `ScanProgressBar`, `ComplianceStepper`, …). Entry: `src/index.ts`;
 theme tokens under `src/theme/`.
@@ -114,7 +107,7 @@ the platform. Not part of the npm workspaces; `cd website && npm install && npm 
 
 ```
 shared  ←  api
-shared, ui  ←  portal, admin
+shared, ui  ←  portal
 shared  ←  cli
 (infra references api handlers by path; website is standalone)
 ```

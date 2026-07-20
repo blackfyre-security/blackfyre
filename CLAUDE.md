@@ -13,7 +13,7 @@ gracefully to heuristics when no key is configured.
 - `platform/` — the product. npm workspaces: `packages/shared` (Zod schemas/types),
   `packages/ui` (source-only component lib), `packages/api` (Fastify 4 backend +
   workers + scanners + migrations), `packages/portal` (customer Next.js app, :3001),
-  `packages/admin` (Next.js, :3003), `packages/cli`.
+  `packages/cli`.
 - `docs/` — architecture, developer guides (`docs/developer/`), ADRs (`docs/adr/`).
 - `website/` — marketing site (separate Next.js static-export app, own lockfile).
 - `sandbox/` — intentionally-vulnerable demo fixture data (out of scope for security reports).
@@ -47,18 +47,16 @@ docker compose up -d postgres redis localstack   # local infra (see docker-compo
 npm run db:migrate                         # raw-SQL migrations via src/db/migrate.ts
 npm run dev                                # API on :4000 (tsx watch)
 npm run dev --workspace=packages/portal    # portal :3001 (needs NEXT_PUBLIC_API_URL)
-npm run dev --workspace=packages/admin     # admin :3003
 npm run build                              # shared, then api (order matters)
 npm run test:unit --workspace=packages/api # CI-blocking unit suite (offline, mocked)
 npm run test --workspace=packages/api      # full suite — needs live Postgres+Redis
 npx vitest run tests/unit/foo.test.ts --config vitest.unit.config.ts   # single test (cwd packages/api)
 npx tsc --noEmit -p packages/api/tsconfig.json   # typecheck (build shared first)
-npm run lint --workspace=packages/admin    # next lint (admin + portal only)
 npm run lint --workspace=packages/portal
 ```
 
-- Playwright e2e: `npm run test:browser --workspace=packages/admin` — **hits real
-  staging** (`ADMIN_BASE_URL` to override) and mutates data. Never wire into `npm test`.
+- No browser/e2e suite lives here — the Playwright smoke tests belonged to the
+  operator console, which is no longer part of the open-source release (ADR-0005).
 - Demo API without a DB: `npm run demo --workspace=packages/api` (:4001, mocked).
 - Env: copy `packages/api/.env.example` → `.env` (loaded via `--env-file-if-exists`);
   every var documented in [docs/developer/configuration.md](docs/developer/configuration.md).

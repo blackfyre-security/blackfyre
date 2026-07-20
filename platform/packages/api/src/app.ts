@@ -306,7 +306,6 @@ export async function buildApp(config: Config): Promise<FastifyInstance> {
   // Routes
   await app.register(healthRoutes);
   await app.register(authRoutes);
-  await app.register(clientRoutes);
   await app.register(integrationRoutes);
   await app.register(scanRoutes);
   await app.register(findingRoutes);
@@ -318,8 +317,18 @@ export async function buildApp(config: Config): Promise<FastifyInstance> {
   await app.register(alertRoutes);
   await app.register(driftRoutes);
   await app.register(learningRoutes);
-  await app.register(adminRoutes);
-  await app.register(adminReportRoutes);
+  // Platform-admin (operator) surface — see config.PLATFORM_ADMIN_API.
+  // Off by default: a self-hosted install is a single tenant and has no use for
+  // cross-tenant reads, tenant provisioning or billing. When disabled these
+  // routes do not exist, so `is_platform_admin` confers nothing over HTTP.
+  if (config.PLATFORM_ADMIN_API === "true") {
+    app.log.warn(
+      "PLATFORM_ADMIN_API=true — cross-tenant operator routes are enabled",
+    );
+    await app.register(clientRoutes);
+    await app.register(adminRoutes);
+    await app.register(adminReportRoutes);
+  }
   await app.register(aiRoutes);
   await app.register(aiEthicsRoutes);
   await app.register(threatIntelRoutes);

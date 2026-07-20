@@ -67,11 +67,10 @@ cp packages/api/.env.example packages/api/.env   # then edit per the local-dev g
 npm run db:migrate && npm run dev                # API on :4000
 ```
 
-Then in two more terminals:
+Then in one more terminal:
 
 ```bash
 NEXT_PUBLIC_API_URL=http://localhost:4000 npm run dev --workspace=packages/portal   # :3001
-NEXT_PUBLIC_API_URL=http://localhost:4000 npm run dev --workspace=packages/admin    # :3003
 ```
 
 Log in at http://localhost:3001 with the seeded dev user `admin@acme.com` /
