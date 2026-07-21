@@ -82,13 +82,27 @@ gh api -X PATCH repos/blackfyre-security/blackfyre \
 
 ## 5. Enable secret scanning + Dependabot security alerts
 
-```bash
-gh api -X PUT repos/blackfyre-security/blackfyre/secret-scanning/push-protection \
-  -F enabled=true
+Native secret scanning, push protection, and private vulnerability reporting are
+now wrapped in a dry-run-by-default helper — [`scripts/enable-repo-security.sh`](../scripts/enable-repo-security.sh).
+Preview first, then apply:
 
+```bash
+./scripts/enable-repo-security.sh          # dry-run — prints the exact API calls
+./scripts/enable-repo-security.sh --apply  # secret scanning + push protection + PVR
+```
+
+Dependabot security alerts + automated fixes still go through `gh api` directly:
+
+```bash
 gh api -X PUT repos/blackfyre-security/blackfyre/vulnerability-alerts
 gh api -X PUT repos/blackfyre-security/blackfyre/automated-security-fixes
 ```
+
+Repo content is additionally scanned by the [`Secret scan`](../.github/workflows/gitleaks.yml)
+gitleaks workflow, which runs on every PR/push to `main`/`staging` (blocking) and
+sweeps the full git history weekly. That gate lives in the tree and needs no admin
+setup — it's already active. When requiring status checks in step 1, its check name
+is `Secret scan / gitleaks`.
 
 ## 6. Delete merged feature branches
 
