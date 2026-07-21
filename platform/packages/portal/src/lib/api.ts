@@ -129,7 +129,11 @@ class ApiClient {
       const err = await res
         .json()
         .catch(() => ({ error: { message: res.statusText } }));
-      throw new Error(err.error?.message || `HTTP ${res.status}`);
+      // Two error shapes reach here: the API's own { error: { message } }, and
+      // Fastify's built-in { statusCode, error, message } for things it rejects
+      // before a handler runs (payload too large, malformed JSON). Reading only the
+      // former turned those into a bare "HTTP 413" with no explanation.
+      throw new Error(err.error?.message || err.message || `HTTP ${res.status}`);
     }
     return res.json();
   }
@@ -318,7 +322,6 @@ class ApiClient {
   uploadEvidence(data: {
     findingId: string;
     type: EvidenceType;
-    collectedBy: string;
     framework?: string;
     content: string;
     contentEncoding: "utf8" | "base64";

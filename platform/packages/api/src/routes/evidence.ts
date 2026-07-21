@@ -8,7 +8,7 @@ import { requireUUID } from "../utils/security-fixes.js";
 import { auditorScopePreHandler } from "../plugins/auditor-scope.js";
 import type { EvidenceJobData } from "../workers/evidence-worker.js";
 import { eq, and } from "drizzle-orm";
-import { reports } from "../db/schema.js";
+import { reports, users } from "../db/schema.js";
 
 export const evidenceRoutes: FastifyPluginAsync = async (app) => {
   // Auditors can read evidence (scoped to their frameworks)
@@ -73,8 +73,19 @@ export const evidenceRoutes: FastifyPluginAsync = async (app) => {
     const body = createEvidenceSchema.parse(request.body);
     const service = new EvidenceService(app.db);
 
+    // Attribution comes from the session, never from the request body. The portal
+    // used to send a filename here, so the vault credited "report.pdf" as the
+    // collector; and a client-supplied value on an audit artefact is attestable to
+    // nobody. Fall back to the user id if the row has no email.
+    const [collector] = await request.db!
+      .select({ email: users.email })
+      .from(users)
+      .where(eq(users.id, request.userId))
+      .limit(1);
+    const collectedBy = collector?.email ?? request.userId;
+
     // Create DB record first (pending state -- no S3 key yet)
-    const created = await service.create(request.tenantId, body);
+    const created = await service.create(request.tenantId, { ...body, collectedBy });
 
     // Queue the S3 upload job to evidence worker
     const jobData: EvidenceJobData = {
@@ -85,7 +96,7 @@ export const evidenceRoutes: FastifyPluginAsync = async (app) => {
       type: body.type,
       content: (request.body as any).content ?? "",
       contentEncoding: (request.body as any).contentEncoding === "base64" ? "base64" : "utf8",
-      collectedBy: body.collectedBy,
+      collectedBy,
     };
 
     await app.evidenceQueue.add("evidence.upload", jobData);

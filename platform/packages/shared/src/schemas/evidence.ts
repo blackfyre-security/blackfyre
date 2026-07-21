@@ -6,7 +6,9 @@ import { RemediationStatus } from "../types/remediation.js";
 export const createEvidenceSchema = z.object({
   findingId: z.string().uuid(),
   type: z.nativeEnum(EvidenceType),
-  collectedBy: z.string().min(1).max(200),
+  // Server-derived from the session (routes/evidence.ts). Optional here for
+  // backward compatibility with existing clients; any value sent is ignored.
+  collectedBy: z.string().min(1).max(200).optional(),
 });
 export type CreateEvidencePayload = z.infer<typeof createEvidenceSchema>;
 

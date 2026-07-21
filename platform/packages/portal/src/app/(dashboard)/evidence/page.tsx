@@ -135,7 +135,6 @@ function UploadModal({ onClose, onUploaded }: { onClose: () => void; onUploaded:
       await api.uploadEvidence({
         findingId,
         type,
-        collectedBy: name || file.name,
         ...(framework ? { framework } : {}),
         content: await fileToBase64(file),
         contentEncoding: "base64",

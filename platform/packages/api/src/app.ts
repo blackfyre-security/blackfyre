@@ -84,6 +84,12 @@ declare module "fastify" {
 export async function buildApp(config: Config): Promise<FastifyInstance> {
   const app = Fastify({
     logger: config.NODE_ENV !== "test",
+    // Evidence is posted as base64 in a JSON body, which inflates payloads by 4/3.
+    // Fastify's 1 MiB default therefore capped usable evidence at roughly 750 KB.
+    // 12 MiB leaves ~9 MB of real file. Note AWS Lambda caps request payloads at
+    // 6 MB regardless, so a deployed install is bounded below this; presigned
+    // direct-to-S3 upload is the right long-term shape for large artefacts.
+    bodyLimit: 12 * 1024 * 1024,
   });
 
   // CORS — enterprise-hardened (GAP-014).
