@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { api } from "@/lib/api";
 import type { AuditLogEntry } from "@/lib/api";
 import { LoadingSpinner } from "@blackfyre/ui";
@@ -12,8 +12,9 @@ import { LoadingSpinner } from "@blackfyre/ui";
  * not part of the open-source release (ADR-0005) — so a self-hosted install wrote
  * an audit trail nobody could read. This is that reader.
  *
- * Paging uses the API's composite (createdAt, id) cursor. Both halves must be
- * passed back or entries sharing a timestamp get skipped.
+ * Paging sends back the last row's id as the cursor; the API resolves its exact
+ * (created_at, id) position server-side. Serialising the timestamp would truncate
+ * microseconds to milliseconds and silently drop rows.
  */
 
 const outcomeConfig: Record<string, { style: React.CSSProperties; label: string }> = {
@@ -27,26 +28,28 @@ export default function AuditLogsPage() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [outcome, setOutcome] = useState<"" | "success" | "failure">("");
-  const [cursor, setCursor] = useState<{ before: string; beforeId: string } | null>(null);
   const [hasMore, setHasMore] = useState(false);
+
+  // The cursor lives in a ref, not state. `load` is memoised on [outcome], so a
+  // state cursor would be captured at the render where outcome last changed —
+  // permanently null after mount — and "Load more" would silently re-fetch page 1
+  // and append duplicates. A ref is read at call time, so it is always current.
+  const cursorRef = useRef<string | null>(null);
 
   const load = useCallback(
     async (reset: boolean) => {
+        if (reset) cursorRef.current = null;
       reset ? setLoading(true) : setLoadingMore(true);
       setError(null);
       try {
         const res = await api.getAuditLogs({
           limit: 50,
           ...(outcome ? { outcome } : {}),
-          ...(!reset && cursor ? cursor : {}),
+          ...(!reset && cursorRef.current ? { beforeId: cursorRef.current } : {}),
         });
         setEntries((prev) => (reset ? res.entries : [...prev, ...res.entries]));
         setHasMore(res.hasMore);
-        setCursor(
-          res.hasMore && res.nextBefore && res.nextBeforeId
-            ? { before: res.nextBefore, beforeId: res.nextBeforeId }
-            : null,
-        );
+        cursorRef.current = res.hasMore ? res.nextBeforeId : null;
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load the audit trail");
       } finally {
@@ -54,9 +57,6 @@ export default function AuditLogsPage() {
         setLoadingMore(false);
       }
     },
-    // `cursor` is deliberately excluded: it is read only on the load-more path and
-    // including it would re-run the reset effect on every page.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [outcome],
   );
 

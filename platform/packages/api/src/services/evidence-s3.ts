@@ -24,11 +24,17 @@ export class EvidenceS3Service {
     framework: string,
     findingId: string,
     content: Buffer | string,
+    contentEncoding: "utf8" | "base64" = "utf8",
   ): Promise<{ s3Key: string; sha256Hex: string }> {
-    const buf = typeof content === "string" ? Buffer.from(content) : content;
+    // Decode before hashing and storing. Hashing the base64 text instead of the
+    // bytes it represents would make the record "content-verified" over the wrong
+    // thing, which on an evidence vault is worse than not hashing at all.
+    const buf = typeof content === "string" ? Buffer.from(content, contentEncoding) : content;
     const sha256Hex = createHash("sha256").update(buf).digest("hex");
     const sha256Base64 = Buffer.from(sha256Hex, "hex").toString("base64");
-    const s3Key = `${tenantId}/${framework}/${findingId}/${randomUUID()}.json`;
+    // Binary evidence is not JSON; only label it so when it actually is.
+    const isBinary = contentEncoding === "base64";
+    const s3Key = `${tenantId}/${framework}/${findingId}/${randomUUID()}${isBinary ? ".bin" : ".json"}`;
 
     await this.client.send(
       new PutObjectCommand({
@@ -36,7 +42,7 @@ export class EvidenceS3Service {
         Key: s3Key,
         Body: buf,
         ChecksumSHA256: sha256Base64,
-        ContentType: "application/json",
+        ContentType: isBinary ? "application/octet-stream" : "application/json",
       }),
     );
 

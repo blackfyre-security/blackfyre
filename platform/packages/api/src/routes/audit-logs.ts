@@ -1,5 +1,5 @@
 import type { FastifyPluginAsync } from "fastify";
-import { and, desc, eq, lt, or } from "drizzle-orm";
+import { and, desc, eq, lt, or, sql } from "drizzle-orm";
 import { z } from "zod";
 import { auditLogs } from "../db/schema.js";
 
@@ -22,14 +22,12 @@ const querySchema = z.object({
   // Keyset pagination. Offset pagination on an append-heavy table drifts as rows
   // arrive mid-scroll and degrades on large tenants.
   //
-  // The cursor is the PAIR (createdAt, id), not createdAt alone. `created_at`
-  // defaults to now(), which is transaction-stable, so every row written in one
-  // transaction shares an identical timestamp; a page boundary landing inside such
-  // a group would skip the rest of it forever. A JS Date is also only
-  // millisecond-precision against a microsecond column, which loses rows the same
-  // way. Both are unacceptable on an audit trail — silently omitting entries is
-  // exactly what this route exists to prevent.
-  before: z.coerce.date().optional(),
+  // The cursor is the id of the last row returned — NOT a timestamp. created_at is
+  // timestamptz (microseconds); a JS Date, and the ISO string it serialises to, are
+  // millisecond-precision. Round-tripping the timestamp truncates it, so every row
+  // in the sub-millisecond remainder falls outside both branches of the comparison
+  // and is silently skipped. Passing only the id lets Postgres resolve the exact
+  // stored value server-side, at full precision.
   beforeId: z.string().uuid().optional(),
   action: z.string().max(100).optional(),
   outcome: z.enum(["success", "failure"]).optional(),
@@ -44,17 +42,18 @@ export const auditLogRoutes: FastifyPluginAsync = async (app) => {
     const q = querySchema.parse(request.query);
 
     const predicates = [eq(auditLogs.tenantId, request.tenantId)];
-    // (createdAt, id) < (before, beforeId), expressed for Postgres via OR so the
-    // composite index is still usable.
-    if (q.before && q.beforeId) {
+    // (created_at, id) < (SELECT created_at, id FROM audit_logs WHERE id = cursor)
+    // Row-comparison form, so Postgres can range-scan it, and the boundary values
+    // never leave the database. The subquery is tenant-scoped too: a cursor naming
+    // another tenant's row resolves to NULL, the comparison is NULL, and the page
+    // comes back empty rather than leaking an ordering position.
+    if (q.beforeId) {
       predicates.push(
-        or(
-          lt(auditLogs.createdAt, q.before),
-          and(eq(auditLogs.createdAt, q.before), lt(auditLogs.id, q.beforeId)),
-        )!,
+        sql`(${auditLogs.createdAt}, ${auditLogs.id}) < (
+          SELECT a2.created_at, a2.id FROM audit_logs a2
+          WHERE a2.id = ${q.beforeId} AND a2.tenant_id = ${request.tenantId}
+        )`,
       );
-    } else if (q.before) {
-      predicates.push(lt(auditLogs.createdAt, q.before));
     }
     if (q.action) predicates.push(eq(auditLogs.action, q.action));
     if (q.outcome) predicates.push(eq(auditLogs.outcome, q.outcome));
@@ -87,8 +86,7 @@ export const auditLogRoutes: FastifyPluginAsync = async (app) => {
         // fragments. Summary fields above are the vetted surface.
       })),
       hasMore,
-      // Both halves of the cursor — pass them back as `before` and `beforeId`.
-      nextBefore: hasMore ? page[page.length - 1]?.createdAt ?? null : null,
+      // Pass this back as `beforeId` to fetch the next page.
       nextBeforeId: hasMore ? page[page.length - 1]?.id ?? null : null,
     };
   });

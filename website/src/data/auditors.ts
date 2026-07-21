@@ -88,7 +88,11 @@ export const AUDITOR_COUNT = AUDITORS.length; // 55
 // catalogue size: several catalogue entries are on-prem auditors that need
 // optional dependencies, or wrappers around the container scanners. Quoting 55 as
 // scanning capability overstates what a default install actually does.
-export const SDK_AUDITOR_COUNT = 41;
+// Derived, not asserted. Container and IaC entries are wrappers around Prowler /
+// Checkov / Semgrep / Bandit rather than in-process SDK auditors, so they are
+// excluded from any claim about SDK scanning coverage.
+const NON_SDK_CLOUDS = new Set<AuditorCloud>(["container", "iac"]);
+export const SDK_AUDITOR_COUNT = AUDITORS.filter((a) => !NON_SDK_CLOUDS.has(a.cloud)).length;
 export const AUDITOR_CLOUDS: readonly AuditorCloud[] = ["aws", "azure", "container", "gcp", "iac", "multi", "other"];
 export const AUDITOR_CATEGORIES: readonly AuditorCategory[] = ["compute", "container", "database", "encryption", "iam", "logging", "monitoring", "networking", "other", "storage"];
 export const SCANNER_TYPES: readonly string[] = ["SDK auditors (TypeScript, cloud SDK-backed agents in packages/api/src/agents)", "AWS/Azure/GCP granular sub-auditors (auditXxx functions, 43 total)", "Active Directory (LDAP) auditors", "SNMP / network-device auditors", "Identity (Okta/Entra/Google Workspace) auditor", "Endpoint EDR/MDM (Jamf/Intune/CrowdStrike) auditor", "Network scanner (ports/TLS/DNS/headers)", "Kubernetes CIS auditor", "Container Registry auditor", "Code Repository (GitHub/GitLab) auditor", "SaaS security auditor", "OT/SCADA passive collector", "Prowler deep scan (container Lambda, 900+ AWS checks)", "Checkov (IaC, container Lambda)", "Semgrep (SAST, container Lambda)", "Bandit (Python SAST, container Lambda)"];

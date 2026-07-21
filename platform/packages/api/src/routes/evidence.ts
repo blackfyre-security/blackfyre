@@ -84,6 +84,7 @@ export const evidenceRoutes: FastifyPluginAsync = async (app) => {
       framework: (request.body as any).framework ?? "",
       type: body.type,
       content: (request.body as any).content ?? "",
+      contentEncoding: (request.body as any).contentEncoding === "base64" ? "base64" : "utf8",
       collectedBy: body.collectedBy,
     };
 

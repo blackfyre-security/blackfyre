@@ -11,7 +11,11 @@ export interface EvidenceJobData {
   findingId: string;
   framework: string;
   type: string;
-  content: string;      // JSON string or base64 for binary
+  content: string;      // JSON/text, or base64 when contentEncoding is "base64"
+  // How `content` is encoded. Without this the uploader defaulted to utf8, so a
+  // base64-encoded binary upload was stored as the base64 TEXT — the S3 object was
+  // unopenable and sha256Hash covered the encoding rather than the evidence.
+  contentEncoding?: "utf8" | "base64";
   collectedBy: string;
 }
 
@@ -43,6 +47,7 @@ export async function handler(event: SQSEvent): Promise<void> {
         data.framework,
         data.findingId,
         data.content,
+        data.contentEncoding ?? "utf8",
       );
 
       // Update DB record with real S3 key and hash

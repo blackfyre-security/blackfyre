@@ -106,7 +106,6 @@ function UploadModal({ onClose, onUploaded }: { onClose: () => void; onUploaded:
   const [name, setName] = useState("");
   const [type, setType] = useState<EvidenceType>("document");
   const [framework, setFramework] = useState("");
-  const [controlId, setControlId] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -139,6 +138,7 @@ function UploadModal({ onClose, onUploaded }: { onClose: () => void; onUploaded:
         collectedBy: name || file.name,
         ...(framework ? { framework } : {}),
         content: await fileToBase64(file),
+        contentEncoding: "base64",
       });
       onUploaded();
       onClose();
@@ -212,7 +212,7 @@ function UploadModal({ onClose, onUploaded }: { onClose: () => void; onUploaded:
               <label className="block text-xs font-medium mb-1.5" style={{ color: "var(--text-secondary)" }}>Framework</label>
               <select
                 value={framework}
-                onChange={(e) => { setFramework(e.target.value); setControlId(""); }}
+                onChange={(e) => setFramework(e.target.value)}
                 className="input"
               >
                 <option value="">Select framework...</option>
@@ -221,21 +221,12 @@ function UploadModal({ onClose, onUploaded }: { onClose: () => void; onUploaded:
             </div>
           </div>
 
-          {framework && CONTROLS[framework] && (
-            <div>
-              <label className="block text-xs font-medium mb-1.5" style={{ color: "var(--text-secondary)" }}>Control ID</label>
-              <select
-                value={controlId}
-                onChange={(e) => setControlId(e.target.value)}
-                className="input"
-              >
-                <option value="">Select control...</option>
-                {CONTROLS[framework].map(c => (
-                  <option key={c.id} value={c.id}>{c.id} — {c.name}</option>
-                ))}
-              </select>
-            </div>
-          )}
+          {/*
+            The Control ID picker was removed with the multipart rewrite: the
+            evidence table has no control_id column and POST /api/evidence never
+            persisted it, so the field asked the user to make a choice that was
+            silently discarded. Control mapping happens through the finding.
+          */}
 
           <div>
             <label className="block text-xs font-medium mb-1.5" style={{ color: "var(--text-secondary)" }}>File</label>

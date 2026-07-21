@@ -377,14 +377,18 @@ export default function SignupPage() {
                 </div>
 
                 <div className="flex gap-3 mt-2">
-                  <button
-                    type="button"
-                    className="btn btn-lg"
-                    style={{ flex: 1 }}
-                    onClick={() => { setStep("plan"); setError(""); }}
-                  >
-                    Back
-                  </button>
+                  {/* Self-hosted skips plan selection, so Back would bounce straight
+                      back here. Hide it rather than render a dead control. */}
+                  {!selfHosted && (
+                    <button
+                      type="button"
+                      className="btn btn-lg"
+                      style={{ flex: 1 }}
+                      onClick={() => { setStep("plan"); setError(""); }}
+                    >
+                      Back
+                    </button>
+                  )}
                   <button
                     type="submit"
                     className="btn btn-primary btn-lg"

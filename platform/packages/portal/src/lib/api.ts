@@ -321,6 +321,7 @@ class ApiClient {
     collectedBy: string;
     framework?: string;
     content: string;
+    contentEncoding: "utf8" | "base64";
   }) {
     return this.request<{ evidence: EvidenceArtifact }>("POST", "/api/evidence", data);
   }
@@ -351,7 +352,7 @@ class ApiClient {
   }
 
   // --- Audit log ---
-  getAuditLogs(params?: { limit?: number; before?: string; beforeId?: string; action?: string; outcome?: "success" | "failure" }) {
+  getAuditLogs(params?: { limit?: number; beforeId?: string; action?: string; outcome?: "success" | "failure" }) {
     const qs = params
       ? "?" + new URLSearchParams(
           Object.entries(params)
@@ -362,7 +363,6 @@ class ApiClient {
     return this.request<{
       entries: AuditLogEntry[];
       hasMore: boolean;
-      nextBefore: string | null;
       nextBeforeId: string | null;
     }>("GET", `/api/audit-logs${qs}`);
   }
