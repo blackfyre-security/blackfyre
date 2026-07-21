@@ -79,7 +79,11 @@ const envSchema = z.object({
   // HTTP, and the zero-leakage plugin has no exempt path prefix.
   PLATFORM_ADMIN_API: z.enum(["true", "false"]).default("false"),
 
-  // Whether this deployment lets someone register without paying.
+  // Whether this deployment allows self-service registration at all.
+  //
+  // ENFORCED SERVER-SIDE in routes/auth.ts, not merely reflected in the portal:
+  // POST /api/auth/register is unauthenticated and mints an owner on a paid-tier
+  // tenant, so a client-side check was never a control.
   //
   // Deliberately NOT inferred from "is a payment gateway configured". Inferring it
   // means a secrets-manager blip that empties RAZORPAY_KEY_ID silently converts a
