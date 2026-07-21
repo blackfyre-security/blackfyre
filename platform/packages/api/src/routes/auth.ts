@@ -4,7 +4,7 @@ import { users, apiKeys, auditorFrameworks, refreshTokens, tenants } from "../db
 import { loginSchema, refreshSchema, apiKeyCreateSchema, mfaVerifySchema, registerSchema } from "@blackfyre/shared";
 import type { UserRole } from "@blackfyre/shared";
 import { verifyPassword, hashPassword } from "../utils/password.js";
-import { badRequest, unauthorized } from "../utils/errors.js";
+import { badRequest, unauthorized, forbidden } from "../utils/errors.js";
 // SECURITY FIX (BLACKFYRE audit 2026-06-05): never log raw emails/PII — fingerprint them.
 import { redactSecretString } from "../lib/redact.js";
 import { nanoid } from "nanoid";
@@ -997,6 +997,26 @@ export const authRoutes: FastifyPluginAsync = async (app) => {
 
   // POST /api/auth/register — self-service signup
   app.post("/api/auth/register", async (request, reply) => {
+    // Self-service registration is an explicit deployment capability, enforced
+    // here rather than only in the portal. Previously this endpoint was
+    // unauthenticated and unconditional: anyone could curl it and receive an owner
+    // account on a `comply`-plan tenant, and the portal's checkout was the only
+    // thing resembling a gate — a client-side boolean, which is not an access
+    // control.
+    //
+    // Nothing working is lost by enforcing it. The paid signup path cannot
+    // complete today regardless: POST /api/payments/create-order and
+    // /api/payments/verify both sit behind requireRole("owner","admin"), but the
+    // portal calls create-order BEFORE the account exists, so it 401s and the
+    // client bounces to /login. Binding registration to a verified gateway order
+    // is the real fix for a paid deployment and is not attempted here; until then
+    // an operator opts in deliberately.
+    if (app.config.ALLOW_UNPAID_REGISTRATION !== "true") {
+      throw forbidden(
+        "Self-service registration is disabled on this deployment. Set ALLOW_UNPAID_REGISTRATION=true to enable it (the default for self-hosting), or have an administrator invite you from Settings → Team.",
+      );
+    }
+
     const body = registerSchema.parse(request.body);
 
     const [existing] = await app.superDb

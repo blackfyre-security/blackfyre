@@ -1,3 +1,4 @@
+-- @dev-only
 -- Migration 018 — Seed platform-admin account for Blackfyre staff
 -- Guarded by `app.env = 'development'`: this only runs in dev / staging
 -- (the migrate Lambda sets that explicitly). Production is untouched.

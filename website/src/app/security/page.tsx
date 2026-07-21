@@ -32,7 +32,7 @@ import { FRAMEWORK_COUNT, TOTAL_CONTROLS } from "@/data/frameworks";
 export const metadata: Metadata = {
   title: "Security — Blackfyre",
   description:
-    "How Blackfyre stays safe: read-only least-privilege scanning, database-enforced tenant isolation, tamper-evident evidence, and private vulnerability disclosure — all in the open.",
+    "How Blackfyre stays safe: read-only least-privilege scanning, database-enforced tenant isolation, hash-verified evidence, and private vulnerability disclosure — all in the open.",
 };
 
 // Resolve a docs URL by a title fragment so links stay bound to the single
@@ -180,7 +180,7 @@ const REQUEST_PATH = [
   { n: "04", title: "Read a row", desc: "Row-level security enforces isolation in the database, below the ORM — not in application code." },
 ];
 
-// § 04 — tamper-evident evidence ---------------------------------------------
+// § 04 — hash-verified evidence ---------------------------------------------
 const EVIDENCE = [
   {
     label: "INTEGRITY",
@@ -230,7 +230,7 @@ export default function SecurityPage() {
                 <>
                   Blackfyre is a compliance and security platform, so its own controls are engineered,
                   documented, and <strong className="font-semibold text-zinc-900">auditable line by line</strong> in
-                  a public repository. Read-only scanning, database-enforced isolation, tamper-evident
+                  a public repository. Read-only scanning, database-enforced isolation, hash-verified
                   evidence, and a private disclosure process. No trust required — verify it yourself.
                 </>
               }

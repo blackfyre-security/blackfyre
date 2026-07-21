@@ -2,6 +2,13 @@ import { describe, it, expect } from "vitest";
 import { SwarmOrchestrator } from "../../src/agents/swarm-orchestrator.js";
 import { getAllAgents, getAgent, getAgentsForIntegration } from "../../src/agents/registry.js";
 
+// This file deliberately loads the agent registry, which imports every auditor
+// module and with them the AWS, Azure and GCP SDKs. That is genuinely expensive
+// (~9s for the import assertion alone) and it is the point of the test, not a
+// bug. Give these two files room rather than raising the global testTimeout —
+// the suite-wide 15s limit stays tight so a real hang elsewhere still fails.
+vi.setConfig({ testTimeout: 60_000 });
+
 describe("Agent Registry", () => {
   it("has all scanning agents registered", () => {
     const agents = getAllAgents();

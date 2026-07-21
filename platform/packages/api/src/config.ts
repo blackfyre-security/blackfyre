@@ -68,6 +68,33 @@ const envSchema = z.object({
   PROWLER_SCANNER_ARN: z.string().default(""),
   IAC_SCANNER_ARN: z.string().default(""),
 
+  // Platform-admin API — OFF by default.
+  //
+  // These routes are the multi-tenant OPERATOR surface for a hosted Blackfyre
+  // service: cross-tenant reads, tenant provisioning, billing, the marketing
+  // contact inbox. A self-hosted install is a single tenant and never needs
+  // them, so they are not registered unless this is explicitly set to "true".
+  //
+  // Leaving them off also means `users.is_platform_admin` grants nothing over
+  // HTTP, and the zero-leakage plugin has no exempt path prefix.
+  PLATFORM_ADMIN_API: z.enum(["true", "false"]).default("false"),
+
+  // Whether this deployment allows self-service registration at all.
+  //
+  // ENFORCED SERVER-SIDE in routes/auth.ts, not merely reflected in the portal:
+  // POST /api/auth/register is unauthenticated and mints an owner on a paid-tier
+  // tenant, so a client-side check was never a control.
+  //
+  // Deliberately NOT inferred from "is a payment gateway configured". Inferring it
+  // means a secrets-manager blip that empties RAZORPAY_KEY_ID silently converts a
+  // paid deployment into a free one — a loud broken checkout becomes a silent
+  // giveaway. This is an explicit operator decision, defaulting to "false" so the
+  // failure mode is a visible checkout rather than free accounts.
+  //
+  // Self-hosting sets this to "true" (see packages/api/.env.example): there is
+  // nobody to bill when you are hosting the software yourself.
+  ALLOW_UNPAID_REGISTRATION: z.enum(["true", "false"]).default("false"),
+
   // Razorpay — leave empty to disable payment processing
   RAZORPAY_KEY_ID: z.string().default(""),
   RAZORPAY_KEY_SECRET: z.string().default(""),

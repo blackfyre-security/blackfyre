@@ -6,12 +6,11 @@
     "packages/ui",
     "packages/api",
     "packages/portal",
-    "packages/admin",
     "packages/cli"
   ],
   "scripts": {
     "dev": "npm run dev --workspace=packages/api",
-    "dev:all": "concurrently -k -n api,portal,admin -c blue,green,magenta \"npm run dev --workspace=packages/api\" \"NEXT_PUBLIC_API_URL=http://localhost:4000 npm run dev --workspace=packages/portal\" \"NEXT_PUBLIC_API_URL=http://localhost:4000 npm run dev --workspace=packages/admin\"",
+    "dev:all": "concurrently -k -n api,portal -c blue,green \"npm run dev --workspace=packages/api\" \"NEXT_PUBLIC_API_URL=http://localhost:4000 npm run dev --workspace=packages/portal\"",
     "build": "npm run build --workspace=packages/shared && npm run build --workspace=packages/api",
     "test": "npm run test --workspace=packages/api",
     "db:up": "docker compose up -d",

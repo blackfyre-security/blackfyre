@@ -61,6 +61,25 @@ proportions, added elements).
 - Apply to **register** the marks (or confusingly similar ones) as your own
   trademarks anywhere.
 
+## Third-party marks
+
+Blackfyre integrates several independent open-source security tools, which it
+installs unmodified and runs as separate processes. Their names appear in this
+repository only to describe that integration accurately — nominative use, the
+same courtesy this policy asks of others:
+
+- **Prowler** is a trademark of Prowler Cloud.
+- **Checkov** is a trademark of Palo Alto Networks (Prisma Cloud).
+- **Semgrep** is a trademark of Semgrep, Inc.
+- **Bandit** is a project of the Python Code Quality Authority (PyCQA).
+- **AWS**, **Azure**, and **Google Cloud** are trademarks of Amazon.com, Inc.,
+  Microsoft Corporation, and Google LLC respectively.
+
+Blackfyre is not affiliated with, endorsed by, or sponsored by any of these
+projects or companies. Apache-2.0 §6 grants no trademark rights in either
+direction. Component licences are listed in
+[THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
+
 ## Asking
 
 Open a [GitHub Discussion](https://github.com/blackfyre-security/blackfyre/discussions)

@@ -88,29 +88,57 @@ const typeConfig: Record<EvidenceType, { style: React.CSSProperties; label: stri
   config: { style: { background: "var(--high-bg)", color: "var(--high-text)" }, label: "Config" },
 };
 
+// Reads a File as base64 so binary evidence survives the JSON transport intact.
+function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error("Could not read the selected file"));
+    reader.onload = () => {
+      const result = String(reader.result ?? "");
+      // strip the "data:<mime>;base64," prefix
+      resolve(result.slice(result.indexOf(",") + 1));
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
 function UploadModal({ onClose, onUploaded }: { onClose: () => void; onUploaded: () => void }) {
   const [name, setName] = useState("");
   const [type, setType] = useState<EvidenceType>("document");
   const [framework, setFramework] = useState("");
-  const [controlId, setControlId] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
+  // Evidence hangs off a finding in the data model (evidence.finding_id is NOT
+  // NULL), so one has to be chosen. The modal previously collected only a file and
+  // posted multipart, which the API cannot parse and which carried no findingId —
+  // upload could never have succeeded.
+  const [findings, setFindings] = useState<{ id: string; title: string }[]>([]);
+  const [findingId, setFindingId] = useState("");
+
+  useEffect(() => {
+    api
+      .getFindings({ limit: "100" })
+      .then((res) => setFindings(res.findings.map((f) => ({ id: f.id, title: f.title }))))
+      .catch(() => setFindings([]));
+  }, []);
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!findingId) { setError("Choose the finding this evidence supports."); return; }
     if (!file) { setError("Please select a file."); return; }
     setUploading(true);
     setError(null);
     try {
-      const fd = new FormData();
-      fd.append("file", file);
-      fd.append("name", name || file.name);
-      fd.append("type", type);
-      if (framework) fd.append("framework", framework);
-      if (controlId) fd.append("controlId", controlId);
-      await api.uploadEvidence(fd);
+      await api.uploadEvidence({
+        findingId,
+        type,
+        ...(framework ? { framework } : {}),
+        content: await fileToBase64(file),
+        contentEncoding: "base64",
+      });
       onUploaded();
       onClose();
     } catch (err) {
@@ -140,6 +168,21 @@ function UploadModal({ onClose, onUploaded }: { onClose: () => void; onUploaded:
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
+            <label className="block text-xs font-medium mb-1.5" style={{ color: "var(--text-secondary)" }}>Finding</label>
+            <select value={findingId} onChange={(e) => setFindingId(e.target.value)} className="input" required>
+              <option value="">Select the finding this supports...</option>
+              {findings.map((f) => (
+                <option key={f.id} value={f.id}>{f.title}</option>
+              ))}
+            </select>
+            {findings.length === 0 && (
+              <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>
+                No findings yet — run a scan first.
+              </p>
+            )}
+          </div>
+
+          <div>
             <label className="block text-xs font-medium mb-1.5" style={{ color: "var(--text-secondary)" }}>Display Name</label>
             <input
               type="text"
@@ -168,7 +211,7 @@ function UploadModal({ onClose, onUploaded }: { onClose: () => void; onUploaded:
               <label className="block text-xs font-medium mb-1.5" style={{ color: "var(--text-secondary)" }}>Framework</label>
               <select
                 value={framework}
-                onChange={(e) => { setFramework(e.target.value); setControlId(""); }}
+                onChange={(e) => setFramework(e.target.value)}
                 className="input"
               >
                 <option value="">Select framework...</option>
@@ -177,21 +220,12 @@ function UploadModal({ onClose, onUploaded }: { onClose: () => void; onUploaded:
             </div>
           </div>
 
-          {framework && CONTROLS[framework] && (
-            <div>
-              <label className="block text-xs font-medium mb-1.5" style={{ color: "var(--text-secondary)" }}>Control ID</label>
-              <select
-                value={controlId}
-                onChange={(e) => setControlId(e.target.value)}
-                className="input"
-              >
-                <option value="">Select control...</option>
-                {CONTROLS[framework].map(c => (
-                  <option key={c.id} value={c.id}>{c.id} — {c.name}</option>
-                ))}
-              </select>
-            </div>
-          )}
+          {/*
+            The Control ID picker was removed with the multipart rewrite: the
+            evidence table has no control_id column and POST /api/evidence never
+            persisted it, so the field asked the user to make a choice that was
+            silently discarded. Control mapping happens through the finding.
+          */}
 
           <div>
             <label className="block text-xs font-medium mb-1.5" style={{ color: "var(--text-secondary)" }}>File</label>
@@ -271,13 +305,33 @@ export default function EvidencePage() {
 
   useEffect(() => { fetchEvidence(); }, [frameworkFilter, typeFilter, dateFrom, dateTo]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // The API returns a short-lived presigned URL as JSON; resolve it, then navigate.
+  async function handleDownload(id: string) {
+    try {
+      const url = await api.downloadEvidence(id);
+      window.open(url, "_blank", "noopener,noreferrer");
+    } catch (err) {
+      setVerifyResults((prev) => ({
+        ...prev,
+        [id]: { ok: false, msg: err instanceof Error ? err.message : "Download failed" },
+      }));
+    }
+  }
+
   async function handleVerify(id: string) {
     setVerifyingId(id);
     try {
-      const res = await api.verifyEvidence(id);
+      const { integrity } = await api.verifyEvidence(id);
       setVerifyResults((prev) => ({
         ...prev,
-        [id]: { ok: res.verified, msg: res.verified ? "Hash verified" : `Mismatch: expected ${res.storedHash.slice(0, 8)}... got ${res.hash.slice(0, 8)}...` },
+        [id]: {
+          ok: integrity.valid,
+          // The API explains *why* a record is not verifiable (metadata-only hash,
+          // not yet uploaded). Surface that rather than a bare "mismatch".
+          msg: integrity.valid
+            ? "Hash verified against stored content"
+            : integrity.reason ?? `Mismatch (expected ${integrity.expected.slice(0, 8)}…)`,
+        },
       }));
     } catch (err) {
       setVerifyResults((prev) => ({
@@ -411,8 +465,8 @@ export default function EvidencePage() {
                 <th scope="col">Name</th>
                 <th scope="col" className="w-28">Type</th>
                 <th scope="col" className="w-28">Framework</th>
-                <th scope="col" className="w-24">Control ID</th>
-                <th scope="col" className="w-28">Upload Date</th>
+                <th scope="col" className="w-32">Integrity</th>
+                <th scope="col" className="w-28">Collected</th>
                 <th scope="col" className="w-44">SHA-256</th>
                 <th scope="col" className="w-44">Actions</th>
               </tr>
@@ -424,8 +478,10 @@ export default function EvidencePage() {
                 return (
                   <tr key={item.id}>
                     <td>
-                      <p className="font-medium" style={{ color: "var(--text-primary)" }}>{item.name}</p>
-                      <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>{item.uploadedBy}</p>
+                      <p className="font-medium" style={{ color: "var(--text-primary)" }}>
+                        {item.storagePath?.split("/").pop() || tc.label}
+                      </p>
+                      <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>{item.collectedBy}</p>
                     </td>
                     <td>
                       <span className="inline-block px-2.5 py-0.5 rounded-md text-xs font-medium" style={tc.style}>
@@ -433,8 +489,13 @@ export default function EvidencePage() {
                       </span>
                     </td>
                     <td style={{ color: "var(--text-secondary)" }}>{item.framework ?? "--"}</td>
-                    <td className="font-mono text-xs" style={{ color: "var(--text-secondary)" }}>{item.controlId ?? "--"}</td>
-                    <td style={{ color: "var(--text-secondary)" }}>{item.uploadedAt.split("T")[0]}</td>
+                    <td className="font-mono text-xs" style={{ color: "var(--text-secondary)" }}>
+                      {/* What the hash actually covers — see EvidenceArtifact.hashSource. */}
+                      {item.integrityVerified ? "content-hashed" : item.hashSource}
+                    </td>
+                    <td style={{ color: "var(--text-secondary)" }}>
+                      {item.collectedAt ? String(item.collectedAt).split("T")[0] : "--"}
+                    </td>
                     <td>
                       <span className="font-mono text-xs" style={{ color: "var(--text-muted)" }} title={item.sha256Hash}>
                         {item.sha256Hash.slice(0, 16)}...
@@ -453,14 +514,13 @@ export default function EvidencePage() {
                         >
                           {verifyingId === item.id ? "Checking..." : "Verify"}
                         </button>
-                        <a
-                          href={api.downloadEvidence(item.id)}
-                          download
+                        <button
+                          onClick={() => void handleDownload(item.id)}
                           className="text-xs font-medium transition-colors"
                           style={{ color: "var(--accent)" }}
                         >
                           Download
-                        </a>
+                        </button>
                       </div>
                     </td>
                   </tr>

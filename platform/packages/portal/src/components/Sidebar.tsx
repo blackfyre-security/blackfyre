@@ -205,6 +205,7 @@ const navGroups: NavGroup[] = [
     items: [
       { label: "Evidence Vault", href: "/evidence", icon: <VaultIcon /> },
       { label: "Reports",       href: "/reports",   icon: <FileTextIcon /> },
+      { label: "Audit Trail",   href: "/audit-logs", icon: <FileTextIcon /> },
     ],
   },
   {

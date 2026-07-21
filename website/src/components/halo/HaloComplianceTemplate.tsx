@@ -30,7 +30,7 @@ import { SITE } from "@/data/site";
  *
  * HONEST FRAMING (OSS product, not a SaaS with SLAs):
  * Blackfyre *maps* multi-cloud + on-prem scan findings to a framework's
- * controls with weighted per-framework scoring, and writes tamper-evident
+ * controls with weighted per-framework scoring, and writes hash-verified
  * evidence to a vault. It assesses and evidences posture — it does not
  * certify compliance and makes no guarantees. Control counts, framework
  * names and summaries come straight from @/data (code-of-record). The
@@ -75,7 +75,7 @@ const VIEW: Record<Framework, FrameworkView> = {
       <>
         Blackfyre&rsquo;s {AUDITOR_COUNT} auditors scan AWS, Azure, GCP and on-prem, then map every
         finding to the SOC 2 controls across the five Trust Services Categories — with weighted
-        scoring and tamper-evident evidence. Open source, self-host free.
+        scoring and hash-verified evidence. Open source, self-host free.
       </>
     ),
     coversTitle: <>What SOC&nbsp;2</>,
@@ -120,7 +120,7 @@ const VIEW: Record<Framework, FrameworkView> = {
       <>
         Blackfyre maps multi-cloud and on-prem findings to the HIPAA Security Rule controls —
         administrative, physical, and technical safeguards — with weighted scoring and a
-        tamper-evident evidence vault. It scans configuration posture, never the ePHI itself.
+        hash-verified evidence vault. It scans configuration posture, never the ePHI itself.
       </>
     ),
     coversTitle: <>What the HIPAA Security Rule</>,
@@ -197,7 +197,7 @@ const VIEW: Record<Framework, FrameworkView> = {
     heroLede: (
       <>
         Blackfyre maps multi-cloud and on-prem findings to the NIST SP 800-53 Rev 5 controls across
-        all 20 families — with weighted scoring and tamper-evident evidence to support your ATO or
+        all 20 families — with weighted scoring and hash-verified evidence to support your ATO or
         FedRAMP process. Open source, self-host free.
       </>
     ),
@@ -327,7 +327,7 @@ export default function HaloComplianceTemplate({ framework }: HaloComplianceTemp
     {
       n: "04",
       title: "Evidence",
-      desc: "Each result is written to a tamper-evident vault — SHA-256 integrity hash, S3 Object Lock, versioning — ready to hand to an auditor.",
+      desc: "Each result is written to a hash-verified vault — SHA-256 integrity hash, S3 Object Lock, versioning — ready to hand to an auditor.",
     },
   ];
 

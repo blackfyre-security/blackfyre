@@ -27,13 +27,13 @@ import { Parallax } from "@/components/vibrant/motion";
 import { LimeButton, GhostButton, GitHubIcon } from "@/components/vibrant/buttons";
 
 import { SITE } from "@/data/site";
-import { AUDITOR_COUNT } from "@/data/auditors";
+import { AUDITOR_COUNT, SDK_AUDITOR_COUNT } from "@/data/auditors";
 import { FRAMEWORKS, FRAMEWORK_COUNT, TOTAL_CONTROLS } from "@/data/frameworks";
 
 export const metadata: Metadata = {
   title: "Blackfyre — Open-source multi-cloud compliance & security platform",
   description:
-    "Scan AWS, Azure & GCP against 678 controls across 9 frameworks with 55 auditors, AI-assisted analysis, and a tamper-evident evidence vault. Apache-2.0 — self-host free.",
+    "Scan AWS, Azure & GCP against 678 controls across 9 frameworks with 40+ SDK auditors, AI-assisted analysis, and a hash-verified evidence vault. Apache-2.0 — self-host free.",
 };
 
 /* ── tiny card illustrations (mono, on #09090e) ─────────────────────────── */
@@ -74,7 +74,7 @@ const RlsIll = () => (
 );
 
 const CAPABILITIES = [
-  { icon: Cloud, title: "Multi-cloud scanning", desc: "55 auditors across AWS, Azure, GCP and on-prem — plus Prowler & IaC scanners.", accent: "blue" as const, badge: "SCANNING", ill: <CloudScanIll />, tile: "Scan every layer of AWS, Azure & GCP." },
+  { icon: Cloud, title: "Multi-cloud scanning", desc: "40+ SDK auditors across AWS, Azure, GCP and on-prem — plus Prowler & IaC scanners.", accent: "blue" as const, badge: "SCANNING", ill: <CloudScanIll />, tile: "Scan every layer of AWS, Azure & GCP." },
   { icon: Cpu, title: "AI, with a floor", desc: "Gap analysis & remediation via Claude or Bedrock — degrades to deterministic heuristics with no key.", accent: "purple" as const, badge: "ANALYSIS", ill: <AiIll />, tile: "Claude/Bedrock analysis, heuristic fallback." },
   { icon: ShieldCheck, title: "Tamper-evident evidence", desc: "SHA-256 integrity per item, S3 Object Lock + versioning, AES-256-GCM for PII.", accent: "emerald" as const, badge: "EVIDENCE", ill: <EvidenceIll />, tile: "Evidence an auditor can trust." },
   { icon: Server, title: "Database-enforced tenancy", desc: "Postgres row-level security below the ORM, request-scoped and fails closed.", accent: "blue" as const, badge: "MULTI-TENANCY", ill: <RlsIll />, tile: "Isolation enforced by the database." },
@@ -82,7 +82,7 @@ const CAPABILITIES = [
 
 const STEPS = [
   { n: "01", title: "Connect a read-only role", desc: "A cross-account IAM role — read-only, no write keys. Blackfyre never mutates your infrastructure." },
-  { n: "02", title: "55 auditors scan", desc: "SDK auditors run in-process; Prowler and IaC scanners run as containers. Every cloud, every layer." },
+  { n: "02", title: "40+ SDK auditors scan", desc: "SDK auditors run in-process; Prowler and IaC scanners run as containers. Every cloud, every layer." },
   { n: "03", title: "Findings map to 678 controls", desc: "Each finding is mapped to the controls it affects across 9 frameworks, with weighted per-framework scoring." },
   { n: "04", title: "AI + heuristics remediate", desc: "Gap analysis, MITRE ATT&CK mapping, and remediation steps — or deterministic heuristics when no key is set." },
   { n: "05", title: "Tamper-evident evidence", desc: "Every artifact lands in a SHA-256 chain on Object-Lock storage — audit-ready, hand it to an assessor." },
@@ -112,7 +112,7 @@ export default function Home() {
                 <>
                   Blackfyre scans AWS, Azure, GCP and on-prem against{" "}
                   <strong className="font-semibold text-zinc-900">{TOTAL_CONTROLS} controls</strong> across{" "}
-                  {FRAMEWORK_COUNT} frameworks with {AUDITOR_COUNT} auditors, then maps every finding to the
+                  {FRAMEWORK_COUNT} frameworks with {SDK_AUDITOR_COUNT} SDK auditors, then maps every finding to the
                   controls it affects. Self-host it free.
                 </>
               }
@@ -128,7 +128,7 @@ export default function Home() {
               className="mt-10"
               kicker="What ships in the box"
               stats={[
-                { value: String(AUDITOR_COUNT), label: "Auditors" },
+                { value: String(SDK_AUDITOR_COUNT), label: "SDK auditors" },
                 { value: String(FRAMEWORK_COUNT), label: "Frameworks" },
                 { value: String(TOTAL_CONTROLS), label: "Controls", color: "text-blue-600" },
                 { value: "Free", label: "Apache-2.0" },

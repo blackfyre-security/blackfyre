@@ -1,4 +1,5 @@
 import type { ADConfig } from "../ad-auditor.js";
+import { OptionalDependencyMissingError, isOptionalDependencyMissing } from "../optional-dependency.js";
 
 export type LdapEntry = Record<string, string | string[] | undefined>;
 
@@ -37,17 +38,27 @@ export function parseAdTimestamp(value: string): number {
   }
 }
 
+
 /**
  * Production LDAP search using ldapjs.
- * Returns an empty array when ldapjs is unavailable or the connection fails,
- * so callers fall through to configuration-level audit findings.
+ *
+ * Throws OptionalDependencyMissingError when ldapjs is not installed — a missing
+ * module must never look like a clean directory. Connection/search failures still
+ * return an empty array, so callers fall through to configuration-level findings.
  */
 export async function ldapSearch(config: ADConfig, query: LdapQuery): Promise<LdapEntry[]> {
   try {
-    // Dynamic import — ldapjs is an optional peer dependency
+    // Dynamic import — ldapjs is an OPTIONAL dependency, deliberately not in
+    // package.json so cloud-only installs (the overwhelming majority) do not carry
+    // it. But a missing module previously returned [] indistinguishably from "the
+    // directory is clean", so four AD auditors reported success while collecting
+    // nothing. Say so loudly instead; the caller still degrades to config-level
+    // findings rather than failing the scan.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const ldap = await import("ldapjs" as any).catch(() => null) as any;
-    if (!ldap) return [];
+    if (!ldap) {
+      throw new OptionalDependencyMissingError("ldapjs", "Active Directory auditing");
+    }
 
     return await new Promise<LdapEntry[]>((resolve) => {
       const client = ldap.createClient({
@@ -88,7 +99,10 @@ export async function ldapSearch(config: ADConfig, query: LdapQuery): Promise<Ld
         });
       });
     });
-  } catch {
+  } catch (err) {
+    // A missing optional dependency is a real, actionable condition — never let the
+    // catch-all turn it back into a silent empty result.
+    if (isOptionalDependencyMissing(err)) throw err;
     return [];
   }
 }

@@ -1,6 +1,7 @@
 import * as dgram from "node:dgram";
 import * as net from "node:net";
 import type { SNMPConfig } from "../snmp-auditor.js";
+import { OptionalDependencyMissingError, isOptionalDependencyMissing } from "../optional-dependency.js";
 
 export interface SnmpEntry {
   oid: string;
@@ -76,7 +77,10 @@ function parseSnmpResponse(msg: Buffer): string | null {
       i++;
     }
     return "";
-  } catch {
+  } catch (err) {
+    // A missing optional dependency is a real, actionable condition — never let the
+    // catch-all turn it back into a silent empty result.
+    if (isOptionalDependencyMissing(err)) throw err;
     return null;
   }
 }
@@ -98,9 +102,13 @@ async function snmpGetV2c(ip: string, community: string): Promise<string | null>
 
 async function snmpGetV3(ip: string, config: SNMPConfig): Promise<string | null> {
   try {
+    // net-snmp is an OPTIONAL dependency (see agents/optional-dependency.ts).
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const netSnmp = await import("net-snmp" as any).catch(() => null) as any;
-    if (!netSnmp || !config.auth) return null;
+    if (!netSnmp) {
+      throw new OptionalDependencyMissingError("net-snmp", "SNMP device auditing");
+    }
+    if (!config.auth) return null;
 
     return await new Promise<string | null>((resolve) => {
       const session = netSnmp.createV3Session(ip, {
@@ -119,7 +127,10 @@ async function snmpGetV3(ip: string, config: SNMPConfig): Promise<string | null>
         resolve(String(varbinds[0].value ?? ""));
       });
     });
-  } catch {
+  } catch (err) {
+    // A missing optional dependency is a real, actionable condition — never let the
+    // catch-all turn it back into a silent empty result.
+    if (isOptionalDependencyMissing(err)) throw err;
     return null;
   }
 }
@@ -133,7 +144,9 @@ export async function snmpWalk(ip: string, config: SNMPConfig, oidPrefix: string
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const netSnmp = await import("net-snmp" as any).catch(() => null) as any;
-    if (!netSnmp) return [];
+    if (!netSnmp) {
+      throw new OptionalDependencyMissingError("net-snmp", "SNMP device auditing");
+    }
 
     const session = config.version === "v3" && config.auth
       ? netSnmp.createV3Session(ip, {
@@ -152,7 +165,8 @@ export async function snmpWalk(ip: string, config: SNMPConfig, oidPrefix: string
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       }, (_err: any) => { session.close(); resolve(entries); });
     });
-  } catch {
+  } catch (err) {
+    if (isOptionalDependencyMissing(err)) throw err;
     return [];
   }
 }

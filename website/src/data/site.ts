@@ -12,7 +12,7 @@ export const SITE = {
   tagline: "Open-source multi-cloud compliance & security platform",
 } as const;
 
-export const QUICKSTART = "# Full local stack \u2014 no cloud account or API keys needed.\ngit clone https://github.com/blackfyre-security/blackfyre.git\ncd blackfyre/platform\ndocker compose up -d postgres redis localstack\nnpm install && npm run build\ncp packages/api/.env.example packages/api/.env   # edit per the local-dev guide\nnpm run db:migrate && npm run dev                # API on :4000\n\n# Then in two more terminals:\nNEXT_PUBLIC_API_URL=http://localhost:4000 npm run dev --workspace=packages/portal   # :3001\nNEXT_PUBLIC_API_URL=http://localhost:4000 npm run dev --workspace=packages/admin    # :3003\n\n# Log in at http://localhost:3001 \u2014 seeded dev user admin@acme.com / password123";
+export const QUICKSTART = "# Full local stack \u2014 no cloud account or API keys needed.\ngit clone https://github.com/blackfyre-security/blackfyre.git\ncd blackfyre/platform\ndocker compose up -d postgres redis localstack\nnpm install && npm run build\ncp packages/api/.env.example packages/api/.env   # edit per the local-dev guide\nnpm run db:migrate && npm run dev                # API on :4000\n\n# Then in one more terminal:\nNEXT_PUBLIC_API_URL=http://localhost:4000 npm run dev --workspace=packages/portal   # :3001\n\n# Log in at http://localhost:3001 \u2014 seeded dev user admin@acme.com / password123";
 
 export interface DocLink { title: string; url: string; blurb?: string; }
 export const DOCS: readonly DocLink[] = [

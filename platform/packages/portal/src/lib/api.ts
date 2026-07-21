@@ -129,7 +129,11 @@ class ApiClient {
       const err = await res
         .json()
         .catch(() => ({ error: { message: res.statusText } }));
-      throw new Error(err.error?.message || `HTTP ${res.status}`);
+      // Two error shapes reach here: the API's own { error: { message } }, and
+      // Fastify's built-in { statusCode, error, message } for things it rejects
+      // before a handler runs (payload too large, malformed JSON). Reading only the
+      // former turned those into a bare "HTTP 413" with no explanation.
+      throw new Error(err.error?.message || err.message || `HTTP ${res.status}`);
     }
     return res.json();
   }
@@ -145,6 +149,16 @@ class ApiClient {
       refreshToken: string;
       user: { id: string; email: string; name: string; role: string };
     }>("POST", "/api/auth/mfa/verify", { mfaChallengeToken, token });
+  }
+
+  // Deployment capabilities. The portal is a static export, so whether this
+  // deployment has a payment gateway is a runtime question, not a build-time one.
+  deploymentConfig() {
+    return this.request<{
+      allowUnpaidRegistration: boolean;
+      paymentsEnabled: boolean;
+      providers: { razorpay: boolean; stripe: boolean };
+    }>("GET", "/api/v1/config");
   }
 
   register(data: { name: string; email: string; password: string; companyName: string }) {
@@ -300,36 +314,60 @@ class ApiClient {
     );
   }
 
-  uploadEvidence(data: FormData) {
-    const token = this.getToken();
-    const headers: Record<string, string> = {};
-    if (token) headers["Authorization"] = `Bearer ${token}`;
-    const csrf = this.getCsrfToken();
-    if (csrf) headers["X-CSRF-Token"] = csrf;
-    return fetch(`${API_URL}/api/evidence`, {
-      method: "POST",
-      headers,
-      credentials: "include",
-      body: data,
-    }).then((res) => {
-      if (!res.ok)
-        return res.json().then((e) => {
-          throw new Error(e.error?.message || `HTTP ${res.status}`);
-        });
-      return res.json() as Promise<{ evidence: EvidenceArtifact }>;
-    });
+  // POST /api/evidence takes JSON, not multipart — the API has no multipart parser
+  // registered, so the previous FormData body was rejected before it reached a
+  // handler. `content` is the file's bytes (base64 for binary), which the evidence
+  // worker hashes and uploads; that hash is what makes the record content-verified
+  // rather than metadata-only.
+  uploadEvidence(data: {
+    findingId: string;
+    type: EvidenceType;
+    framework?: string;
+    content: string;
+    contentEncoding: "utf8" | "base64";
+  }) {
+    return this.request<{ evidence: EvidenceArtifact }>("POST", "/api/evidence", data);
   }
 
-  downloadEvidence(id: string) {
-    return `${API_URL}/api/evidence/${encodeURIComponent(id)}/download`;
+  // The download endpoint returns a presigned URL as JSON and requires auth, so it
+  // cannot be used as a bare <a href download>. Previously it was, which rendered a
+  // 401 body into a file. Resolve the real URL first, then hand it to the browser.
+  async downloadEvidence(id: string) {
+    const res = await this.request<{ evidenceId: string; downloadUrl: string; expiresIn: number }>(
+      "GET", `/api/evidence/${encodeURIComponent(id)}/download`,
+    );
+    return res.downloadUrl;
   }
 
+  // GET, not POST — the API registers this as GET, so POST 404'd and the Verify
+  // button could never succeed.
   verifyEvidence(id: string) {
     return this.request<{
-      verified: boolean;
-      hash: string;
-      storedHash: string;
-    }>("POST", `/api/evidence/${encodeURIComponent(id)}/verify`);
+      evidenceId: string;
+      integrity: {
+        valid: boolean;
+        expected: string;
+        actual: string;
+        hashSource: string;
+        reason?: string;
+      };
+    }>("GET", `/api/evidence/${encodeURIComponent(id)}/verify`);
+  }
+
+  // --- Audit log ---
+  getAuditLogs(params?: { limit?: number; beforeId?: string; action?: string; outcome?: "success" | "failure" }) {
+    const qs = params
+      ? "?" + new URLSearchParams(
+          Object.entries(params)
+            .filter(([, v]) => v !== undefined && v !== "")
+            .map(([k, v]) => [k, String(v)]),
+        ).toString()
+      : "";
+    return this.request<{
+      entries: AuditLogEntry[];
+      hasMore: boolean;
+      nextBeforeId: string | null;
+    }>("GET", `/api/audit-logs${qs}`);
   }
 
   // --- Team ---
@@ -772,17 +810,36 @@ export interface Client {
 
 export type EvidenceType = "document" | "screenshot" | "log" | "config";
 
+// Mirrors the `evidence` table as returned by GET /api/evidence. Previously this
+// declared name/controlId/uploadedAt/uploadedBy, none of which are columns — the
+// list view crashed on the first row of any non-empty vault.
 export interface EvidenceArtifact {
   id: string;
   tenantId: string;
-  name: string;
+  findingId: string;
   type: EvidenceType;
   framework: string | null;
-  controlId: string | null;
   sha256Hash: string;
+  // What sha256Hash actually covers. Only "content" and "reference-fetch" mean the
+  // hash is tamper-evident over real evidence bytes; "metadata-only" does not.
+  hashSource: "content" | "reference-fetch" | "metadata-only";
+  integrityVerified: boolean;
   storagePath: string;
-  uploadedAt: string;
-  uploadedBy: string;
+  s3ObjectKey: string | null;
+  collectedAt: string;
+  collectedBy: string;
+}
+
+export interface AuditLogEntry {
+  id: string;
+  action: string;
+  actorType: string;
+  actorEmail: string | null;
+  resourceType: string | null;
+  resourceId: string | null;
+  outcome: string;
+  ipAddress: string | null;
+  createdAt: string;
 }
 
 export type TeamRole = "owner" | "admin" | "engineer" | "viewer";

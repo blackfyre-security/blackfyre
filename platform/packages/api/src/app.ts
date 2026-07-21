@@ -15,6 +15,7 @@ import { remediationRoutes } from "./routes/remediations.js";
 import { alertRoutes } from "./routes/alerts.js";
 import { driftRoutes } from "./routes/drift.js";
 import { learningRoutes } from "./routes/learning.js";
+import { auditLogRoutes } from "./routes/audit-logs.js";
 import { adminRoutes } from "./routes/admin.js";
 import { adminReportRoutes } from "./routes/admin-reports.js";
 import { aiRoutes } from "./routes/ai-analysis.js";
@@ -83,6 +84,12 @@ declare module "fastify" {
 export async function buildApp(config: Config): Promise<FastifyInstance> {
   const app = Fastify({
     logger: config.NODE_ENV !== "test",
+    // Evidence is posted as base64 in a JSON body, which inflates payloads by 4/3.
+    // Fastify's 1 MiB default therefore capped usable evidence at roughly 750 KB.
+    // 12 MiB leaves ~9 MB of real file. Note AWS Lambda caps request payloads at
+    // 6 MB regardless, so a deployed install is bounded below this; presigned
+    // direct-to-S3 upload is the right long-term shape for large artefacts.
+    bodyLimit: 12 * 1024 * 1024,
   });
 
   // CORS — enterprise-hardened (GAP-014).
@@ -306,7 +313,7 @@ export async function buildApp(config: Config): Promise<FastifyInstance> {
   // Routes
   await app.register(healthRoutes);
   await app.register(authRoutes);
-  await app.register(clientRoutes);
+  await app.register(auditLogRoutes);
   await app.register(integrationRoutes);
   await app.register(scanRoutes);
   await app.register(findingRoutes);
@@ -318,8 +325,18 @@ export async function buildApp(config: Config): Promise<FastifyInstance> {
   await app.register(alertRoutes);
   await app.register(driftRoutes);
   await app.register(learningRoutes);
-  await app.register(adminRoutes);
-  await app.register(adminReportRoutes);
+  // Platform-admin (operator) surface — see config.PLATFORM_ADMIN_API.
+  // Off by default: a self-hosted install is a single tenant and has no use for
+  // cross-tenant reads, tenant provisioning or billing. When disabled these
+  // routes do not exist, so `is_platform_admin` confers nothing over HTTP.
+  if (config.PLATFORM_ADMIN_API === "true") {
+    app.log.warn(
+      "PLATFORM_ADMIN_API=true — cross-tenant operator routes are enabled",
+    );
+    await app.register(clientRoutes);
+    await app.register(adminRoutes);
+    await app.register(adminReportRoutes);
+  }
   await app.register(aiRoutes);
   await app.register(aiEthicsRoutes);
   await app.register(threatIntelRoutes);

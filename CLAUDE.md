@@ -13,7 +13,7 @@ gracefully to heuristics when no key is configured.
 - `platform/` — the product. npm workspaces: `packages/shared` (Zod schemas/types),
   `packages/ui` (source-only component lib), `packages/api` (Fastify 4 backend +
   workers + scanners + migrations), `packages/portal` (customer Next.js app, :3001),
-  `packages/admin` (Next.js, :3003), `packages/cli`.
+  `packages/cli`.
 - `docs/` — architecture, developer guides (`docs/developer/`), ADRs (`docs/adr/`).
 - `website/` — marketing site (separate Next.js static-export app, own lockfile).
 - `sandbox/` — intentionally-vulnerable demo fixture data (out of scope for security reports).
@@ -21,7 +21,7 @@ gracefully to heuristics when no key is configured.
 ## Architecture (read the ADRs, don't re-derive)
 
 - API: `platform/packages/api/src/` — `index.ts` → `app.ts` (`buildApp`) → `plugins/`
-  (auth, csrf, rate-limit, plan-gate, …) → `routes/` (40 files) → `services/` (56).
+  (auth, csrf, rate-limit, plan-gate, …) → `routes/` (41 files) → `services/` (56).
   `lambda.ts` wraps the same app for AWS. SSE lives in `sse-handler.ts`.
 - Tenancy/RLS ([ADR-0001](docs/adr/0001-rls-multi-tenancy.md)): `plugins/auth.ts`
   reserves a connection, runs `set_config('app.current_tenant', <tenantId>)` then
@@ -36,6 +36,14 @@ gracefully to heuristics when no key is configured.
 - Compliance data: `src/compliance/` — `control-registry.ts` registers the 9
   frameworks; catalogs live in `compliance/frameworks/`. New frameworks are data,
   not code.
+- Deployment capability flags, both defaulting OFF and both enforced server-side:
+  `PLATFORM_ADMIN_API` registers the cross-tenant operator routes (`/api/admin/*`,
+  `/api/clients/*`) and is the only thing that makes `users.is_platform_admin` mean
+  anything over HTTP ([ADR-0005](docs/adr/0005-operator-console-split.md));
+  `ALLOW_UNPAID_REGISTRATION` gates `POST /api/auth/register`, which otherwise mints
+  an owner on a paid-tier tenant to any caller. Self-hosting sets the latter true.
+  `GET /api/v1/config` reports both to the portal, which is a static export and
+  cannot read server env at build time.
 - LLM ([ADR-0004](docs/adr/0004-model-routing.md)): `services/llm/client.ts` picks
   Anthropic API when `ANTHROPIC_API_KEY` is real, else Bedrock, else heuristics.
 
@@ -47,18 +55,16 @@ docker compose up -d postgres redis localstack   # local infra (see docker-compo
 npm run db:migrate                         # raw-SQL migrations via src/db/migrate.ts
 npm run dev                                # API on :4000 (tsx watch)
 npm run dev --workspace=packages/portal    # portal :3001 (needs NEXT_PUBLIC_API_URL)
-npm run dev --workspace=packages/admin     # admin :3003
 npm run build                              # shared, then api (order matters)
 npm run test:unit --workspace=packages/api # CI-blocking unit suite (offline, mocked)
 npm run test --workspace=packages/api      # full suite — needs live Postgres+Redis
 npx vitest run tests/unit/foo.test.ts --config vitest.unit.config.ts   # single test (cwd packages/api)
 npx tsc --noEmit -p packages/api/tsconfig.json   # typecheck (build shared first)
-npm run lint --workspace=packages/admin    # next lint (admin + portal only)
 npm run lint --workspace=packages/portal
 ```
 
-- Playwright e2e: `npm run test:browser --workspace=packages/admin` — **hits real
-  staging** (`ADMIN_BASE_URL` to override) and mutates data. Never wire into `npm test`.
+- No browser/e2e suite lives here — the Playwright smoke tests belonged to the
+  operator console, which is no longer part of the open-source release (ADR-0005).
 - Demo API without a DB: `npm run demo --workspace=packages/api` (:4001, mocked).
 - Env: copy `packages/api/.env.example` → `.env` (loaded via `--env-file-if-exists`);
   every var documented in [docs/developer/configuration.md](docs/developer/configuration.md).
@@ -95,6 +101,16 @@ npm run lint --workspace=packages/portal
 ## Gotchas
 
 - Build `packages/shared` before api typecheck/build — CI does; you must too.
+- **CI only triggers on PRs targeting `main`/`staging`** (`.github/workflows/ci.yml`).
+  A stacked PR onto another feature branch silently skips every blocking gate —
+  `workflow_dispatch` it manually, or don't trust a green PR page.
+- Never import `agents/registry.js` at module scope. It eagerly pulls all ~34
+  auditor modules and the AWS/Azure/GCP SDKs (~210s of vitest collect, and the same
+  cost on every Lambda cold start). `services/integration-service.ts` resolves it
+  lazily; keep it that way. The two tests that must load it set their own timeout.
+- Auth events are NOT audited. `plugins/audit-log.ts` skips when `tenantId`/`userId`
+  are absent, and login/register are unauthenticated — so `audit_logs` records
+  authenticated mutations only. Verified empty after a register plus four logins.
 - Migrations are **hand-written SQL** in `src/migrations/`, applied by filename order
   and tracked in `_migrations`. Append-only: never rename/reorder applied files.
   drizzle-kit is installed but unused — there is no generate/push/studio flow.

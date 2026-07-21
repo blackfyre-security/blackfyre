@@ -1,6 +1,6 @@
 /**
  * Halo in-page copy/data for the open-source Blackfyre site. All figures are
- * code-of-record (55 auditors · 9 frameworks · 678 controls · 3 clouds + on-prem).
+ * code-of-record (40+ SDK auditors · 9 frameworks · 678 controls · 3 clouds + on-prem).
  * Types are stable; canonical framework/auditor/site data lives in `@/data/*`.
  */
 
@@ -91,7 +91,7 @@ export const HOW_STEPS: readonly HowStep[] = [
     n: "02",
     t: "Auditors scan",
     d: "55 SDK auditors sweep AWS, Azure, GCP and on-prem — plus Prowler (900+ AWS checks) and Checkov / Semgrep / Bandit running as container Lambdas.",
-    min: "55 auditors",
+    min: "40+ SDK auditors",
   },
   {
     n: "03",
@@ -108,8 +108,8 @@ export const HOW_STEPS: readonly HowStep[] = [
   {
     n: "05",
     t: "Evidence for auditors",
-    d: "Results land in a tamper-evident vault: SHA-256 hash per item, S3 Object Lock + versioning, AES-256-GCM PII encryption — export-ready for auditors.",
-    min: "tamper-evident",
+    d: "Results land in a hash-verified vault: SHA-256 hash per item, S3 Object Lock + versioning, AES-256-GCM PII encryption — export-ready for auditors.",
+    min: "hash-verified",
   },
 ] as const;
 

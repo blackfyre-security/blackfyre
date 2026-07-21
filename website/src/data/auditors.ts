@@ -79,7 +79,20 @@ export const AUDITORS: readonly Auditor[] = [
   { name: "Bandit SAST Scanner", cloud: "iac", category: "other", description: "Bandit 1.7.10 in a container Lambda: Python security static analysis (SARIF output)." },
 ];
 
+// Size of the catalogue below — every auditor module that exists, including the
+// container/IaC/other entries.
 export const AUDITOR_COUNT = AUDITORS.length; // 55
+
+// The subset that constructs a real cloud SDK client and calls it. Capability
+// claims ("scan AWS/Azure/GCP with N auditors") must use THIS number, not the
+// catalogue size: several catalogue entries are on-prem auditors that need
+// optional dependencies, or wrappers around the container scanners. Quoting 55 as
+// scanning capability overstates what a default install actually does.
+// Derived, not asserted. Container and IaC entries are wrappers around Prowler /
+// Checkov / Semgrep / Bandit rather than in-process SDK auditors, so they are
+// excluded from any claim about SDK scanning coverage.
+const NON_SDK_CLOUDS = new Set<AuditorCloud>(["container", "iac"]);
+export const SDK_AUDITOR_COUNT = AUDITORS.filter((a) => !NON_SDK_CLOUDS.has(a.cloud)).length;
 export const AUDITOR_CLOUDS: readonly AuditorCloud[] = ["aws", "azure", "container", "gcp", "iac", "multi", "other"];
 export const AUDITOR_CATEGORIES: readonly AuditorCategory[] = ["compute", "container", "database", "encryption", "iam", "logging", "monitoring", "networking", "other", "storage"];
 export const SCANNER_TYPES: readonly string[] = ["SDK auditors (TypeScript, cloud SDK-backed agents in packages/api/src/agents)", "AWS/Azure/GCP granular sub-auditors (auditXxx functions, 43 total)", "Active Directory (LDAP) auditors", "SNMP / network-device auditors", "Identity (Okta/Entra/Google Workspace) auditor", "Endpoint EDR/MDM (Jamf/Intune/CrowdStrike) auditor", "Network scanner (ports/TLS/DNS/headers)", "Kubernetes CIS auditor", "Container Registry auditor", "Code Repository (GitHub/GitLab) auditor", "SaaS security auditor", "OT/SCADA passive collector", "Prowler deep scan (container Lambda, 900+ AWS checks)", "Checkov (IaC, container Lambda)", "Semgrep (SAST, container Lambda)", "Bandit (Python SAST, container Lambda)"];

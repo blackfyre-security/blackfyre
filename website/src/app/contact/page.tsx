@@ -281,7 +281,7 @@ export default function ContactPage() {
             eyebrowIcon={<FileCheck2 className="h-3.5 w-3.5" />}
             title="Rather build in"
             accentWord="the open?"
-            sub="Everything Blackfyre does is in the repository — 55 auditors, 9 frameworks, 678 controls. Star it, fork it, or file an issue."
+            sub="Everything Blackfyre does is in the repository — 40+ SDK auditors, 9 frameworks, 678 controls. Star it, fork it, or file an issue."
           />
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <LimeButton href={SITE.repoUrl} external icon={<GitHubIcon />}>

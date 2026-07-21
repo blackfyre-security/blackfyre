@@ -401,7 +401,7 @@ export interface PlatformFeature {
 export const platformFeatures: PlatformFeature[] = [
   {
     title: "Multi-Cloud Scanning",
-    description: "55 auditors cover IAM, storage, compute, networking, encryption, logging, database, monitoring, and containers across AWS, Azure, GCP, and on-premises — plus Prowler and Checkov/Semgrep/Bandit.",
+    description: "40+ SDK auditors cover IAM, storage, compute, networking, encryption, logging, database, monitoring, and containers across AWS, Azure, GCP, and on-premises — plus Prowler and Checkov/Semgrep/Bandit.",
     icon: "Layers",
   },
   {

@@ -8,7 +8,7 @@ import { requireUUID } from "../utils/security-fixes.js";
 import { auditorScopePreHandler } from "../plugins/auditor-scope.js";
 import type { EvidenceJobData } from "../workers/evidence-worker.js";
 import { eq, and } from "drizzle-orm";
-import { reports } from "../db/schema.js";
+import { reports, users } from "../db/schema.js";
 
 export const evidenceRoutes: FastifyPluginAsync = async (app) => {
   // Auditors can read evidence (scoped to their frameworks)
@@ -27,7 +27,7 @@ export const evidenceRoutes: FastifyPluginAsync = async (app) => {
     preHandler: [authenticated, auditorScopePreHandler("query")],
   }, async (request) => {
     const query = listVaultQuerySchema.parse(request.query);
-    const service = new EvidenceService(app.db);
+    const service = new EvidenceService(request.db!);
     const { rows, total } = await service.listVault(request.tenantId, query);
 
     return {
@@ -52,7 +52,7 @@ export const evidenceRoutes: FastifyPluginAsync = async (app) => {
   // GET /api/evidence — existing listing (by finding, backward compatible)
   app.get("/api/evidence", { preHandler: [authenticated] }, async (request) => {
     const query = listEvidenceQuerySchema.parse(request.query);
-    const service = new EvidenceService(app.db);
+    const service = new EvidenceService(request.db!);
     const { rows, total } = await service.listForFinding(
       request.tenantId,
       query,
@@ -73,8 +73,19 @@ export const evidenceRoutes: FastifyPluginAsync = async (app) => {
     const body = createEvidenceSchema.parse(request.body);
     const service = new EvidenceService(app.db);
 
+    // Attribution comes from the session, never from the request body. The portal
+    // used to send a filename here, so the vault credited "report.pdf" as the
+    // collector; and a client-supplied value on an audit artefact is attestable to
+    // nobody. Fall back to the user id if the row has no email.
+    const [collector] = await request.db!
+      .select({ email: users.email })
+      .from(users)
+      .where(eq(users.id, request.userId))
+      .limit(1);
+    const collectedBy = collector?.email ?? request.userId;
+
     // Create DB record first (pending state -- no S3 key yet)
-    const created = await service.create(request.tenantId, body);
+    const created = await service.create(request.tenantId, { ...body, collectedBy });
 
     // Queue the S3 upload job to evidence worker
     const jobData: EvidenceJobData = {
@@ -84,7 +95,8 @@ export const evidenceRoutes: FastifyPluginAsync = async (app) => {
       framework: (request.body as any).framework ?? "",
       type: body.type,
       content: (request.body as any).content ?? "",
-      collectedBy: body.collectedBy,
+      contentEncoding: (request.body as any).contentEncoding === "base64" ? "base64" : "utf8",
+      collectedBy,
     };
 
     await app.evidenceQueue.add("evidence.upload", jobData);
@@ -97,7 +109,7 @@ export const evidenceRoutes: FastifyPluginAsync = async (app) => {
     preHandler: [authenticated],
   }, async (request) => {
     requireUUID(request.params.id);
-    const service = new EvidenceService(app.db);
+    const service = new EvidenceService(request.db!);
     const record = await service.getByIdForTenant(request.params.id, request.tenantId);
     return { evidence: record };
   });
@@ -107,8 +119,10 @@ export const evidenceRoutes: FastifyPluginAsync = async (app) => {
     preHandler: [authenticated],
   }, async (request) => {
     requireUUID(request.params.id);
-    const service = new EvidenceService(app.db);
-    const result = await service.verifyIntegrity(request.params.id, evidenceS3);
+    // SECURITY: RLS-bound handle + explicit tenant scoping (repo invariant — never
+    // resolve tenant data through app.db).
+    const service = new EvidenceService(request.db!);
+    const result = await service.verifyIntegrity(request.params.id, request.tenantId, evidenceS3);
 
     return {
       evidenceId: request.params.id,
@@ -121,8 +135,10 @@ export const evidenceRoutes: FastifyPluginAsync = async (app) => {
     preHandler: [authenticated],
   }, async (request) => {
     requireUUID(request.params.id);
-    const service = new EvidenceService(app.db);
-    const record = await service.getById(request.params.id);
+    // SECURITY: was app.db + un-scoped getById — any authenticated user holding an
+    // evidence UUID could mint a presigned URL to another tenant's evidence.
+    const service = new EvidenceService(request.db!);
+    const record = await service.getByIdForTenant(request.params.id, request.tenantId);
 
     if (!record.s3ObjectKey) {
       throw notFound("Evidence file not yet uploaded to S3");
@@ -156,7 +172,7 @@ export const evidenceRoutes: FastifyPluginAsync = async (app) => {
       return reply.status(400).send({ error: { code: "VALIDATION_ERROR", message: "framework is required" } });
     }
 
-    const service = new EvidenceService(app.db);
+    const service = new EvidenceService(request.db!);
 
     // Fetch all evidence for this tenant+framework
     const { rows } = await service.listVault(request.tenantId, {
