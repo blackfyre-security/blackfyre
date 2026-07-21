@@ -1,4 +1,5 @@
 import type { ADConfig } from "../ad-auditor.js";
+import { OptionalDependencyMissingError, isOptionalDependencyMissing } from "../optional-dependency.js";
 
 export type LdapEntry = Record<string, string | string[] | undefined>;
 
@@ -37,12 +38,13 @@ export function parseAdTimestamp(value: string): number {
   }
 }
 
-import { OptionalDependencyMissingError, isOptionalDependencyMissing } from "../optional-dependency.js";
 
 /**
  * Production LDAP search using ldapjs.
- * Returns an empty array when ldapjs is unavailable or the connection fails,
- * so callers fall through to configuration-level audit findings.
+ *
+ * Throws OptionalDependencyMissingError when ldapjs is not installed — a missing
+ * module must never look like a clean directory. Connection/search failures still
+ * return an empty array, so callers fall through to configuration-level findings.
  */
 export async function ldapSearch(config: ADConfig, query: LdapQuery): Promise<LdapEntry[]> {
   try {

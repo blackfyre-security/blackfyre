@@ -27,7 +27,7 @@ import { Parallax } from "@/components/vibrant/motion";
 import { LimeButton, GhostButton, GitHubIcon } from "@/components/vibrant/buttons";
 
 import { SITE } from "@/data/site";
-import { AUDITOR_COUNT } from "@/data/auditors";
+import { AUDITOR_COUNT, SDK_AUDITOR_COUNT } from "@/data/auditors";
 import { FRAMEWORKS, FRAMEWORK_COUNT, TOTAL_CONTROLS } from "@/data/frameworks";
 
 export const metadata: Metadata = {
@@ -112,7 +112,7 @@ export default function Home() {
                 <>
                   Blackfyre scans AWS, Azure, GCP and on-prem against{" "}
                   <strong className="font-semibold text-zinc-900">{TOTAL_CONTROLS} controls</strong> across{" "}
-                  {FRAMEWORK_COUNT} frameworks with {AUDITOR_COUNT} auditors, then maps every finding to the
+                  {FRAMEWORK_COUNT} frameworks with {SDK_AUDITOR_COUNT} SDK auditors, then maps every finding to the
                   controls it affects. Self-host it free.
                 </>
               }
@@ -128,7 +128,7 @@ export default function Home() {
               className="mt-10"
               kicker="What ships in the box"
               stats={[
-                { value: String(AUDITOR_COUNT), label: "Auditors" },
+                { value: String(SDK_AUDITOR_COUNT), label: "SDK auditors" },
                 { value: String(FRAMEWORK_COUNT), label: "Frameworks" },
                 { value: String(TOTAL_CONTROLS), label: "Controls", color: "text-blue-600" },
                 { value: "Free", label: "Apache-2.0" },

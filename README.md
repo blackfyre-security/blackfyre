@@ -44,7 +44,6 @@ findings through remediation — with evidence you can hand to an auditor.
   one that only covers collection metadata. S3 Object Lock (WORM, COMPLIANCE mode)
   on AWS deployments; local self-hosted storage has no Object Lock. The chained
   ledger (`services/ledger/`) is implemented but not yet wired into the write path
-  — see [#33](https://github.com/blackfyre-security/blackfyre/issues/33)
 - **Real-time monitoring** — configuration drift detection and live scan progress
   over SSE
 - **Serious multi-tenancy** — Postgres row-level security enforced below the ORM

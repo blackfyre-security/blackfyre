@@ -99,6 +99,17 @@ export default function SignupPage() {
 
   const selfHosted = paymentsEnabled === false;
 
+  // Skip plan selection entirely when nobody is being billed. Showing priced tiers
+  // to a self-hoster is misleading twice over: there is no charge, and the choice
+  // is not honoured — POST /api/auth/register hard-codes the `comply` plan, so
+  // picking "Defend" would silently yield a Comply-tier tenant.
+  useEffect(() => {
+    if (selfHosted && step === "plan") {
+      setSelectedPlan("comply");
+      setStep("details");
+    }
+  }, [selfHosted, step]);
+
   // Self-hosted: create the tenant and owner directly, no checkout in between.
   async function registerWithoutPayment() {
     setError("");
@@ -374,8 +385,19 @@ export default function SignupPage() {
                   >
                     Back
                   </button>
-                  <button type="submit" className="btn btn-primary btn-lg" style={{ flex: 2 }}>
-                    Continue to Payment
+                  <button
+                    type="submit"
+                    className="btn btn-primary btn-lg"
+                    style={{ flex: 2 }}
+                    // Without this a double-click fires two registrations; the second
+                    // returns EMAIL_EXISTS and paints an error over a successful signup.
+                    disabled={loading}
+                  >
+                    {loading
+                      ? "Creating account\u2026"
+                      : selfHosted
+                        ? "Create account"
+                        : "Continue to Payment"}
                   </button>
                 </div>
 

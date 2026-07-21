@@ -1,5 +1,5 @@
 import type { FastifyPluginAsync } from "fastify";
-import { and, desc, eq, lt } from "drizzle-orm";
+import { and, desc, eq, lt, or } from "drizzle-orm";
 import { z } from "zod";
 import { auditLogs } from "../db/schema.js";
 
@@ -19,9 +19,18 @@ import { auditLogs } from "../db/schema.js";
 
 const querySchema = z.object({
   limit: z.coerce.number().int().min(1).max(200).default(50),
-  // Keyset pagination on createdAt. Offset pagination on an append-heavy table
-  // drifts as rows arrive mid-scroll and degrades on large tenants.
+  // Keyset pagination. Offset pagination on an append-heavy table drifts as rows
+  // arrive mid-scroll and degrades on large tenants.
+  //
+  // The cursor is the PAIR (createdAt, id), not createdAt alone. `created_at`
+  // defaults to now(), which is transaction-stable, so every row written in one
+  // transaction shares an identical timestamp; a page boundary landing inside such
+  // a group would skip the rest of it forever. A JS Date is also only
+  // millisecond-precision against a microsecond column, which loses rows the same
+  // way. Both are unacceptable on an audit trail — silently omitting entries is
+  // exactly what this route exists to prevent.
   before: z.coerce.date().optional(),
+  beforeId: z.string().uuid().optional(),
   action: z.string().max(100).optional(),
   outcome: z.enum(["success", "failure"]).optional(),
 });
@@ -35,7 +44,18 @@ export const auditLogRoutes: FastifyPluginAsync = async (app) => {
     const q = querySchema.parse(request.query);
 
     const predicates = [eq(auditLogs.tenantId, request.tenantId)];
-    if (q.before) predicates.push(lt(auditLogs.createdAt, q.before));
+    // (createdAt, id) < (before, beforeId), expressed for Postgres via OR so the
+    // composite index is still usable.
+    if (q.before && q.beforeId) {
+      predicates.push(
+        or(
+          lt(auditLogs.createdAt, q.before),
+          and(eq(auditLogs.createdAt, q.before), lt(auditLogs.id, q.beforeId)),
+        )!,
+      );
+    } else if (q.before) {
+      predicates.push(lt(auditLogs.createdAt, q.before));
+    }
     if (q.action) predicates.push(eq(auditLogs.action, q.action));
     if (q.outcome) predicates.push(eq(auditLogs.outcome, q.outcome));
 
@@ -45,7 +65,7 @@ export const auditLogRoutes: FastifyPluginAsync = async (app) => {
       .select()
       .from(auditLogs)
       .where(and(...predicates))
-      .orderBy(desc(auditLogs.createdAt))
+      .orderBy(desc(auditLogs.createdAt), desc(auditLogs.id))
       .limit(q.limit + 1);
 
     const hasMore = rows.length > q.limit;
@@ -67,7 +87,9 @@ export const auditLogRoutes: FastifyPluginAsync = async (app) => {
         // fragments. Summary fields above are the vetted surface.
       })),
       hasMore,
+      // Both halves of the cursor — pass them back as `before` and `beforeId`.
       nextBefore: hasMore ? page[page.length - 1]?.createdAt ?? null : null,
+      nextBeforeId: hasMore ? page[page.length - 1]?.id ?? null : null,
     };
   });
 };
