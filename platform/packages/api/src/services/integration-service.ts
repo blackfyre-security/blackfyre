@@ -1,7 +1,18 @@
 import { eq, and, count } from "drizzle-orm";
 import { integrations, integrationCredentials } from "../db/schema.js";
 import type { Db } from "../db/connection.js";
-import { getAgentsForIntegration } from "../agents/registry.js";
+// PERF: the agent registry eagerly imports all ~34 auditor modules and, with them,
+// the AWS, Azure and GCP SDKs. Importing it at module scope meant anything that
+// touched IntegrationService dragged that entire graph in — ~210s of transform in
+// the test suite (which is what made the blocking unit gate flaky), and the same
+// cost on every Lambda cold start, for a dependency only two methods use.
+// Resolved lazily instead; both call sites are already async.
+type AgentRegistry = typeof import("../agents/registry.js");
+let registryPromise: Promise<AgentRegistry> | null = null;
+function loadAgentRegistry(): Promise<AgentRegistry> {
+  registryPromise ??= import("../agents/registry.js");
+  return registryPromise;
+}
 import { notFound, badRequest } from "../utils/errors.js";
 import {
   EncryptionProviderService,
@@ -161,6 +172,7 @@ export class IntegrationService {
     type: string;
     credentialRef: string;
   }): Promise<SafeIntegration> {
+    const { getAgentsForIntegration } = await loadAgentRegistry();
     const agents = getAgentsForIntegration(data.type);
     if (agents.length === 0) {
       throw badRequest("UNSUPPORTED_TYPE", `No scanning agent registered for type "${data.type}"`);
@@ -393,6 +405,7 @@ export class IntegrationService {
   // must live here, not only at the route layer.
   async testConnection(id: string, tenantId: string) {
     const integration = await this.getByIdForTenant(id, tenantId);
+    const { getAgentsForIntegration } = await loadAgentRegistry();
     const agents = getAgentsForIntegration(integration.type);
 
     // SECURITY FIX (BLACKFYRE audit 2026-06-05): credential access auditability — record

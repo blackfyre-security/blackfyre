@@ -310,24 +310,19 @@ class ApiClient {
     );
   }
 
-  uploadEvidence(data: FormData) {
-    const token = this.getToken();
-    const headers: Record<string, string> = {};
-    if (token) headers["Authorization"] = `Bearer ${token}`;
-    const csrf = this.getCsrfToken();
-    if (csrf) headers["X-CSRF-Token"] = csrf;
-    return fetch(`${API_URL}/api/evidence`, {
-      method: "POST",
-      headers,
-      credentials: "include",
-      body: data,
-    }).then((res) => {
-      if (!res.ok)
-        return res.json().then((e) => {
-          throw new Error(e.error?.message || `HTTP ${res.status}`);
-        });
-      return res.json() as Promise<{ evidence: EvidenceArtifact }>;
-    });
+  // POST /api/evidence takes JSON, not multipart — the API has no multipart parser
+  // registered, so the previous FormData body was rejected before it reached a
+  // handler. `content` is the file's bytes (base64 for binary), which the evidence
+  // worker hashes and uploads; that hash is what makes the record content-verified
+  // rather than metadata-only.
+  uploadEvidence(data: {
+    findingId: string;
+    type: EvidenceType;
+    collectedBy: string;
+    framework?: string;
+    content: string;
+  }) {
+    return this.request<{ evidence: EvidenceArtifact }>("POST", "/api/evidence", data);
   }
 
   // The download endpoint returns a presigned URL as JSON and requires auth, so it
@@ -353,6 +348,23 @@ class ApiClient {
         reason?: string;
       };
     }>("GET", `/api/evidence/${encodeURIComponent(id)}/verify`);
+  }
+
+  // --- Audit log ---
+  getAuditLogs(params?: { limit?: number; before?: string; beforeId?: string; action?: string; outcome?: "success" | "failure" }) {
+    const qs = params
+      ? "?" + new URLSearchParams(
+          Object.entries(params)
+            .filter(([, v]) => v !== undefined && v !== "")
+            .map(([k, v]) => [k, String(v)]),
+        ).toString()
+      : "";
+    return this.request<{
+      entries: AuditLogEntry[];
+      hasMore: boolean;
+      nextBefore: string | null;
+      nextBeforeId: string | null;
+    }>("GET", `/api/audit-logs${qs}`);
   }
 
   // --- Team ---
@@ -813,6 +825,18 @@ export interface EvidenceArtifact {
   s3ObjectKey: string | null;
   collectedAt: string;
   collectedBy: string;
+}
+
+export interface AuditLogEntry {
+  id: string;
+  action: string;
+  actorType: string;
+  actorEmail: string | null;
+  resourceType: string | null;
+  resourceId: string | null;
+  outcome: string;
+  ipAddress: string | null;
+  createdAt: string;
 }
 
 export type TeamRole = "owner" | "admin" | "engineer" | "viewer";

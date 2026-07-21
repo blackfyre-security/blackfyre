@@ -88,6 +88,20 @@ const typeConfig: Record<EvidenceType, { style: React.CSSProperties; label: stri
   config: { style: { background: "var(--high-bg)", color: "var(--high-text)" }, label: "Config" },
 };
 
+// Reads a File as base64 so binary evidence survives the JSON transport intact.
+function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error("Could not read the selected file"));
+    reader.onload = () => {
+      const result = String(reader.result ?? "");
+      // strip the "data:<mime>;base64," prefix
+      resolve(result.slice(result.indexOf(",") + 1));
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
 function UploadModal({ onClose, onUploaded }: { onClose: () => void; onUploaded: () => void }) {
   const [name, setName] = useState("");
   const [type, setType] = useState<EvidenceType>("document");
@@ -98,19 +112,34 @@ function UploadModal({ onClose, onUploaded }: { onClose: () => void; onUploaded:
   const [error, setError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
+  // Evidence hangs off a finding in the data model (evidence.finding_id is NOT
+  // NULL), so one has to be chosen. The modal previously collected only a file and
+  // posted multipart, which the API cannot parse and which carried no findingId —
+  // upload could never have succeeded.
+  const [findings, setFindings] = useState<{ id: string; title: string }[]>([]);
+  const [findingId, setFindingId] = useState("");
+
+  useEffect(() => {
+    api
+      .getFindings({ limit: "100" })
+      .then((res) => setFindings(res.findings.map((f) => ({ id: f.id, title: f.title }))))
+      .catch(() => setFindings([]));
+  }, []);
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!findingId) { setError("Choose the finding this evidence supports."); return; }
     if (!file) { setError("Please select a file."); return; }
     setUploading(true);
     setError(null);
     try {
-      const fd = new FormData();
-      fd.append("file", file);
-      fd.append("name", name || file.name);
-      fd.append("type", type);
-      if (framework) fd.append("framework", framework);
-      if (controlId) fd.append("controlId", controlId);
-      await api.uploadEvidence(fd);
+      await api.uploadEvidence({
+        findingId,
+        type,
+        collectedBy: name || file.name,
+        ...(framework ? { framework } : {}),
+        content: await fileToBase64(file),
+      });
       onUploaded();
       onClose();
     } catch (err) {
@@ -139,6 +168,21 @@ function UploadModal({ onClose, onUploaded }: { onClose: () => void; onUploaded:
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-xs font-medium mb-1.5" style={{ color: "var(--text-secondary)" }}>Finding</label>
+            <select value={findingId} onChange={(e) => setFindingId(e.target.value)} className="input" required>
+              <option value="">Select the finding this supports...</option>
+              {findings.map((f) => (
+                <option key={f.id} value={f.id}>{f.title}</option>
+              ))}
+            </select>
+            {findings.length === 0 && (
+              <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>
+                No findings yet — run a scan first.
+              </p>
+            )}
+          </div>
+
           <div>
             <label className="block text-xs font-medium mb-1.5" style={{ color: "var(--text-secondary)" }}>Display Name</label>
             <input
