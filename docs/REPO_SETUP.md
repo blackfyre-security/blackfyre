@@ -28,11 +28,22 @@ Items 1, 2, 3 (branch protection + auto-delete) below assume option 1 (upgraded 
 
 ## 1. Branch protection — `main` (requires GH Pro/Team for private repos)
 
+> The easiest path is [`scripts/enable-repo-security.sh --with-branch-protection`](../scripts/enable-repo-security.sh),
+> which applies protection on `main` (with the check names below) as part of the same run.
+> The raw `gh api` calls below are the manual equivalent.
+
+**Required-check names must match exactly what GitHub reports** as `<workflow name> / <job name>`
+— a wrong string leaves a PR waiting forever on a check that never reports. Verify against the
+checks list on any recent PR before requiring them. As of this writing they are:
+`CI / Platform — build + typecheck + lint + unit tests`, `CI / Website — build`, and
+`Secret scan / gitleaks`.
+
 ```bash
 gh api -X PUT repos/blackfyre-security/blackfyre/branches/main/protection \
   -F required_status_checks[strict]=true \
-  -F required_status_checks[contexts][]=platform \
-  -F required_status_checks[contexts][]=website \
+  -F 'required_status_checks[contexts][]=CI / Platform — build + typecheck + lint + unit tests' \
+  -F 'required_status_checks[contexts][]=CI / Website — build' \
+  -F 'required_status_checks[contexts][]=Secret scan / gitleaks' \
   -F enforce_admins=false \
   -F required_pull_request_reviews= \
   -F restrictions= \
@@ -44,7 +55,7 @@ gh api -X PUT repos/blackfyre-security/blackfyre/branches/main/protection \
 
 What this enforces:
 - Must PR to merge (no direct push)
-- CI `platform` + `website` jobs must pass
+- CI (platform + website builds) and the gitleaks secret scan must pass
 - No force-push, no deletion
 - **No required reviewer count** — either of you can self-merge
 
@@ -55,8 +66,9 @@ Same as `main`, just substitute the branch:
 ```bash
 gh api -X PUT repos/blackfyre-security/blackfyre/branches/staging/protection \
   -F required_status_checks[strict]=true \
-  -F required_status_checks[contexts][]=platform \
-  -F required_status_checks[contexts][]=website \
+  -F 'required_status_checks[contexts][]=CI / Platform — build + typecheck + lint + unit tests' \
+  -F 'required_status_checks[contexts][]=CI / Website — build' \
+  -F 'required_status_checks[contexts][]=Secret scan / gitleaks' \
   -F enforce_admins=false \
   -F required_pull_request_reviews= \
   -F restrictions= \
