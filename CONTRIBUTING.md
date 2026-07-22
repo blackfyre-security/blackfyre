@@ -50,6 +50,27 @@ npm run db:migrate && npm run dev                # API on :4000
 The portal (`:3001`) runs with
 `NEXT_PUBLIC_API_URL=http://localhost:4000 npm run dev --workspace=packages/portal`.
 
+## Secret scanning
+
+Blackfyre is a security product — never commit real credentials. Secrets are read
+from the environment / SST secrets at runtime (see
+[`docs/developer/configuration.md`](docs/developer/configuration.md)), never from
+the tree. Enable the local pre-commit hook once per clone so gitleaks scans your
+staged changes before every commit:
+
+```bash
+git config core.hooksPath .githooks   # from the repo root
+```
+
+The hook is a convenience gate — if gitleaks isn't installed it warns and lets the
+commit through (install: `brew install gitleaks`, or see the
+[gitleaks install docs](https://github.com/gitleaks/gitleaks#installing)). The
+**blocking** gates are the `Secret scan` CI workflow (runs on every PR/push and
+fails the check on a finding) plus GitHub push protection. All three share the
+repo's [`.gitleaks.toml`](.gitleaks.toml) allowlist, which covers only documented
+synthetic fixtures — add a narrow path/regex entry there for a verified false
+positive, never a blanket suppression.
+
 ## Running and writing tests
 
 ```bash

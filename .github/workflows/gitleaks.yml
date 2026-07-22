@@ -1,0 +1,58 @@
+# REAL IMPL (BLACKFYRE 2026-07): secret-scanning gate turned ON.
+#   - Runs gitleaks against the WORKING TREE on every PR/push to main|staging;
+#     a finding FAILS the check (blocking) so a secret can't land on a protected branch.
+#   - A weekly scheduled run re-scans the FULL git history (defence in depth).
+#   - The gitleaks binary is pinned by version AND verified by SHA-256 before it runs.
+#     We deliberately do NOT use the gitleaks marketplace action: it requires a paid
+#     GITLEAKS_LICENSE for organisation repos. Running the binary is licence-free.
+#   - Uses the repo's own .gitleaks.toml (extends the default ruleset; allowlists only
+#     documented synthetic fixtures — no blanket suppression).
+name: Secret scan
+
+permissions:
+  contents: read
+
+on:
+  pull_request:
+    branches: [main, staging]
+  push:
+    branches: [main, staging]
+  schedule:
+    - cron: "0 6 * * 1" # Mondays 06:00 UTC — full-history sweep
+  workflow_dispatch:
+
+# Cancel in-progress runs for the same PR/branch when new commits land
+concurrency:
+  group: gitleaks-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gitleaks:
+    runs-on: ubuntu-latest
+    name: gitleaks
+    env:
+      GITLEAKS_VERSION: "8.30.1"
+      # sha256 of gitleaks_8.30.1_linux_x64.tar.gz — bump both together on upgrade.
+      GITLEAKS_SHA256: "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb"
+    steps:
+      # Pinned to the commit SHA of actions/checkout v5 (tags are mutable; Dependabot bumps SHAs).
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          fetch-depth: 0 # full history required for the weekly `gitleaks git` sweep
+
+      - name: Install gitleaks ${{ env.GITLEAKS_VERSION }} (checksum-verified)
+        run: |
+          set -euo pipefail
+          url="https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          curl -sSfL "$url" -o gitleaks.tar.gz
+          echo "${GITLEAKS_SHA256}  gitleaks.tar.gz" | sha256sum -c -
+          tar -xzf gitleaks.tar.gz gitleaks
+          sudo install -m 0755 gitleaks /usr/local/bin/gitleaks
+          gitleaks version
+
+      - name: Scan working tree (blocking)
+        run: gitleaks dir . --config .gitleaks.toml --redact=100 -v
+
+      - name: Scan full git history (scheduled sweep)
+        if: github.event_name == 'schedule'
+        run: gitleaks git . --config .gitleaks.toml --redact=100 -v

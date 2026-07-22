@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# Blackfyre pre-commit hook — blocks secrets from being committed locally.
+#
+# Enable once per clone:   git config core.hooksPath .githooks
+#
+# This is a convenience gate. The BLOCKING gates are the "Secret scan" CI workflow
+# and GitHub push protection. If gitleaks isn't installed we warn and ALLOW the
+# commit rather than wedging you — CI still catches it.
+set -euo pipefail
+
+if ! command -v gitleaks >/dev/null 2>&1; then
+  echo "⚠️  gitleaks not found — skipping local secret scan."
+  echo "    Install: brew install gitleaks   (or https://github.com/gitleaks/gitleaks#installing)"
+  echo "    CI + push protection will still scan."
+  exit 0
+fi
+
+# Scan only STAGED changes, using the repo's .gitleaks.toml.
+if ! gitleaks git --staged --config .gitleaks.toml --redact=100 -v; then
+  echo ""
+  echo "❌ gitleaks flagged a potential secret in your staged changes (redacted above)."
+  echo "   • Remove or rotate it before committing."
+  echo "   • If it's a VERIFIED false positive, add a narrow allowlist entry to"
+  echo "     .gitleaks.toml (a specific path/regex — never a blanket rule)."
+  echo "   • Genuine emergency bypass:  git commit --no-verify"
+  exit 1
+fi
